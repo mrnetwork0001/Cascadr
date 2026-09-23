@@ -1,0 +1,39 @@
+# Cascadr — full stack for the VPS.
+#
+#   cp backend/.env.example backend/.env   # then paste your keys
+#   docker compose up -d --build
+#
+# Set PUBLIC_API_URL to the address the BROWSER will use to reach the API.
+# It is compiled into the frontend bundle, so an internal hostname such as
+# http://backend:8010 will not work — it must be reachable from outside.
+
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      # Where SQLite lives inside the container (mapped to the volume below).
+      CASCADR_DB: /data/cascadr.db
+      # The browser origin that is allowed to call this API.
+      CASCADR_CORS_ORIGINS: ${PUBLIC_SITE_URL:-http://localhost:4010}
+    ports:
+      - "8010:8010"
+    volumes:
+      # Named volume, not a bind mount: the paper-trading journal is the
+      # record the submission is scored on and must survive redeploys.
+      - cascadr-data:/data
+
+  frontend:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_CASCADR_API: ${PUBLIC_API_URL:-http://localhost:8010}
+    restart: unless-stopped
+    ports:
+      - "4010:4010"
+    depends_on:
+      - backend
+
+volumes:
+  cascadr-data:
