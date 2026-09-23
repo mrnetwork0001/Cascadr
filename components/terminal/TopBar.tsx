@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Logo } from "@/components/brand/Logo";
 import { NODES } from "@/lib/mock/graph";
 import { clock, signedPct, usd } from "@/lib/format";
 import type { Phase } from "@/hooks/useCascadrEngine";
@@ -38,9 +39,7 @@ export function TopBar({ phase, prices, onRun, onReset }: Props) {
         title="Back to overview"
         className="group flex items-center gap-2 border-r border-term-line px-3 transition-colors hover:bg-term-raised"
       >
-        <span className="text-sm font-bold tracking-[0.3em] text-amber text-glow-amber">
-          CASCADR
-        </span>
+        <Logo height={18} priority />
         <span className="hidden text-2xs uppercase tracking-widest text-term-dim group-hover:text-amber lg:inline">
           supply-chain contagion engine
         </span>

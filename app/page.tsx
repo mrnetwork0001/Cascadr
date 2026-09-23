@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/Logo";
 import { Card, Section } from "@/components/landing/Section";
 import { LaunchButton } from "@/components/landing/LaunchButton";
 import { GraphPreview } from "@/components/landing/GraphPreview";
@@ -129,12 +130,9 @@ export default function LandingPage() {
       {/* ---------------------------------------------------------------- nav */}
       <nav className="sticky top-0 z-30 border-b border-term-line bg-term-void/90 backdrop-blur">
         <div className="mx-auto flex max-w-[84rem] items-center gap-4 px-5 py-2.5 md:px-6">
-          <span className="text-sm font-bold tracking-[0.3em] text-amber text-glow-amber">
-            CASCADR
-          </span>
-          <span className="hidden text-2xs uppercase tracking-widest text-term-dim sm:inline">
-            NetLayer Labs
-          </span>
+          <Link href="/" aria-label="Cascadr home" className="flex items-center">
+            <Logo height={26} priority />
+          </Link>
           {/* No CTA here: the hero's Launch terminal is the single entry point. */}
           <div className="ml-auto flex items-center gap-4">
             <Link
@@ -475,9 +473,7 @@ export default function LandingPage() {
         <div className="border-t border-term-line px-5 pb-16 pt-12 md:px-6">
           <div className="mx-auto grid max-w-[81rem] gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
             <div>
-              <span className="text-sm font-bold tracking-[0.3em] text-amber text-glow-amber">
-                CASCADR
-              </span>
+              <Logo height={30} />
               <p className="mt-4 max-w-xs text-xs leading-relaxed text-term-dim">
                 A supply-chain knowledge graph that trades downstream contagion on
                 Bitget stock perpetuals. Built by NetLayer Labs for the Bitget AI
