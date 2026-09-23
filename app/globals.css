@@ -2,26 +2,85 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply bg-term-void text-term-text font-mono text-xs antialiased;
+    /* Faint CRT phosphor wash so flat panels do not read as plain divs. */
+    background-image: radial-gradient(
+      ellipse at 50% 0%,
+      rgba(255, 167, 38, 0.05),
+      transparent 60%
+    );
+    overscroll-behavior: none;
+  }
+
+  /* Terminals do not get rounded scrollbars. */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0d12;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #22303f;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #33465b;
+  }
+
+  * {
+    scrollbar-color: #22303f #0a0d12;
+    scrollbar-width: thin;
+  }
+
+  ::selection {
+    background: rgba(255, 167, 38, 0.3);
+    color: #e6eef7;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Column headers in every blotter / log table. */
+  .col-head {
+    @apply text-2xs uppercase tracking-widest text-term-dim;
+  }
+
+  /* Numeric cells must align across rows regardless of glyph widths. */
+  .num {
+    @apply tabular-nums tracking-tight;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hairline {
+    @apply border-term-line;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .text-glow-red {
+    text-shadow: 0 0 8px rgba(255, 59, 82, 0.65);
+  }
+  .text-glow-green {
+    text-shadow: 0 0 8px rgba(0, 224, 138, 0.55);
+  }
+  .text-glow-amber {
+    text-shadow: 0 0 8px rgba(255, 167, 38, 0.5);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Blueprint grid behind the landing hero. */
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(30, 39, 50, 0.55) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 39, 50, 0.55) 1px, transparent 1px);
+    background-size: 46px 46px;
   }
 }
