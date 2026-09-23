@@ -1,46 +1,34 @@
 /**
- * Company logos for the knowledge graph.
+ * Company icons for the knowledge graph.
  *
- * Official marks sourced from each company's Wikipedia infobox, trimmed and
- * normalised to 96px tall under public/logos/. Aspect ratios live here rather
- * than being read from the image so a badge has its final size before the
- * image finishes loading — no layout jump when logos stream in.
+ * Round stock-app style icons (the Apple apple, the NVIDIA eye, the Tesla T),
+ * resolved through TradingView's symbol search so each one is the icon that
+ * company's listing actually uses, not a guessed URL. Stored as square SVGs
+ * under public/logos/ and clipped to a circle when drawn, so they stay sharp
+ * at every zoom level.
  */
 
-export const LOGO_ASPECT: Record<string, number> = {
-  ASML: 3.562,
-  SHIN_ETSU: 4.49,
-  LYNAS: 2.25,
-  TSMC: 1.271,
-  SK_HYNIX: 1.906,
-  SAMSUNG: 6.5,
-  SONY: 5.652,
-  CATL: 4.99,
-  FOXCONN: 5.474,
-  PEGATRON: 6.753,
-  MAERSK: 4.479,
-  NVDA: 5.406,
-  AAPL: 0.812,
-  AMD: 4.188,
-  QCOM: 5.417,
-  AVGO: 7.324,
-  TSLA: 0.771,
-  DELL: 7.761,
-};
+const IDS = [
+  "ASML", "SHIN_ETSU", "LYNAS", "TSMC", "SK_HYNIX", "SAMSUNG", "SONY", "CATL",
+  "FOXCONN", "PEGATRON", "MAERSK", "NVDA", "AAPL", "AMD", "QCOM", "AVGO",
+  "TSLA", "DELL",
+] as const;
+
+const HAS_LOGO = new Set<string>(IDS);
 
 export function logoSrc(id: string): string {
-  return `/logos/${id}.png`;
+  return `/logos/${id}.svg`;
 }
 
 const cache = new Map<string, HTMLImageElement>();
 
 /**
- * Returns the logo once it has decoded, or null while it is still loading.
+ * Returns the icon once it has decoded, or null while it is still loading.
  * Canvas painters call this every frame; the first call starts the fetch and
  * later calls pick up the finished image.
  */
 export function getLogo(id: string): HTMLImageElement | null {
-  if (typeof window === "undefined" || !(id in LOGO_ASPECT)) return null;
+  if (typeof window === "undefined" || !HAS_LOGO.has(id)) return null;
   let img = cache.get(id);
   if (!img) {
     img = new Image();
