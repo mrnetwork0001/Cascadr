@@ -7,7 +7,9 @@ import type {
   LinkObject,
   NodeObject,
 } from "react-force-graph-2d";
+import { forceCollide } from "d3-force";
 import { EDGES, NODES } from "@/lib/mock/graph";
+import { getLogo, LOGO_ASPECT } from "@/lib/logos";
 import { CONTAGION_COLOR, COLORS, TIER_COLOR } from "@/lib/theme";
 import type { Contagion, GraphEdge, GraphNode } from "@/lib/types";
 
@@ -95,12 +97,18 @@ export function GraphCanvas(props: Props) {
     return () => ro.disconnect();
   }, []);
 
-  // Default charge clumps 18 nodes into an unreadable knot; spread them out.
+  // Wordmark badges are much wider than the old dots. Collision keeps them
+  // apart; charge and link distance stay tight on purpose, because spreading
+  // the layout out makes zoom-to-fit shrink every logo below legibility.
   useEffect(() => {
     const g = fg.current;
     if (!g) return;
-    g.d3Force("charge")?.strength(-280);
-    g.d3Force("link")?.distance(78);
+    g.d3Force("charge")?.strength(-150);
+    g.d3Force("link")?.distance(38);
+    g.d3Force(
+      "collide",
+      forceCollide<NodeDatum>((n) => badgeOf(n).w / 2 + 7).strength(1).iterations(3)
+    );
   }, [ForceGraph2D]);
 
   const isActiveEdge = (l: LinkDatum) => {
@@ -124,7 +132,7 @@ export function GraphCanvas(props: Props) {
           backgroundColor={COLORS.void}
           nodeRelSize={1}
           cooldownTicks={140}
-          onEngineStop={() => fg.current?.zoomToFit(500, 46)}
+          onEngineStop={() => fg.current?.zoomToFit(500, 24)}
           // --- edges ---------------------------------------------------------
           linkColor={(l) => (isActiveEdge(l) ? COLORS.red : "rgba(43,54,68,0.9)")}
           linkWidth={(l) => (isActiveEdge(l) ? 1.8 : 0.5)}
@@ -145,9 +153,9 @@ export function GraphCanvas(props: Props) {
           }
           nodePointerAreaPaint={(node, color, ctx) => {
             if (node.x == null || node.y == null) return;
+            const { w, h } = badgeOf(node);
             ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, radiusOf(node) + 6, 0, 2 * Math.PI);
+            roundRect(ctx, node.x - w / 2 - 3, node.y - h / 2 - 3, w + 6, h + 6, h * 0.3);
             ctx.fill();
           }}
         />
@@ -167,9 +175,43 @@ function endpointId(end: LinkDatum["source"]): string | null {
   return String(end);
 }
 
-/** Radius tracks revenue, compressed so Apple does not dwarf Lynas off-screen. */
-function radiusOf(node: NodeDatum): number {
-  return 3.2 + Math.sqrt(node.revenueB ?? 1) * 0.62;
+/**
+ * Badge geometry. Height tracks revenue (compressed, so Apple does not dwarf
+ * Lynas off-screen); width follows the logo's own aspect ratio, capped so the
+ * widest wordmarks - Dell, Broadcom - do not become banners.
+ */
+const PAD = 0.2; // logo inset, as a fraction of badge height
+const MAX_ASPECT = 4.2; // widest a badge may be relative to its height
+
+function badgeOf(node: NodeDatum): { w: number; h: number; lw: number; lh: number } {
+  const h = 15 + Math.sqrt(node.revenueB ?? 1) * 0.7;
+  const pad = h * PAD;
+  const aspect = LOGO_ASPECT[String(node.id)] ?? 3;
+  let lh = h - pad * 2;
+  let lw = lh * aspect;
+  const maxLw = h * MAX_ASPECT - pad * 2.4;
+  if (lw > maxLw) {
+    lw = maxLw;
+    lh = lw / aspect;
+  }
+  return { w: Math.max(lw + pad * 2.4, h), h, lw, lh };
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
 }
 
 function paintNode(
@@ -181,52 +223,65 @@ function paintNode(
   if (node.x == null || node.y == null) return;
 
   const id = String(node.id);
-  const r = radiusOf(node);
+  const { w, h, lw, lh } = badgeOf(node);
+  const x = node.x - w / 2;
+  const y = node.y - h / 2;
+  const radius = h * 0.3;
   const status = s.contagion[id] ?? "NOMINAL";
   const hot = status !== "NOMINAL";
+  // The logo carries identity now, so the border carries state: tier colour
+  // while unaffected, contagion colour once the cascade reaches it.
   const color = hot ? CONTAGION_COLOR[status] : TIER_COLOR[node.tier];
   const isSelected = s.selected === id;
 
-  // Critical nodes breathe — the only animation on screen, so it reads as alarm.
+  // Critical badges breathe - the one animation on screen, so it reads as alarm.
   if (status === "CRITICAL") {
     const phase = (Math.sin(Date.now() / 260) + 1) / 2;
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, r + 4 + phase * 5, 0, 2 * Math.PI);
-    ctx.strokeStyle = `rgba(255,59,82,${0.5 - phase * 0.34})`;
+    const grow = 2.5 + phase * 4;
+    roundRect(ctx, x - grow, y - grow, w + grow * 2, h + grow * 2, radius + grow);
+    ctx.strokeStyle = `rgba(255,59,82,${0.55 - phase * 0.38})`;
     ctx.lineWidth = 1.4;
     ctx.stroke();
   }
 
   if (hot) {
     ctx.shadowColor = color;
-    ctx.shadowBlur = status === "CRITICAL" ? 18 : 10;
+    ctx.shadowBlur = status === "CRITICAL" ? 20 : 12;
   }
 
-  ctx.beginPath();
-  ctx.arc(node.x, node.y, r, 0, 2 * Math.PI);
-  ctx.fillStyle = hot ? color : COLORS.panel;
+  // White ground: several marks (Samsung, Sony, Apple) are black and would
+  // vanish on the dark canvas.
+  roundRect(ctx, x, y, w, h, radius);
+  ctx.fillStyle = "#f4f7fb";
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  ctx.lineWidth = isSelected ? 2 : 1.2;
+  const logo = getLogo(id);
+  if (logo) {
+    ctx.drawImage(logo, node.x - lw / 2, node.y - lh / 2, lw, lh);
+  } else {
+    // Still loading (or missing): the ticker keeps the node identifiable.
+    ctx.fillStyle = "#1e2732";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `700 ${h * 0.34}px ui-monospace, monospace`;
+    ctx.fillText(id.replace(/_/g, " "), node.x, node.y);
+  }
+
+  roundRect(ctx, x, y, w, h, radius);
+  ctx.lineWidth = isSelected ? 2.2 : hot ? 1.8 : 1;
   ctx.strokeStyle = isSelected ? COLORS.bright : color;
   ctx.stroke();
 
-  // Labels turn to mush when zoomed out; drop them rather than draw noise.
+  // Exposure is the number that matters once a cascade is running.
   if (scale < 0.5) return;
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-
-  ctx.font = `600 ${fontPx(7.4, scale)}px ui-monospace, monospace`;
-  ctx.fillStyle = hot ? color : COLORS.text;
-  ctx.fillText(id.replace(/_/g, " "), node.x, node.y + r + 2.5);
-
   const score = s.exposure[id];
   if (score && score > 0.05) {
-    ctx.font = `500 ${fontPx(6.2, scale)}px ui-monospace, monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.font = `600 ${fontPx(6.6, scale)}px ui-monospace, monospace`;
     ctx.fillStyle = CONTAGION_COLOR[status];
-    ctx.fillText(`${(score * 100).toFixed(0)}%`, node.x, node.y + r + fontPx(7.4, scale) + 3.5);
+    ctx.fillText(`${(score * 100).toFixed(0)}%`, node.x, y + h + 2.5);
   }
 }
 
