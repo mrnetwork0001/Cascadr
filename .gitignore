@@ -34,3 +34,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# python
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/.env
+backend/*.db
+backend/*.db-wal
+backend/*.db-shm
+
+# generated at runtime by POST /ingest/edgar/refresh
+backend/disclosed_edges.json
