@@ -1,31 +1,43 @@
 "use client";
 
+import { useMemo } from "react";
 import { Panel } from "@/components/terminal/Panel";
 import { GraphCanvas } from "@/components/graph/GraphCanvas";
 import { GraphLegend } from "@/components/graph/GraphLegend";
 import { NodeInspector } from "@/components/graph/NodeInspector";
-import { EDGES, NODES } from "@/lib/mock/graph";
-import type { Contagion } from "@/lib/types";
+import type { Contagion, Decision, Graph, Quote } from "@/lib/types";
 
 interface Props {
-  contagion: Record<string, Contagion>;
-  exposure: Record<string, number>;
-  activePath: string[];
-  prices: Record<string, number>;
-  selected: string | null;
-  onSelect: (id: string | null) => void;
+  graph: Graph | null;
+  graphError: string | null;
+  decision: Decision | null;
+  following: boolean;
+  onFollow: () => void;
+  quotes: Quote[];
+  quotesError: string | null;
+  node: string | null;
+  onNode: (id: string | null) => void;
 }
 
-export function GraphPanel({
-  contagion,
-  exposure,
-  activePath,
-  prices,
-  selected,
-  onSelect,
-}: Props) {
-  const breached = Object.values(contagion).filter((c) => c !== "NOMINAL").length;
+/**
+ * The graph served by the API, coloured by the contagion that one real
+ * decision implies. Which decision is drawn is stated in the header, so the
+ * picture is never mistaken for a live event that did not happen.
+ */
+export function GraphPanel({ graph, graphError, decision, following, onFollow, quotes, quotesError, node, onNode }: Props) {
+  const { contagion, exposure, activeEdges } = useMemo(() => {
+    const c: Record<string, Contagion> = {};
+    const x: Record<string, number> = {};
+    const a = new Set<string>();
+    for (const e of decision?.exposures ?? []) {
+      c[e.target] = e.contagion;
+      x[e.target] = e.score;
+      for (let i = 0; i + 1 < e.hops.length; i++) a.add(`${e.hops[i]}>${e.hops[i + 1]}`);
+    }
+    return { contagion: c, exposure: x, activeEdges: a };
+  }, [decision]);
 
+  const prov = graph?.stats.edges_by_provenance ?? {};
   return (
     <Panel
       title="Supply Chain Knowledge Graph"
@@ -34,32 +46,61 @@ export function GraphPanel({
       // it fills whatever the positions blotter leaves.
       className="h-[440px] min-h-0 sm:h-[520px] lg:h-auto lg:flex-1"
       meta={
-        <span className="flex items-center gap-3">
-          <span>
-            {NODES.length} nodes · {EDGES.length} edges
+        graph ? (
+          <span className="flex flex-wrap items-center gap-x-3">
+            <span>
+              {graph.stats.nodes} companies · {graph.stats.edges} sourced links
+            </span>
+            <span className="hidden text-term-dim md:inline">
+              {Object.entries(prov)
+                .map(([k, v]) => `${v} ${k.toLowerCase()}`)
+                .join(" · ")}
+            </span>
           </span>
-          <span className={breached > 0 ? "text-signal-red" : "text-term-dim"}>
-            {breached} breached
-          </span>
-        </span>
+        ) : (
+          <span className="text-signal-red">{graphError ?? "loading"}</span>
+        )
       }
     >
       <div className="relative h-full w-full">
-        <GraphCanvas
-          contagion={contagion}
-          exposure={exposure}
-          activePath={activePath}
-          selected={selected}
-          onSelect={onSelect}
-        />
+        {graph ? (
+          <GraphCanvas
+            nodes={graph.nodes}
+            edges={graph.edges}
+            contagion={contagion}
+            exposure={exposure}
+            activeEdges={activeEdges}
+            selected={node}
+            onSelect={onNode}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-2xs uppercase tracking-widest text-term-dim">
+            {graphError ? "graph unavailable — cannot reach the API" : "loading graph…"}
+          </div>
+        )}
+        {decision && (
+          <div className="absolute left-2 top-2 max-w-[70%] border border-term-line bg-term-panel/90 px-2 py-1 backdrop-blur-sm">
+            <p className="col-head flex items-center gap-2">
+              <span>
+                Showing decision #{decision.id} · {following ? "following latest" : "pinned"}
+              </span>
+              {!following && (
+                <button type="button" onClick={onFollow} className="text-amber underline underline-offset-2 hover:text-term-bright">
+                  follow latest
+                </button>
+              )}
+            </p>
+            <p className="truncate text-2xs text-term-text">{decision.headline}</p>
+          </div>
+        )}
         <GraphLegend />
-        {selected && (
+        {graph && node && (
           <NodeInspector
-            nodeId={selected}
-            contagion={contagion[selected] ?? "NOMINAL"}
-            exposure={exposure[selected] ?? 0}
-            price={prices[selected]}
-            onClose={() => onSelect(null)}
+            graph={graph}
+            nodeId={node}
+            quote={quotes.find((q) => q.id === node) ?? null}
+            quoteStale={quotesError != null}
+            onClose={() => onNode(null)}
           />
         )}
       </div>

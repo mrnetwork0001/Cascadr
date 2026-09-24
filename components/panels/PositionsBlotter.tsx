@@ -2,13 +2,7 @@
 
 import { Panel } from "@/components/terminal/Panel";
 import { signedPct, signedUsd, usd } from "@/lib/format";
-import type { Position } from "@/lib/types";
-
-/** Short P&L: price down is profit, scaled by leverage. */
-function pnlOf(p: Position) {
-  const move = (p.entry - p.mark) / p.entry;
-  return { pct: move * p.leverage * 100, usd: move * p.notional * p.leverage };
-}
+import type { PositionsResponse } from "@/lib/types";
 
 const EXIT_TONE: Record<string, string> = {
   STOP_LOSS: "text-signal-red",
@@ -16,109 +10,117 @@ const EXIT_TONE: Record<string, string> = {
   TIME_STOP: "text-amber",
 };
 
+/**
+ * The paper book exactly as the backend holds it, marked to Bitget's live
+ * mark price. P&L is units x price move; ROE is that P&L over the margin
+ * posted, which is where leverage appears.
+ */
 export function PositionsBlotter({
-  positions,
-  pnl,
-  realized = 0,
+  book,
+  error,
 }: {
-  positions: Position[];
-  pnl: number;
-  /** Booked P&L from positions the exit sweep has already closed. */
-  realized?: number;
+  book: PositionsResponse | null;
+  error: string | null;
 }) {
+  const open = book?.positions.filter((p) => p.status === "OPEN") ?? [];
+  const closed = book?.positions.filter((p) => p.status === "CLOSED").slice(0, 8) ?? [];
+  // Only figures the API returned are shown: unknown is "—", never $0.00.
+  const upl = book?.unrealized_usdt ?? null;
+  const rpl = book?.realized_usdt ?? null;
+  const pnlTone = (v: number | null) => (v == null ? "text-term-dim" : v >= 0 ? "text-signal-green" : "text-signal-red");
+
   return (
     <Panel
-      title="Bitget Positions"
+      title="Paper Positions"
       flush
       className="h-full"
       meta={
-        <span className="flex gap-3">
-          <span className={pnl >= 0 ? "text-signal-green" : "text-signal-red"}>
-            UPL {signedUsd(pnl)}
+        error && !book ? (
+          <span className="text-signal-red">unavailable</span>
+        ) : (
+          <span className="flex gap-3">
+            <span className={pnlTone(upl)} title={book?.market_error ?? undefined}>
+              UPL {upl != null ? signedUsd(upl) : "—"}
+            </span>
+            <span className={pnlTone(rpl)}>RPL {rpl != null ? signedUsd(rpl) : "—"}</span>
+            {book?.market_error && <span className="text-signal-red">no marks</span>}
+            {error && <span className="text-signal-red" title={error}>stale</span>}
+            {book && <span className={book.paper ? "text-amber" : "text-signal-red"}>{book.paper ? "PAPER" : "LIVE"}</span>}
           </span>
-          <span
-            className={realized >= 0 ? "text-signal-green" : "text-signal-red"}
-            title="Booked P&L from positions the exit sweep has closed"
-          >
-            RPL {signedUsd(realized)}
-          </span>
-        </span>
+        )
       }
     >
       <div className="h-full overflow-auto">
-        <table className="w-full min-w-[640px] border-collapse">
+        <table className="w-full min-w-[720px] border-collapse">
           <thead className="sticky top-0 bg-term-panel">
             <tr className="border-b border-term-line">
-              <th className="col-head px-2 py-1 text-left">Symbol</th>
-              <th className="col-head px-2 py-1 text-left">Side</th>
-              <th className="col-head px-2 py-1 text-right">Notional</th>
-              <th className="col-head px-2 py-1 text-right">Entry</th>
-              <th className="col-head px-2 py-1 text-right">Mark</th>
-              <th className="col-head px-2 py-1 text-right">P&amp;L</th>
-              <th className="col-head px-2 py-1 text-right">%</th>
-              <th className="col-head px-2 py-1 text-right">Age</th>
-              <th className="col-head px-2 py-1 text-left">Exit</th>
+              {["Symbol", "Side", "By", "Notional", "Entry", "Mark / Exit", "P&L", "Move", "ROE", "Age", "Exit"].map((h, i) => (
+                <th key={h} className={`col-head px-2 py-1 ${i >= 3 && i <= 9 ? "text-right" : "text-left"}`}>
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {positions.length === 0 ? (
+            {open.length === 0 && closed.length === 0 ? (
               <tr>
-                <td
-                  colSpan={9}
-                  className="px-2 py-6 text-center text-2xs uppercase tracking-widest text-term-dim"
-                >
-                  flat · no open risk
+                <td colSpan={11} className="px-2 py-6 text-center text-2xs uppercase tracking-widest text-term-dim">
+                  {book ? "flat · the agent has not opened a position" : error ? "book unavailable" : "loading the book…"}
                 </td>
               </tr>
             ) : (
-              positions.map((p) => {
-                const r = pnlOf(p);
-                const tone = r.usd >= 0 ? "text-signal-green" : "text-signal-red";
-                return (
-                  <tr
-                    key={p.id}
-                    className="border-b border-term-line/60 hover:bg-term-raised"
-                    title={p.thesis}
-                  >
-                    <td className="px-2 py-1 font-semibold text-term-bright">
-                      {p.symbol}
-                    </td>
-                    <td className="px-2 py-1">
-                      <span className="text-signal-red">{p.side}</span>
-                      <span className="ml-1 text-term-dim">{p.leverage}x</span>
-                    </td>
-                    <td className="num px-2 py-1 text-right text-term-text">
-                      {usd(p.notional, 0)}
-                    </td>
-                    <td className="num px-2 py-1 text-right text-term-dim">
-                      {usd(p.entry)}
-                    </td>
-                    <td className="num px-2 py-1 text-right text-term-text">
-                      {usd(p.mark)}
-                    </td>
-                    <td className={`num px-2 py-1 text-right ${tone}`}>
-                      {signedUsd(r.usd)}
-                    </td>
-                    <td className={`num px-2 py-1 text-right ${tone}`}>
-                      {signedPct(r.pct)}
-                    </td>
-                    <td className="num px-2 py-1 text-right text-term-dim">
-                      {p.ageHours !== undefined ? `${p.ageHours.toFixed(1)}h` : "—"}
-                    </td>
-                    <td className="px-2 py-1">
-                      {p.wouldExit ? (
-                        <span
-                          className={`text-2xs font-semibold ${EXIT_TONE[p.wouldExit] ?? "text-amber"}`}
-                        >
-                          {p.wouldExit}
-                        </span>
-                      ) : (
-                        <span className="text-2xs text-term-dim">hold</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
+              <>
+                {open.map((p) => {
+                  const tone = p.pnl_usdt == null ? "text-term-dim" : p.pnl_usdt >= 0 ? "text-signal-green" : "text-signal-red";
+                  return (
+                    <tr key={p.id} className="border-b border-term-line/60 hover:bg-term-raised" title={p.thesis}>
+                      <td className="px-2 py-1 font-semibold text-term-bright">{p.symbol}</td>
+                      <td className="px-2 py-1">
+                        <span className="text-signal-red">{p.side}</span>
+                        <span className="ml-1 text-term-dim">{p.leverage}x</span>
+                      </td>
+                      <td className="px-2 py-1 text-2xs text-term-dim">{p.source}</td>
+                      <td className="num px-2 py-1 text-right">{usd(p.notional_usdt, 0)}</td>
+                      <td className="num px-2 py-1 text-right text-term-dim">{usd(p.entry_price)}</td>
+                      <td className="num px-2 py-1 text-right">{p.mark != null ? usd(p.mark) : "—"}</td>
+                      <td className={`num px-2 py-1 text-right ${tone}`}>{p.pnl_usdt != null ? signedUsd(p.pnl_usdt) : "—"}</td>
+                      <td className={`num px-2 py-1 text-right ${tone}`}>{p.pnl_pct != null ? signedPct(p.pnl_pct) : "—"}</td>
+                      <td className={`num px-2 py-1 text-right ${tone}`}>{p.roe_pct != null ? signedPct(p.roe_pct) : "—"}</td>
+                      <td className="num px-2 py-1 text-right text-term-dim">{p.age_hours.toFixed(1)}h</td>
+                      <td className="px-2 py-1 text-2xs">
+                        {p.mark == null ? (
+                          // Exit rules cannot be checked without a price.
+                          <span className="text-amber">unpriced</span>
+                        ) : p.would_exit ? (
+                          <span className={`font-semibold ${EXIT_TONE[p.would_exit] ?? "text-amber"}`}>{p.would_exit}</span>
+                        ) : (
+                          <span className="text-term-dim">hold</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {closed.map((p) => {
+                  const tone = (p.realized_pnl_usdt ?? 0) >= 0 ? "text-signal-green/70" : "text-signal-red/70";
+                  return (
+                    <tr key={p.id} className="border-b border-term-line/40 text-term-dim" title={p.thesis}>
+                      <td className="px-2 py-1">{p.symbol}</td>
+                      <td className="px-2 py-1 text-2xs">closed</td>
+                      <td className="px-2 py-1 text-2xs">{p.source}</td>
+                      <td className="num px-2 py-1 text-right">{usd(p.notional_usdt, 0)}</td>
+                      <td className="num px-2 py-1 text-right">{usd(p.entry_price)}</td>
+                      <td className="num px-2 py-1 text-right">{p.exit_price != null ? usd(p.exit_price) : "—"}</td>
+                      <td className={`num px-2 py-1 text-right ${tone}`}>
+                        {p.realized_pnl_usdt != null ? signedUsd(p.realized_pnl_usdt) : "—"}
+                      </td>
+                      <td className="px-2 py-1" />
+                      <td className="px-2 py-1" />
+                      <td className="num px-2 py-1 text-right">{p.age_hours.toFixed(1)}h</td>
+                      <td className="px-2 py-1 text-2xs">{p.close_reason}</td>
+                    </tr>
+                  );
+                })}
+              </>
             )}
           </tbody>
         </table>

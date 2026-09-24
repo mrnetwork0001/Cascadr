@@ -14,7 +14,6 @@ import type {
   NodeObject,
 } from "react-force-graph-2d";
 import { forceCollide } from "d3-force";
-import { EDGES, NODES } from "@/lib/mock/graph";
 import { getLogo } from "@/lib/logos";
 import { CONTAGION_COLOR, COLORS, TIER_COLOR } from "@/lib/theme";
 import type { Contagion, GraphEdge, GraphNode } from "@/lib/types";
@@ -37,9 +36,13 @@ type FGComponent = ComponentType<
 >;
 
 interface Props {
+  /** The graph served by the API. */
+  nodes: GraphNode[];
+  edges: GraphEdge[];
   contagion: Record<string, Contagion>;
   exposure: Record<string, number>;
-  activePath: string[];
+  /** "SOURCE>TARGET" keys of edges on the selected decision's contagion paths. */
+  activeEdges: Set<string>;
   selected: string | null;
   onSelect: (id: string | null) => void;
 }
@@ -48,12 +51,12 @@ interface Props {
 interface PaintState {
   contagion: Record<string, Contagion>;
   exposure: Record<string, number>;
-  activePath: string[];
+  activeEdges: Set<string>;
   selected: string | null;
 }
 
 export function GraphCanvas(props: Props) {
-  const { contagion, exposure, activePath, selected, onSelect } = props;
+  const { nodes, edges, contagion, exposure, activeEdges, selected, onSelect } = props;
   const wrap = useRef<HTMLDivElement>(null);
   const fg = useRef<ForceGraphMethods<NodeDatum, LinkDatum>>();
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -76,26 +79,37 @@ export function GraphCanvas(props: Props) {
   }, []);
 
   /**
-   * Built exactly once. force-graph mutates these objects in place with x/y and
-   * swaps link endpoints for node references — handing it a fresh array on
-   * every state change would reheat the simulation and make the graph jump.
-   * Live state reaches the painter through the ref below instead.
+   * Rebuilt only when the graph itself changes (a new node or edge set from
+   * the API). force-graph mutates these objects in place with x/y and swaps
+   * link endpoints for node references — handing it a fresh array on every
+   * state change would reheat the simulation and make the graph jump. Live
+   * state reaches the painter through the ref below instead.
    */
+  const graphKey = useMemo(
+    () =>
+      nodes.map((n) => n.id).join(",") +
+      "|" +
+      edges.map((e) => `${e.source}>${e.target}:${e.dependency}`).join(","),
+    [nodes, edges],
+  );
   const data = useMemo(
     () => ({
-      nodes: NODES.map((n) => ({ ...n })) as NodeDatum[],
-      links: EDGES.map((e) => ({ ...e })) as LinkDatum[],
+      nodes: nodes.map((n) => ({ ...n })) as NodeDatum[],
+      links: edges.map((e) => ({ ...e })) as LinkDatum[],
     }),
-    [],
+    // graphKey captures every change that matters; identity churn from
+    // re-polling the same graph must not restart the layout.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [graphKey],
   );
 
   const state = useRef<PaintState>({
     contagion,
     exposure,
-    activePath,
+    activeEdges,
     selected,
   });
-  state.current = { contagion, exposure, activePath, selected };
+  state.current = { contagion, exposure, activeEdges, selected };
 
   useEffect(() => {
     const el = wrap.current;
@@ -125,13 +139,9 @@ export function GraphCanvas(props: Props) {
   }, [ForceGraph2D]);
 
   const isActiveEdge = (l: LinkDatum) => {
-    const path = state.current.activePath;
-    if (path.length < 2) return false;
     const s = endpointId(l.source);
     const t = endpointId(l.target);
-    if (!s || !t) return false;
-    const i = path.indexOf(s);
-    return i !== -1 && path[i + 1] === t;
+    return !!s && !!t && state.current.activeEdges.has(`${s}>${t}`);
   };
 
   return (
@@ -164,7 +174,7 @@ export function GraphCanvas(props: Props) {
             linkDirectionalArrowRelPos={0.92}
             linkDirectionalArrowColor={() => "rgba(92,107,127,0.9)"}
             linkLabel={(l) =>
-              `${l.component} · ${Math.round((l.dependency ?? 0) * 100)}% dependency`
+              `${l.component} · ${Math.round((l.dependency ?? 0) * 100)}% dependency · ${l.provenance}`
             }
             // --- nodes ---------------------------------------------------------
             onNodeClick={(n) => onSelect(String(n.id))}
@@ -197,9 +207,9 @@ function endpointId(end: LinkDatum["source"]): string | null {
   return String(end);
 }
 
-/** Radius tracks revenue, compressed so Apple does not dwarf Lynas off-screen. */
+/** Radius tracks revenue, compressed so Apple does not dwarf Shin-Etsu off-screen. */
 function radiusOf(node: NodeDatum): number {
-  return 7 + Math.sqrt(node.revenueB ?? 1) * 0.45;
+  return 7 + Math.sqrt(node.revenue_b ?? 1) * 0.45;
 }
 
 /** What to print under the icon: the tradable ticker where there is one. */

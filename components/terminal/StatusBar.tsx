@@ -1,47 +1,71 @@
-import { EDGES, NODES } from "@/lib/mock/graph";
-import type { BackendHealth } from "@/lib/api";
-
-interface Props {
-  positions: number;
-  logs: number;
-  backend: BackendHealth | null;
-}
+import type { Graph, Health } from "@/lib/types";
 
 /**
- * Bottom rail. Service states are read from the backend's /health rather than
- * hardcoded: if the Python service is down the terminal says so plainly
- * instead of implying a connection it does not have.
+ * Bottom rail: the real state of every moving part, read from /health.
+ * Nothing is asserted that the API did not report.
  */
-export function StatusBar({ positions, logs, backend }: Props) {
-  const online = backend !== null;
-
+export function StatusBar({
+  health,
+  healthError,
+  graph,
+}: {
+  health: Health | null;
+  healthError: string | null;
+  graph: Graph | null;
+}) {
+  if (!health) {
+    return (
+      <footer className="flex shrink-0 items-center gap-4 border-t border-term-line bg-term-panel px-3 py-1 text-2xs">
+        {healthError ? (
+          <Service label="API" state="UNREACHABLE" tone="red" />
+        ) : (
+          <Service label="API" state="CONNECTING" tone="amber" />
+        )}
+      </footer>
+    );
+  }
+  if (healthError) {
+    // Showing the last good snapshot as current would assert what the API no
+    // longer reports.
+    return (
+      <footer className="flex shrink-0 items-center gap-4 border-t border-term-line bg-term-panel px-3 py-1 text-2xs">
+        <Service label="API" state="UNREACHABLE" tone="red" />
+        <span className="text-term-dim">last good read shown elsewhere may be stale</span>
+      </footer>
+    );
+  }
+  const feedBad = health.feeds.last_poll_errors > 0 && health.feeds.last_poll_errors === health.feeds.last_poll_queries;
+  // The feed is only "OK" once a poll has actually succeeded.
+  const feedIdle = health.feeds.last_ok == null;
   return (
     <footer className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-term-line bg-term-panel px-3 py-1 text-2xs text-term-dim">
+      <Service label="API" state={health.status.toUpperCase()} tone={health.status === "ok" ? "green" : "amber"} />
       <Service
-        label="ENGINE"
-        state={online ? "BACKEND" : "LOCAL"}
-        tone={online ? "green" : "amber"}
+        label="AGENT"
+        state={health.autonomous.armed ? `ARMED · ${health.autonomous.cycles} cycles` : "OFF"}
+        tone={health.autonomous.armed ? "green" : "amber"}
       />
+      <Service label="LLM" state={health.llm.configured ? (health.llm.model ?? "?") : "NOT SET"} tone={health.llm.configured ? "green" : "red"} />
       <Service
-        label="GRAPH"
-        state={online ? backend.graph_backend.toUpperCase() : "SEED"}
-        tone={online && backend.graph_backend === "neo4j" ? "green" : "amber"}
+        label="NEWS"
+        state={
+          feedBad
+            ? "FEED DOWN"
+            : health.feeds.last_poll_errors
+              ? `${health.feeds.last_poll_errors} errors`
+              : feedIdle
+                ? "NOT POLLED"
+                : "OK"
+        }
+        tone={feedBad ? "red" : health.feeds.last_poll_errors || feedIdle ? "amber" : "green"}
       />
-      <Service
-        label="BITGET"
-        // Paper is the safe state, so it reads green; live trading is the
-        // one that should catch your eye.
-        state={!online ? "OFFLINE" : backend.paper_trading ? "PAPER" : "LIVE"}
-        tone={!online ? "red" : backend.paper_trading ? "green" : "red"}
-      />
-      <span className="hidden md:inline">
-        KG {NODES.length}n/{EDGES.length}e
-      </span>
-      <span className="hidden md:inline">POS {positions}</span>
-      <span className="hidden md:inline">EVT {logs}</span>
-      <span className="ml-auto hidden tracking-widest sm:inline">
-        NETLAYER LABS · BITGET AI HACKATHON
-      </span>
+      <Service label="BITGET" state={health.paper_trading ? "PAPER" : "LIVE"} tone={health.paper_trading ? "green" : "red"} />
+      {graph && (
+        <span className="hidden md:inline">
+          KG {graph.stats.nodes}n/{graph.stats.edges}e
+        </span>
+      )}
+      <span className="ml-auto hidden tracking-widest sm:inline">NETLAYER LABS · BITGET AI HACKATHON</span>
     </footer>
   );
 }
@@ -52,15 +76,7 @@ const TONE = {
   red: { dot: "bg-signal-red", text: "text-signal-red" },
 } as const;
 
-function Service({
-  label,
-  state,
-  tone,
-}: {
-  label: string;
-  state: string;
-  tone: keyof typeof TONE;
-}) {
+function Service({ label, state, tone }: { label: string; state: string; tone: keyof typeof TONE }) {
   const c = TONE[tone];
   return (
     <span className="flex items-center gap-1">
