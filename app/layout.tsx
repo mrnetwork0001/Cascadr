@@ -16,7 +16,7 @@ const mono = localFont({
 export const metadata: Metadata = {
   title: "CASCADR // Supply Chain Knowledge Graph Arbitrage Agent",
   description:
-    "Cascadr maps the global electronics supply chain as a knowledge graph and trades downstream contagion on Bitget tokenized equities — shorting exposed names before the second-order effect is priced in.",
+    "An autonomous agent that reads live supply-chain news, traces which downstream companies a disruption exposes through a source-cited knowledge graph, and paper-trades Bitget stock perpetuals against them.",
 };
 
 export default function RootLayout({

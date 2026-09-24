@@ -2,50 +2,47 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { GraphCanvas } from "@/components/graph/GraphCanvas";
-import { traverseContagion, scoreToContagion } from "@/lib/traversal";
-import { NODES } from "@/lib/mock/graph";
-import type { Contagion } from "@/lib/types";
-
-/** The headline the preview is frozen on, matching scenario event 001. */
-const ORIGIN = "TSMC";
-const SHOCK = 0.88;
+import type { Contagion, Decision, Graph } from "@/lib/types";
 
 /**
- * Hero graph. Runs the same traversal the terminal runs — nothing here is a
- * hand-drawn mock — then cycles the highlighted route so the page has one
- * piece of motion without asking the visitor to press anything.
+ * Hero graph: the real graph, coloured by the contagion of the agent's most
+ * recent decision that implied any exposure. The highlighted route cycles
+ * through that decision's own paths - motion over real data, not a replay.
  */
-export function GraphPreview() {
+export function GraphPreview({ graph, decision }: { graph: Graph; decision: Decision | null }) {
   const { contagion, exposure, routes } = useMemo(() => {
-    const paths = traverseContagion(ORIGIN, SHOCK);
-
-    const contagion: Record<string, Contagion> = Object.fromEntries(
-      NODES.map((n) => [n.id, "NOMINAL" as Contagion])
-    );
-    const exposure: Record<string, number> = { [ORIGIN]: SHOCK };
-    contagion[ORIGIN] = scoreToContagion(SHOCK);
-
-    for (const p of paths) {
-      exposure[p.target] = p.score;
-      contagion[p.target] = scoreToContagion(p.score);
+    const c: Record<string, Contagion> = {};
+    const x: Record<string, number> = {};
+    const r: string[][] = [];
+    for (const e of decision?.exposures ?? []) {
+      c[e.target] = e.contagion;
+      x[e.target] = e.score;
+      if (e.hops.length > 1) r.push(e.hops);
     }
-
-    // Only the strongest few routes are worth cycling through.
-    return { contagion, exposure, routes: paths.slice(0, 5).map((p) => p.hops) };
-  }, []);
+    return { contagion: c, exposure: x, routes: r.slice(0, 6) };
+  }, [decision]);
 
   const [i, setI] = useState(0);
   useEffect(() => {
-    if (routes.length === 0) return;
+    if (routes.length < 2) return;
     const id = setInterval(() => setI((v) => (v + 1) % routes.length), 2600);
     return () => clearInterval(id);
   }, [routes.length]);
 
+  const activeEdges = useMemo(() => {
+    const s = new Set<string>();
+    const hops = routes[i] ?? [];
+    for (let k = 0; k + 1 < hops.length; k++) s.add(`${hops[k]}>${hops[k + 1]}`);
+    return s;
+  }, [routes, i]);
+
   return (
     <GraphCanvas
+      nodes={graph.nodes}
+      edges={graph.edges}
       contagion={contagion}
       exposure={exposure}
-      activePath={routes[i] ?? []}
+      activeEdges={activeEdges}
       selected={null}
       onSelect={() => {}}
     />
