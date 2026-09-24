@@ -28,6 +28,7 @@ from xml.etree import ElementTree
 
 import httpx
 
+from app import db
 from app.models import GraphNode
 
 GOOGLE_NEWS = "https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
@@ -38,9 +39,17 @@ CREATE TABLE IF NOT EXISTS seen_headlines (
     first_seen  TEXT NOT NULL,
     title       TEXT NOT NULL,
     source      TEXT NOT NULL DEFAULT '',
-    acted       INTEGER NOT NULL DEFAULT 0
+    acted       INTEGER NOT NULL DEFAULT 0,
+    url         TEXT,
+    published   TEXT
 );
 """
+
+# Databases created before url/published were stored get the columns added.
+MIGRATIONS = [
+    "ALTER TABLE seen_headlines ADD COLUMN url TEXT",
+    "ALTER TABLE seen_headlines ADD COLUMN published TEXT",
+]
 
 # Google News appends " - Publisher" to every title.
 _PUBLISHER = re.compile(r"\s+-\s+[^-]{2,40}$")
@@ -73,7 +82,7 @@ class FeedReader:
     def __init__(
         self,
         # Must be opened with check_same_thread=False: reads and writes run
-        # through asyncio.to_thread, so they land on worker threads.
+        # through app.db.run, so they land on worker threads, one at a time.
         conn: sqlite3.Connection,
         user_agent: str,
         *,
@@ -82,8 +91,20 @@ class FeedReader:
     ):
         self._conn = conn
         self._conn.executescript(SCHEMA)
+        for stmt in MIGRATIONS:
+            try:
+                self._conn.execute(stmt)
+            except sqlite3.OperationalError as exc:
+                if "duplicate column" not in str(exc):
+                    raise
         self._conn.commit()
         self._max_age = max_age_hours
+        # A failed fetch used to look exactly like a quiet news cycle. These
+        # make "the feed is down" distinguishable from "nothing happened".
+        self.stats = {
+            "queries": 0, "errors": 0, "last_error": None,
+            "last_ok": None, "last_poll_errors": 0, "last_poll_queries": 0,
+        }
         self._client = client or httpx.AsyncClient(
             timeout=30.0, follow_redirects=True, headers={"User-Agent": user_agent}
         )
@@ -105,24 +126,29 @@ class FeedReader:
     def _mark(self, h: Headline, acted: bool) -> None:
         self._conn.execute(
             """INSERT OR IGNORE INTO seen_headlines
-               (fingerprint, first_seen, title, source, acted) VALUES (?,?,?,?,?)""",
-            (h.fingerprint, datetime.now(UTC).isoformat(), h.title, h.source, int(acted)),
+               (fingerprint, first_seen, title, source, acted, url, published)
+               VALUES (?,?,?,?,?,?,?)""",
+            (
+                h.fingerprint, datetime.now(UTC).isoformat(), h.title, h.source,
+                int(acted), h.url or None,
+                h.published.astimezone(UTC).isoformat() if h.published else None,
+            ),
         )
         self._conn.commit()
 
     async def mark_seen(self, h: Headline, acted: bool = False) -> None:
         async with self._lock:
-            await asyncio.to_thread(self._mark, h, acted)
+            await db.run(self._mark, h, acted)
 
     async def seen_count(self) -> int:
-        return await asyncio.to_thread(
+        return await db.run(
             lambda: self._conn.execute(
                 "SELECT COUNT(*) FROM seen_headlines"
             ).fetchone()[0]
         )
 
     async def recent(self, limit: int = 40) -> list[dict]:
-        rows = await asyncio.to_thread(
+        rows = await db.run(
             lambda: self._conn.execute(
                 "SELECT * FROM seen_headlines ORDER BY first_seen DESC LIMIT ?",
                 (limit,),
@@ -134,12 +160,21 @@ class FeedReader:
 
     async def _fetch(self, query: str) -> list[Headline]:
         url = GOOGLE_NEWS.format(q=httpx.QueryParams({"q": query})["q"].replace(" ", "+"))
+        self.stats["queries"] += 1
         try:
             r = await self._client.get(url)
             r.raise_for_status()
             root = ElementTree.fromstring(r.text)
-        except Exception:
+        except Exception as exc:
+            self.stats["errors"] += 1
+            self.stats["last_poll_errors"] += 1
+            self.stats["last_error"] = {
+                "at": datetime.now(UTC).isoformat(),
+                "query": query,
+                "error": f"{type(exc).__name__}: {str(exc)[:160]}",
+            }
             return []
+        self.stats["last_ok"] = datetime.now(UTC).isoformat()
 
         out: list[Headline] = []
         for item in root.iter("item"):
@@ -174,6 +209,8 @@ class FeedReader:
         queries = {n.name.split(" (")[0]: n for n in nodes}
         fresh: list[Headline] = []
         seen_this_round: set[str] = set()
+        self.stats["last_poll_errors"] = 0
+        self.stats["last_poll_queries"] = len(queries)
 
         for query in queries:
             for h in (await self._fetch(query))[:per_entity]:
@@ -182,7 +219,7 @@ class FeedReader:
                     continue
                 seen_this_round.add(fp)
 
-                if await asyncio.to_thread(self._is_seen, fp):
+                if await db.run(self._is_seen, fp):
                     continue
                 if not self._fresh(h):
                     # Record it so it never resurfaces as "new" later.

@@ -1,13 +1,13 @@
 """Contagion propagation.
 
-A direct port of lib/traversal.ts. The constants must stay identical to the
-frontend's or the terminal will display scores the backend did not produce;
-tests/test_traversal.py pins the shared values.
+The only place scores are computed. Every path records the edges it was
+multiplied through, so any score can be re-derived from what was stored with
+it, even after the graph changes.
 """
 
 from collections import deque
 
-from app.models import Contagion, ExposurePath, GraphEdge, GraphNode, Provenance
+from app.models import Contagion, ExposurePath, GraphEdge, GraphNode, PathLink, Provenance
 
 HOP_DECAY = 0.62
 MAX_HOPS = 3
@@ -16,8 +16,10 @@ MIN_SCORE = 0.08
 # Provenance of a path is only as good as its weakest link.
 _PROVENANCE_RANK = {
     Provenance.DISCLOSED: 0,
-    Provenance.INFERRED: 1,
-    Provenance.ESTIMATED: 2,
+    Provenance.REPORTED: 1,
+    Provenance.INFERRED: 2,
+    Provenance.QUALITATIVE: 3,
+    Provenance.ESTIMATED: 4,
 }
 
 
@@ -29,13 +31,15 @@ def traverse_contagion(
 ) -> list[ExposurePath]:
     """Breadth-first walk of the downstream cone, strongest path per target."""
     best: dict[str, ExposurePath] = {}
-    queue: deque[tuple[str, list[str], float, Provenance]] = deque(
-        [(origin_id, [origin_id], shock, Provenance.DISCLOSED)]
+    queue: deque[tuple[str, list[str], float, Provenance, list[PathLink]]] = deque(
+        [(origin_id, [origin_id], shock, Provenance.DISCLOSED, [])]
     )
 
     while queue:
-        node_id, hops, score, worst = queue.popleft()
-        if len(hops) > MAX_HOPS + 1:
+        node_id, hops, score, worst, links = queue.popleft()
+        # hops includes the origin, so len(hops) - 1 hops are already taken;
+        # expand only while another hop stays within MAX_HOPS.
+        if len(hops) > MAX_HOPS:
             continue
 
         for edge in downstream.get(node_id, []):
@@ -49,6 +53,14 @@ def traverse_contagion(
                 continue
 
             next_hops = [*hops, edge.target]
+            next_links = [
+                *links,
+                PathLink(
+                    source=edge.source, target=edge.target, component=edge.component,
+                    dependency=edge.dependency, provenance=edge.provenance,
+                    weight_note=edge.weight_note,
+                ),
+            ]
             next_worst = (
                 edge.provenance
                 if _PROVENANCE_RANK[edge.provenance] > _PROVENANCE_RANK[worst]
@@ -61,21 +73,49 @@ def traverse_contagion(
                     target=edge.target,
                     hops=next_hops,
                     score=next_score,
-                    rationale=_describe(edge, nodes, len(next_hops) - 1),
+                    rationale=describe_path(next_links, nodes),
                     weakest_provenance=next_worst,
+                    links=next_links,
                 )
 
-            queue.append((edge.target, next_hops, next_score, next_worst))
+            queue.append((edge.target, next_hops, next_score, next_worst, next_links))
 
     return sorted(best.values(), key=lambda p: p.score, reverse=True)
 
 
-def _describe(edge: GraphEdge, nodes: dict[str, GraphNode], hops: int) -> str:
-    src = nodes[edge.source].name if edge.source in nodes else edge.source
-    return (
-        f"{round(edge.dependency * 100)}% of {edge.component} sourced from "
-        f"{src} · {hops}-hop exposure"
+# The published mapping for QUALITATIVE weights (see app/graph/seed.py).
+QUALITATIVE_RULE = {
+    0.95: "sole supplier",
+    0.70: "primary supplier",
+    0.50: "one of two suppliers",
+    0.25: "one of several suppliers",
+}
+
+
+def weight_phrase(dependency: float, provenance: Provenance, note: str = "") -> str:
+    """Say what a weight is: a disclosed or reported share is a share, said the
+    way its source said it (a forecast, a range midpoint); a QUALITATIVE
+    weight is a rule applied to wording, and must not read as a share."""
+    if note:
+        return f"weight {dependency:g} ({note})"
+    if provenance is Provenance.DISCLOSED:
+        return f"disclosed share {dependency:.0%}"
+    if provenance is Provenance.REPORTED:
+        return f"reported share {dependency:g}"
+    if provenance is Provenance.QUALITATIVE:
+        rule = QUALITATIVE_RULE.get(round(dependency, 2), "qualitative")
+        return f"weight {dependency:.2f} ({rule})"
+    return f"weight {dependency:.2f} ({str(provenance).lower()})"
+
+
+def describe_path(links: list[PathLink], nodes: dict[str, GraphNode]) -> str:
+    name = lambda i: nodes[i].name if i in nodes else i
+    steps = "; ".join(
+        f"{name(l.source)} → {name(l.target)}: {l.component}, "
+        f"{weight_phrase(l.dependency, l.provenance, l.weight_note)}"
+        for l in links
     )
+    return f"{steps} · {len(links)}-hop exposure"
 
 
 def score_to_contagion(score: float) -> Contagion:

@@ -113,8 +113,7 @@ class LLMClient:
             h["X-0G-Provider-Trust-Mode"] = self._s.llm_trust_mode
         return h
 
-    @staticmethod
-    def _provenance(r: httpx.Response, body: dict) -> dict[str, Any]:
+    def _provenance(self, r: httpx.Response, body: dict) -> dict[str, Any]:
         """Who actually ran this inference, and what it cost."""
         trace = body.get("x_0g_trace") or {}
         billing = trace.get("billing") or {}
@@ -124,7 +123,11 @@ class LLMClient:
             "trace_id": r.headers.get("x-trace-id"),
             "model_served": body.get("model"),
             "cost_0g": billing.get("total_cost"),
-            "verified": bool(trace),
+            # Whether 0G returned a trace block - NOT whether the provider was
+            # attested. Attestation only happens in LLM_TRUST_MODE=verified,
+            # which is reported separately so the two are never conflated.
+            "has_trace": bool(trace),
+            "trust_mode": self._s.llm_trust_mode or "standard",
         }
 
     async def complete_json(
