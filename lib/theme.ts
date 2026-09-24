@@ -51,3 +51,39 @@ export const LEVEL_CLASS: Record<string, string> = {
   EXEC: "text-signal-red",
   FILL: "text-signal-green",
 };
+
+/** Decision outcome badges. Each outcome names what actually happened. */
+export const ACTION_CLASS: Record<string, string> = {
+  DECLINED: "text-term-dim border-term-edge",
+  TRADED: "text-signal-green border-signal-green/50",
+  BLOCKED_BY_RISK: "text-amber border-amber/50",
+  REJECTED_BY_VENUE: "text-amber border-amber/50",
+  NO_MARKET_PRICE: "text-amber border-amber/50",
+  ALREADY_HOLDING: "text-signal-cyan border-signal-cyan/40",
+  NO_TRADABLE_EXPOSURE: "text-signal-cyan border-signal-cyan/40",
+  EXECUTION_FAILED: "text-signal-red border-signal-red/50",
+  ANALYSED: "text-signal-violet border-signal-violet/40",
+  BLOCKED: "text-amber border-amber/50",
+};
+
+export const ACTION_LABEL: Record<string, string> = {
+  DECLINED: "DECLINED",
+  TRADED: "TRADED",
+  BLOCKED_BY_RISK: "RISK-BLOCKED",
+  REJECTED_BY_VENUE: "FILL REJECTED",
+  NO_MARKET_PRICE: "NO PRICE",
+  ALREADY_HOLDING: "ALREADY SHORT",
+  NO_TRADABLE_EXPOSURE: "NO TRADE",
+  EXECUTION_FAILED: "EXEC FAILED",
+  ANALYSED: "ANALYSED",
+  BLOCKED: "NO TRADE",
+};
+
+/** How strongly a figure is evidenced, strongest first. */
+export const PROVENANCE_CLASS: Record<string, string> = {
+  DISCLOSED: "text-signal-green border-signal-green/40",
+  REPORTED: "text-signal-cyan border-signal-cyan/40",
+  QUALITATIVE: "text-amber border-amber/40",
+  INFERRED: "text-signal-violet border-signal-violet/40",
+  ESTIMATED: "text-signal-red border-signal-red/40",
+};
