@@ -14,7 +14,12 @@ const SEVERITY_CLASS: Record<NewsItem["severity"], string> = {
 /** Raw wire in, resolved graph entities out — the front of the pipeline. */
 export function NewsOracle({ news }: { news: NewsItem[] }) {
   return (
-    <Panel title="NLP News Oracle" meta={`${news.length} resolved`} flush>
+    <Panel
+      title="NLP News Oracle"
+      meta={`${news.length} resolved`}
+      flush
+      className="h-full"
+    >
       <div className="h-full overflow-y-auto">
         {news.length === 0 ? (
           <p className="py-6 text-center text-2xs uppercase tracking-widest text-term-dim">

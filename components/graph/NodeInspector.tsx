@@ -28,7 +28,7 @@ export function NodeInspector({
   const outbound = EDGES.filter((e) => e.source === nodeId);
 
   return (
-    <div className="pointer-events-auto absolute bottom-2 left-2 w-[300px] border border-term-edge bg-term-panel/95 backdrop-blur-sm">
+    <div className="pointer-events-auto absolute bottom-2 left-2 w-[calc(100%-1rem)] max-w-[300px] border border-term-edge bg-term-panel/95 backdrop-blur-sm">
       <header className="flex items-center gap-2 border-b border-term-line bg-term-raised px-2 py-1">
         <span className="text-xs font-semibold text-term-bright">{node.name}</span>
         {node.ticker && (

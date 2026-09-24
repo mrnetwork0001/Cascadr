@@ -30,6 +30,7 @@ export function PositionsBlotter({
     <Panel
       title="Bitget Positions"
       flush
+      className="h-full"
       meta={
         <span className="flex gap-3">
           <span className={pnl >= 0 ? "text-signal-green" : "text-signal-red"}>
@@ -45,7 +46,7 @@ export function PositionsBlotter({
       }
     >
       <div className="h-full overflow-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full min-w-[640px] border-collapse">
           <thead className="sticky top-0 bg-term-panel">
             <tr className="border-b border-term-line">
               <th className="col-head px-2 py-1 text-left">Symbol</th>

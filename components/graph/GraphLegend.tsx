@@ -13,7 +13,7 @@ const STATES: Contagion[] = ["WATCH", "STRESSED", "CRITICAL"];
 /** Two keys, because colour means tier until a node is hit, then severity. */
 export function GraphLegend() {
   return (
-    <div className="pointer-events-none absolute right-2 top-2 space-y-1.5 border border-term-line bg-term-panel/90 px-2 py-1.5 backdrop-blur-sm">
+    <div className="pointer-events-none absolute right-2 top-2 hidden space-y-1.5 sm:block border border-term-line bg-term-panel/90 px-2 py-1.5 backdrop-blur-sm">
       <Group title="Tier" items={TIERS.map((t) => [t, TIER_COLOR[t]])} />
       <Group title="Contagion" items={STATES.map((s) => [s, CONTAGION_COLOR[s]])} />
     </div>

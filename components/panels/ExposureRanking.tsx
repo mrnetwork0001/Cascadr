@@ -25,7 +25,12 @@ export function ExposureRanking({ exposure, contagion, selected, onSelect }: Pro
     .sort((a, b) => b.score - a.score);
 
   return (
-    <Panel title="Contagion Exposure" meta={`${rows.length} flagged`} flush>
+    <Panel
+      title="Contagion Exposure"
+      meta={`${rows.length} flagged`}
+      flush
+      className="h-full"
+    >
       <div className="h-full overflow-y-auto">
         {rows.length === 0 ? (
           <p className="py-6 text-center text-2xs uppercase tracking-widest text-term-dim">
