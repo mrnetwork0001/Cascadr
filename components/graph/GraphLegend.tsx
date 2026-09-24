@@ -1,13 +1,7 @@
 import { CONTAGION_COLOR, TIER_COLOR } from "@/lib/theme";
 import type { Contagion, Tier } from "@/lib/types";
 
-const TIERS: Tier[] = [
-  "MATERIAL",
-  "SUPPLIER",
-  "MANUFACTURER",
-  "LOGISTICS",
-  "BRAND",
-];
+const TIERS: Tier[] = ["MATERIAL", "SUPPLIER", "MANUFACTURER", "BRAND"];
 const STATES: Contagion[] = ["WATCH", "STRESSED", "CRITICAL"];
 
 /** Two keys, because colour means tier until a node is hit, then severity. */

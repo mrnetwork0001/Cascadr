@@ -1,0 +1,1038 @@
+{
+ "_about": "Every supply-chain link in the graph, with the evidence behind its dependency figure. Produced by a sourced research pass on 2026-09-24: one researcher per supplier and an independent verifier per link, both reading primary pages. See app/graph/seed.py for the provenance classes and the mapping rule.",
+ "researched": "2026-09-24",
+ "edges": [
+  {
+   "source": "SONY",
+   "target": "AAPL",
+   "relation": "SUPPLIES",
+   "component": "CMOS image sensors (iPhone camera sensors)",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "Apple has confirmed that Sony supplies iPhone camera sensors (Tim Cook, Dec 2022), but neither Apple nor Sony gives a share. Sony's 20-F for the fiscal year ended 2026-03-31 (filed 2026-06-18) never mentions 'Apple' and gives no customer-concentration figure. So the size can only come from wording in reputable outlets: Sony is the 'sole supplier' of iPhone image sensors (MacRumors, Dec 2025), Apple has 'relied exclusively on Sony' (TrendForce, Aug 2025), and Apple 'sourced all image sensors for its iPhones from Japan's Sony' (Korea Herald, Aug 2025). In Sept 2025 Ming-Chi Kuo said Samsung's iPhone CIS mass volume had probably slipped to 2027, and that Samsung's ultrawide CIS would go into mid- to low-end iPhones first. The line 'For now, Sony will continue to be Apple's exclusive camera sensor supplier' is from Wccftech's own author (Omar Sohail), not Kuo. In Feb 2026, Y.M.Cinema, citing Nikkei Business, said Samsung supply was expected 'as early as 2027'. The rule maps 'sole / exclusive / only supplier' to 0.95. No outlet gives a percentage, so this is QUALITATIVE, not REPORTED. Contrary signal, not relied on: after the June 2026 Tata Electronics data leak, lower-tier outlets (Sammy Fans, 2026-07-03; SoftwareSeni) said Samsung appears as an image-sensor supplier in the iPhone 18 Pro supplier map ('a slice has been cut and given to Samsung'). MacRumors, 9to5Mac, Al Jazeera and Outlook Business covered the leak but none of them named camera-sensor suppliers. TechInsights' iPhone 18 Pro Max teardown (2026-09-18) still lists camera sensors as analysis in progress. If a reputable teardown shows a Samsung sensor in a shipping iPhone, re-map this to 'primary' = 0.70.",
+   "as_of": "2026 (Sony still described as the sole or exclusive iPhone image-sensor supplier. Reputable reporting puts Samsung's Austin-made sensors at 2027 mass volume, starting with the ultrawide sensor in lower-end iPhones. Expect this to fall to 0.70 under the 'primary' rule once Samsung ships.)",
+   "confidence": "medium",
+   "notes": "The relationship is certain: Apple's CEO has confirmed it publicly. The size is less certain, because it rests only on wording in the press ('sole' / 'exclusive' / 'all'). Neither company discloses a share. Sony's 2026 20-F has no mention of Apple and no figures on how concentrated its customers are. The invented 0.81 should be replaced with 0.95.\n\nThis figure will go down. Apple's 6 Aug 2025 release announced chips from Samsung's Austin fab. Apple did not say they are image sensors; outlets (TrendForce, FT via Engadget/MacRumors, Kuo, Nikkei Business) report they are stacked iPhone image sensors. Kuo says the first ones are 48MP ultra-wide sensors for lower- and mid-range iPhones, with mass volume in 2027. MacRumors expects them first in the base iPhone 18 in the first half of 2027. After that, Sony would become 'primary' rather than 'sole' (0.70 under the rule) once a source confirms it.\n\nNo source confirms the suppliers in the iPhone 18 Pro (launched Sept 2026) yet. The iFixit teardown (2026-09-20) names no sensor maker. The TechInsights preliminary teardown (2026-09-18) lists camera sensors as 'Analysis in progress'. Pre-launch leaks naming a Sony IMX905 were not treated as evidence.\n\nPages I could not open myself: the Tim Cook tweet on x.com (HTTP 402), so its text was checked through The Daily Star; the TechInsights article 'Sony Keeps Lead in Apple's iPhone Image Sensors' (paywalled, no content returned); and the original FT and Nikkei Business articles, which I saw only through secondary outlets.\n\nThe 'sole supplier' wording covers the iPhone's camera image sensors. I did not check the Face ID / TrueDepth infrared sensors.",
+   "sources": [
+    {
+     "url": "https://www.thedailystar.net/tech-startup/news/iphones-have-been-using-sony-camera-sensors-years-tim-cook-tweets-3195026",
+     "publisher": "The Daily Star (quoting Apple CEO Tim Cook's tweet, x.com/tim_cook/status/1602516736145858561)",
+     "date": "2022-12-13",
+     "quote": "We've been partnering with Sony for over a decade to create the world's leading camera sensors for iPhone"
+    },
+    {
+     "url": "https://www.macrumors.com/2025/12/24/iphone-18-camera-sensor-to-be-made-in-texas/",
+     "publisher": "MacRumors (citing The Elec / FT reporting)",
+     "date": "2025-12-24",
+     "quote": "Today, Sony is the sole supplier of iPhone image sensors; they are produced in Japan and delivered via TSMC."
+    },
+    {
+     "url": "https://www.koreaherald.com/article/10549200",
+     "publisher": "The Korea Herald",
+     "date": "2025-08-07",
+     "quote": "Apple has so far sourced all image sensors for its iPhones from Japan's Sony."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2025/08/07/news-samsung-tapped-to-produce-apples-new-chips-at-austin-fab-likely-for-iphone-image-sensors/",
+     "publisher": "TrendForce",
+     "date": "2025-08-07",
+     "quote": "Until now, Apple has relied exclusively on Sony in Japan for iPhone image sensors."
+    },
+    {
+     "url": "https://wccftech.com/samsung-to-supply-apple-with-camera-sensors-delayed-to-2027/",
+     "publisher": "Wccftech (Omar Sohail; embeds analyst Ming-Chi Kuo's tweet, x.com/mingchikuo/status/1964534143850860987)",
+     "date": "2025-09-07",
+     "quote": "Samsung's shipment schedule for iPhone CIS is later than expected, with mass volume likely postponed until 2027. The ultra-wide CIS supplied by Samsung is expected to be adopted first in mid- to low-end iPhone models. [Kuo]  /  For now, Sony will continue to be Apple's exclusive camera sensor supplier. [Wccftech author]"
+    },
+    {
+     "url": "https://ymcinema.com/2026/02/25/apple-moves-to-samsung-sony-sensor-monopoly-ending/",
+     "publisher": "Y.M.Cinema Magazine (citing Nikkei Business)",
+     "date": "2026-02-25",
+     "quote": "Samsung is expected to begin supplying Apple with CMOS image sensors as early as 2027."
+    },
+    {
+     "url": "https://www.apple.com/newsroom/2025/08/apple-increases-us-commitment-to-600-billion-usd-announces-ambitious-program/",
+     "publisher": "Apple Newsroom",
+     "date": "2025-08-06",
+     "quote": "Apple is also working with Samsung at its fab in Austin, Texas, to launch an innovative new technology for making chips, which has never been used before anywhere in the world."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/0000313838/000119312526274893/d28719d20f.htm",
+     "publisher": "Sony Group Corp Form 20-F, fiscal year ended 2026-03-31 (SEC EDGAR, filed 2026-06-18)",
+     "date": "2026-06-18",
+     "quote": "In the mobile image sensor business, which is the core of the I&SS segment, Sony is pursuing enhanced performance ... (the full text has no mention of 'Apple' and no customer-concentration figure)"
+    }
+   ],
+   "counter_evidence": [
+    {
+     "url": "https://www.sammyfans.com/2026/07/03/apple-reportedly-adopts-samsung-camera-sensors/",
+     "publisher": "Sammy Fans (low-tier; citing Tata Electronics breach data)",
+     "date": "2026-07-03",
+     "quote": "Sony is also in the supply chain, but a slice has been cut and given to Samsung."
+    },
+    {
+     "url": "https://www.techinsights.com/blog/apple-iphone-18-pro-max-teardown",
+     "publisher": "TechInsights",
+     "date": "2026-09-18",
+     "quote": "Camera sensors listed under 'What Comes Next' (analysis in progress). No sensor supplier identified yet."
+    }
+   ]
+  },
+  {
+   "source": "CATL",
+   "target": "TSLA",
+   "relation": "SUPPLIES",
+   "component": "LFP cells (Megapack, Shanghai-built Model 3/Y)",
+   "dependency": 0.7,
+   "provenance": "QUALITATIVE",
+   "basis": "No reputable source gives a percentage for CATL's share of Tesla's LFP cells. Tesla's FY2025 10-K names CATL as a cell supplier for both vehicles and energy storage. LatePost, via CnEVPost, calls CATL the \"primary supplier\" of cells for the Shanghai Megafactory and says CATL \"remains the largest supplier\" to Tesla's energy storage business. Under the mapping rule, primary/main maps to 0.70. The same report gives BYD's FinDreams \"more than 20 percent\" of Shanghai Megafactory supply, so CATL's share there is below about 80%, which fits 0.70. ETNews says CATL supplies the entire volume of Tesla's prismatic EV cells, which alone would map to 0.95. That claim covers vehicles only, and reports of BYD cells at Giga Berlin conflict with it. CATL's position is shrinking, but no newer source shows a change in its rank. Tesla stopped using Chinese LFP cells in US-built cars after 2024. Tesla's own Nevada LFP line is only 7 GWh and in early ramp (Q2 2026), against 46.7 GWh of storage deployed in 2025. LG Energy Solution's US LFP supply does not start until August 2027. The claim that energy storage is Tesla's largest LFP use is an inference and is not directly sourced.",
+   "as_of": "Ranking evidence: LatePost via CnEVPost, 2024-06-05 and 2024-12-26. Relationship still confirmed in Tesla FY2025 10-K (filed 2026-01-29) and WSJ via Just Auto (2025-11-17). No source found that is newer than Dec 2024 and changes CATL's rank.",
+   "confidence": "medium",
+   "notes": "Scope: LFP cells: prismatic LFP for Megapack (mainly Shanghai Megafactory and US energy storage) and Shanghai-built Model 3/Y Standard/RWD. US-built Tesla cars no longer use CATL/Chinese LFP cells (WSJ via Just Auto, 2025-11-17).\n\nThe relationship is real and current. Tesla's FY2025 10-K names CATL, and CATL's supply contract with Tesla was extended to 2025 (S&P AutoTechInsight citing Reuters, 2021-06-29). What is not public is a numeric share of Tesla's LFP cells. Figures I checked and rejected: (1) Adamas Intelligence via ETNews (2022-02-20) put CATL at 18.5 GWh of Tesla's 2021 EV cells, about 28% of the ~65 GWh total, but that covers all chemistries, EVs only, and is stale. (2) A claim that Tesla committed to 20 GWh of CATL cells for 2026-2028, 'about 30%' of Tesla Energy's needs, appears only on low-quality blogs (teslaacessories.com, optimusk.blog) with no primary source, so I excluded it. (3) InsideEVs' 'remaining 80% likely CATL' for the Shanghai Megafactory is the outlet's own inference. CATL's share is falling: BYD FinDreams won 'more than 20 percent' of Shanghai Megafactory orders (LatePost, 2024), EVE Energy was added as a storage supplier (2024-12), and Tesla's own Nevada LFP line is in early ramp (7 GWh installed). LG Energy Solution's $4.3B Michigan LFP contract starts August 2027. Reuters (2025-07-30) quotes Tesla's CFO saying tariffs hit the energy business 'since it sources LFP batteries from China'. The ETNews quotes came through a summarizing fetch; the Korean wording was returned verbatim, but I did not see the full page. The Bloomberg (2026-04-22) and TheStreet pages returned 403 and I did not use them. Consider cutting to 0.50 if the app wants to reflect the 2026-2027 diversification, but no source currently supports a lower figure.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+     "publisher": "",
+     "date": "",
+     "quote": "Currently, we rely on suppliers such as Panasonic and Contemporary Amperex Technology Co. Limited (CATL) for these cells. We have to date fully qualified only a very limited number of such suppliers and have limited flexibility in changing suppliers."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+     "publisher": "",
+     "date": "",
+     "quote": "In 2025, we deployed 46.7 GWh of energy storage products."
+    },
+    {
+     "url": "https://cnevpost.com/2024/06/05/byd-findreams-to-supply-battery-cells-to-tesla-megafactory/",
+     "publisher": "",
+     "date": "",
+     "quote": "the primary supplier of the cells used in the plant has been identified as CATL, with FinDreams as an alternative supplier, according to LatePost. FinDreams' share of supply should exceed 20 percent"
+    },
+    {
+     "url": "https://cnevpost.com/2024/12/26/eve-energy-tesla-6th-battery-supplier-report/",
+     "publisher": "",
+     "date": "",
+     "quote": "After Tesla's supplier expansion, CATL remains the largest supplier to its energy storage business, LatePost said, citing a person familiar with the matter."
+    },
+    {
+     "url": "https://www.etnews.com/20250811000198",
+     "publisher": "",
+     "date": "",
+     "quote": "각형 배터리는 '모델 Y' 등 테슬라 일부 차종에만 적용됐다. 중국 CATL이 전량 공급하고 있다. ... 테슬라가 CATL에서 조달하는 각형 배터리도 LFP 기반이다."
+    },
+    {
+     "url": "https://www.kedglobal.com/batteries/newsView/ked202507300003",
+     "publisher": "",
+     "date": "",
+     "quote": "The deal highlights Tesla's move away from its long-time supplier, China's Contemporary Amperex Technology Co. Ltd. (CATL), the world's largest LFP battery maker."
+    },
+    {
+     "url": "https://www.just-auto.com/news/tesla-strip-out-china-components/",
+     "publisher": "",
+     "date": "",
+     "quote": "Lithium-iron phosphate (LFP) batteries from China's Contemporary Amperex Technology (CATL) have been an important input. Tesla sold US vehicles with Chinese-produced LFP batteries until last year, but those batteries are no longer qualified for specific EV tax credits and were subject to US tariffs, prompting the company to stop using them in US cars."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/exhibit991.htm",
+     "publisher": "",
+     "date": "",
+     "quote": "Battery Cell Manufacturing Nevada LFP 7 GWh Early Ramp ... LFP cells in Nevada for our energy storage products."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "SAMSUNG",
+   "target": "QCOM",
+   "relation": "FABRICATES",
+   "component": "Foundry wafers (one of three primary foundries)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "Qualcomm's FY2025 10-K (period ended 2025-09-28, filed 2025-11-05) names Samsung as one of three primary foundry suppliers, alongside TSMC and GlobalFoundries, and gives no share. Under the rule, 'one of several / a supplier' maps to 0.25. No filing, outlet or analyst publishes a numeric Samsung share of Qualcomm wafers. At Snapdragon Summit on 2026-09-22, Qualcomm SVP Chris Patrick said all of the newly announced 2nm parts are made by TSMC. The planned Samsung 2nm Snapdragon production is reportedly slipping to 2027 over pricing. The FY2026 10-K is not due until about Nov 2026.",
+   "as_of": "FY2025 10-K (filed 2025-11-05); flagship foundry status as of 2026-09-22 (Snapdragon Summit)",
+   "confidence": "high",
+   "notes": "Scope: Foundry wafers for Qualcomm chips. Samsung is one of three named primary foundries. Qualcomm confirmed that its flagship 2nm Snapdragon 8 Elite Gen 6 and 8 Elite Extreme Gen 6 are both made by TSMC, so the 'dual-source' label is not supported\n\nThe claimed 0.39 is unsupported. The relationship itself is disclosed in the 10-K, but that disclosure covers all Qualcomm ICs, not Snapdragon SoCs specifically. Snapdragon premium SoCs have been TSMC-only since Qualcomm moved the 8 Gen 1 family to TSMC in 2022. The 2026 flagships (8 Elite Gen 5, including the 'for Galaxy' variant, plus 8 Elite Gen 6 and Extreme Gen 6) are all TSMC. A Samsung-made 2nm 'Kaanapali S' / 8 Elite Gen 5 was reported in 2025 and Jan 2026, but TrendForce (Sept 2026) says Qualcomm AP production at Samsung 2nm has not started. The rule-mapped 0.25 therefore probably overstates Samsung's share of Snapdragon SoC wafers, and no public number exists to refine it. Recommendation: rename the component as shown and drop the 'dual-source' wording. If the app needs strictly the 'Snapdragon SoC' edge, set keep=false as unsourced at the product level. The Sammy Fans page is a secondary report of the Qualcomm executive's remarks; the Chosun/Korean original was not opened. The Qualcomm press release page for the 8 Elite Gen 5 for Galaxy could not be read (fetch timed out) and is not relied on.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/804328/000080432825000085/qcom-20250928.htm",
+     "publisher": "Qualcomm Inc., Form 10-K FY2025 (SEC EDGAR)",
+     "date": "2025-11-05",
+     "quote": "The primary foundry suppliers for our various digital, analog/mixed-signal, RF and PM integrated circuits include Taiwan Semiconductor Manufacturing Company (TSMC), Samsung Electronics and Global Foundries."
+    },
+    {
+     "url": "https://www.thelec.net/news/articleView.html?idxno=14172",
+     "publisher": "The Elec (direct quote of Qualcomm SVP Chris Patrick)",
+     "date": "2026-09-24",
+     "quote": "\"All of the latest components based on the 2-nanometer process that we announced today are manufactured by TSMC,\" Chris Patrick, senior vice president and general manager of mobile handsets at Qualcomm, said at Snapdragon Summit 2026 in Maui on Sept. 22."
+    },
+    {
+     "url": "https://www.sammyfans.com/2026/09/23/qualcomm-confirms-tsmc-makes-both-new-2nm-snapdragon-chips/",
+     "publisher": "Sammy Fans",
+     "date": "2026-09-23",
+     "quote": "Qualcomm executive Chris Patrick confirmed that both the Snapdragon 8 Elite Gen 6 and Snapdragon 8 Elite Extreme Gen 6 are being manufactured by TSMC."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2026/09/11/news-samsung-qualcomm-2nm-deal-may-slip-to-2027-foundry-resists-lower-pricing-as-process-stabilizes/",
+     "publisher": "TrendForce (citing The Bell)",
+     "date": "2026-09-11",
+     "quote": "Qualcomm AP production using Samsung Foundry's 2nm could be pushed back to next year, with prolonged price negotiations making production before the end of 2026 increasingly uncertain."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "SAMSUNG",
+   "target": "NVDA",
+   "relation": "SUPPLIES",
+   "component": "HBM4 stacks (Vera Rubin), some HBM3E",
+   "dependency": 0.25,
+   "provenance": "REPORTED",
+   "basis": "Hankyung, via TrendForce (Feb 2026), reports NVIDIA's provisional HBM4 allocation as SK hynix mid-50%, Samsung mid-20%, Micron about 20%. Mid-20% is taken as 0.25. A June 2026 report cites supply-chain analysts estimating Samsung at about 25-30% of Vera Rubin HBM4 volume. Yonhap puts SK hynix at close to 70%, which caps Samsung at about 30% or less. NVIDIA's FY2026 10-K confirms Samsung as one of three memory suppliers; under the qualitative rule that would also map to 0.25 ('one of several').",
+   "as_of": "2026 (allocation made late 2025; estimates repeated through June 2026)",
+   "confidence": "medium",
+   "notes": "Scope: HBM stacks: HBM4 for Vera Rubin (the numeric share applies here), plus a limited volume of HBM3E 12-high for Blackwell Ultra\n\nThe claimed 0.24 is close by coincidence but was invented; replace it with 0.25 using the sources above. The published estimates span a range: about 20% (a Hankyung headline relayed on X), mid-20% (Hankyung via TrendForce), 25-30% (TechTimes analysts via Yahoo, June 2026), and 'more than 30%' (DigiTimes, Dec 2025, describing Samsung's negotiating target, not a confirmed allocation). No number is published for HBM3E specifically: KED only says Samsung's HBM3E 12-high volumes to NVIDIA are 'relatively small'. That wording maps to 'a supplier' = 0.25, but actual HBM3E volume is probably lower. So the component label should say HBM4 (Vera Rubin) rather than 'HBM3E stacks'. KED (Mar 2026) reported Samsung and SK hynix as the sole Rubin HBM4 suppliers, but NVIDIA later (June 2026) said Micron was also qualified, so a three-way split is current. Counterpoint's Q2 2026 global HBM revenue share (Samsung 33%) covers all customers, not NVIDIA alone, and was not used. NVIDIA has not disclosed the allocations.",
+   "sources": [
+    {
+     "url": "https://www.trendforce.com/news/2026/02/09/news-samsung-hbm4-reportedly-to-ship-first-after-lunar-new-year-initial-share-projected-at-mid-20/",
+     "publisher": "TrendForce (citing Hankyung / Yonhap)",
+     "date": "2026-02-09",
+     "quote": "SK hynix is said to have received the largest share, in the mid-50% range, while Samsung holds the mid-20% range and Micron around 20%, the report adds."
+    },
+    {
+     "url": "https://finance.yahoo.com/sectors/technology/articles/nvidia-certifies-samsung-sk-hynix-133001560.html",
+     "publisher": "Yahoo Finance (citing TechTimes)",
+     "date": "2026-06-05",
+     "quote": "While Nvidia has not disclosed official HBM4 volume allocations, supply-chain analysts cited by TechTimes estimate SK Hynix holds roughly 60–70% of Vera Rubin HBM4 volume, with Samsung capturing approximately 25–30% and Micron supplying the remainder."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2026/01/28/news-sk-hynix-reportedly-to-supply-about-two-thirds-of-nvidia-hbm4-samsung-targets-early-delivery/",
+     "publisher": "TrendForce (citing Yonhap News)",
+     "date": "2026-01-28",
+     "quote": "sources say NVIDIA is expected to allocate roughly two-thirds of its HBM4 demand for the Vera Rubin platform to SK hynix, with the company's share understood to be close to 70%."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+     "publisher": "NVIDIA Corp., Form 10-K FY2026 (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung."
+    },
+    {
+     "url": "https://www.kedglobal.com/korean-chipmakers/newsView/ked202509190008",
+     "publisher": "KED Global (Korea Economic Daily)",
+     "date": "2025-09-19",
+     "quote": "Volumes of 12-layer HBM3E chips to be supplied to Nvidia are expected to be relatively small, as Samsung is the third supplier to secure approval, following SK Hynix Inc. and Micron Technology Inc., sources said."
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "reported 'mid-20%' HBM4 allocation (Hankyung via TrendForce)"
+  },
+  {
+   "source": "SAMSUNG",
+   "target": "TSLA",
+   "relation": "FABRICATES",
+   "component": "FSD inference SoC (AI4/HW4, Samsung 7nm)",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "Tesla CEO Elon Musk (X post, quoted verbatim by CNBC and Tom's Hardware): 'Samsung currently makes AI4.' This names Samsung as the maker of the whole chip, and no second AI4 foundry is reported anywhere. It is mapped to the 'sole / only supplier' bucket = 0.95. The wording does not literally say 'sole', which is why confidence is medium. AI4 remains the vehicle chip as of Sept 2026: AI5 goes to Optimus and data centers first, with volume production 'hopefully next year'. Musk also said Samsung is doing the AI4+ revision.",
+   "as_of": "2026 (Musk statement July 2025; vehicle-chip status confirmed on Tesla's Q1 and Q2 2026 earnings calls)",
+   "confidence": "medium",
+   "notes": "Scope: FSD inference SoC for vehicles: AI4/HW4, made on Samsung 7nm. Samsung is also making the AI4+ revision; AI5 is split between TSMC and Samsung and is not yet in vehicles\n\nThe claimed 0.83 is unsupported. For the current vehicle FSD chip (AI4), Samsung is the only reported foundry. Musk's X post (x.com/elonmusk/status/1949673345567592869) was not opened directly because X needs a login; its text was checked verbatim in the CNBC and Tom's Hardware copies. Obsolescence flag: this figure holds only while vehicles use AI4/AI4+. Musk has said AI5, and later AI6, will be made by both TSMC and Samsung. Once AI5 enters vehicles (2027 at the earliest), the edge becomes dual-source, which the rule maps to 0.50; no public split between the two foundries exists. Reports differ on AI6: one says Samsung will make it exclusively, while Musk's Nov 2025 remark says both fabs. Early-2026 reports of an 'AI4.5' three-chip board did not identify its foundry. The Q1 2026 call quotes come from press summaries (Electrek, The Tribune), not an official Tesla transcript.",
+   "sources": [
+    {
+     "url": "https://www.cnbc.com/2025/07/28/samsung-electronics-new-chip-supply-contract.html",
+     "publisher": "CNBC (quoting Elon Musk's X post)",
+     "date": "2025-07-28",
+     "quote": "Samsung's giant new Texas fab will be dedicated to making Tesla's next-generation AI6 chip. The strategic importance of this is hard to overstate. Samsung currently makes AI4."
+    },
+    {
+     "url": "https://www.tomshardware.com/tech-industry/semiconductors/samsung-inks-usd16-5-billion-tesla-ai-chip-deal-elon-musk-says-samsung-will-produce-new-a16-chips-the-strategic-importance-of-this-is-hard-to-overstate",
+     "publisher": "Tom's Hardware",
+     "date": "2025-07-28",
+     "quote": "Samsung used to produce Tesla's HW3 (AI3) processor using its 14nm-class fabrication process and is currently producing the company's HW4 (AI4) SoC using its 7nm-class (7LPP?) manufacturing technology."
+    },
+    {
+     "url": "https://electrek.co/2026/04/23/tesla-hw4-plus-upgrade-will-hw4-follow-hw3/",
+     "publisher": "Electrek",
+     "date": "2026-04-23",
+     "quote": "Musk described the upgrade while explaining why Tesla's next-generation AI5 chip won't go into vehicles anytime soon."
+    },
+    {
+     "url": "https://www.tribuneindia.com/news/2-nanometer/musk-confirms-samsung-will-produce-upgraded-ai4-self-driving-chip",
+     "publisher": "The Tribune (India)",
+     "date": "2026-04-24",
+     "quote": "\"Samsung is doing a revision on the chip,\" he told analysts, framing AI4+ as a bridge that lets Tesla keep its existing production lines running"
+    },
+    {
+     "url": "https://www.notateslaapp.com/news/4481/summary-of-teslas-2026-q2-earnings-call-cybercab-fsd-ai4-and-more",
+     "publisher": "Not a Tesla App (Q2 2026 earnings call summary)",
+     "date": "2026-07-22",
+     "quote": "AI5 will be in volume production hopefully next year, as the chip team has exceeded expectations with the design."
+    },
+    {
+     "url": "https://www.tomshardware.com/tech-industry/semiconductors/musk-confirms-tesla-ai5-and-ai6-will-be-made-at-samsung-and-tsmc",
+     "publisher": "Tom's Hardware (quoting Musk)",
+     "date": "2025-11-10",
+     "quote": "Slightly different versions of the Tesla AI5 chip will be made at TSMC and Samsung simply because they translate designs to physical form differently, but the goal is that our AI software works identically."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "SK_HYNIX",
+   "target": "NVDA",
+   "relation": "SUPPLIES",
+   "component": "HBM3E stacks",
+   "dependency": 0.71,
+   "provenance": "REPORTED",
+   "basis": "Daishin Securities (Korean brokerage, analyst Ryu Hyung-geun) estimated that SK hynix will hold a 71% volume share of NVIDIA's HBM3E in 2026, as reported by NewDaily on 2026-03-30. 71% = 0.71. The relationship itself is DISCLOSED in NVIDIA's FY2026 10-K ('We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung') and in SK hynix's 2026 SEC prospectus (the June 2026 NVIDIA partnership 'also includes the supply of memory semiconductors'). Other reports agree: Hankyung, via TrendForce, says SK hynix will take 'over half' of NVIDIA's total 2026 HBM including HBM3E, and the same Daishin analyst puts SK hynix's volume share across all NVIDIA HBM at 72% in 2025, falling to 63% in 2026.",
+   "as_of": "2026 (estimate published 2026-03-30)",
+   "confidence": "medium",
+   "notes": "The 0.71 figure is a sell-side analyst's forecast of 2026 volume share for NVIDIA's HBM3E. It is not disclosed by either company. I pulled the Korean NewDaily page directly and confirmed the quotes, date (2026-03-30 10:58 KST) and author. The TrendForce and NVIDIA-newsroom quotes came through a page-summarizing fetch, not a raw read, although the Hankyung sentence came back identical on two fetches. I confirmed the NVIDIA 10-K and SK hynix 424B4 quotes from the raw EDGAR text. Context: HBM4 estimates conflict (Yonhap about 67-70%, Daishin 55%), and Samsung is gaining share. Counterpoint via Seoul Economic Daily (2026-09-03) puts SK hynix's revenue share of the whole HBM market at 50% in Q2 2026, versus IDC's 56.4% in Q1 2026 (SK hynix prospectus). Those are market-wide shares, not NVIDIA-specific. If the app wants all of NVIDIA's HBM (HBM3E and HBM4) rather than HBM3E only, the best-supported 2026 figure is 0.63 (Daishin, same article). The unrelated F-1 fact that SK hynix's largest customer was 23.9% of its 2025 revenue measures SK hynix's dependence on that customer, not NVIDIA's dependence on SK hynix, so I did not use it.",
+   "sources": [
+    {
+     "url": "https://biz.newdaily.co.kr/site/data/html/2026/03/30/2026033000155.html",
+     "publisher": "NewDaily (뉴데일리), reporter 이나리, citing Daishin Securities, 2026-03-30",
+     "date": "",
+     "quote": "30일 대신증권은 2026년 엔비디아 HBM3E 시장에서 SK하이닉스가 물량 기준 점유율 71%를 차지할 것으로 추정했다. HBM4에서도 SK하이닉스 55%, 삼성전자 28%, 마이크론 17% 구도를 제시했다."
+    },
+    {
+     "url": "https://biz.newdaily.co.kr/site/data/html/2026/03/30/2026033000155.html",
+     "publisher": "NewDaily (뉴데일리), quoting Daishin Securities analyst Ryu Hyung-geun, 2026-03-30",
+     "date": "",
+     "quote": "류형근 대신증권 연구원은 \"SK하이닉스의 엔비디아 내 물량 기준 점유율이 2025년 72%에서 2026년 63%로 낮아질 수는 있어도, 여전히 가장 강한 파트너십을 유지할 것\"이라고 내다봤다."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2026/03/09/news-samsung-sk%E2%80%AFhynix-reportedly-tapped-as-nvidia-rubin-hbm4-suppliers-shipments-could-start-in-march/",
+     "publisher": "TrendForce (citing Hankyung), 2026-03-09",
+     "date": "",
+     "quote": "SK hynix to take over half of NVIDIA's total HBM supply in 2026, including HBM3E, while Samsung is set to lead Vera Rubin-specific HBM4."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+     "publisher": "NVIDIA Corporation, Form 10-K (FY2026), 2026-02-25",
+     "date": "",
+     "quote": "We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/0002120882/000119312526299963/d32785d424b4.htm",
+     "publisher": "SK hynix Inc., Form 424B4 prospectus (SEC), 2026-07",
+     "date": "",
+     "quote": "In June 2026, we announced a technology partnership with NVIDIA Corporation (\"NVIDIA\") to advance next-generation memory aligned with NVIDIA's AI infrastructure roadmap, which also includes the supply of memory semiconductors."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2026/01/28/news-sk-hynix-reportedly-to-supply-about-two-thirds-of-nvidia-hbm4-samsung-targets-early-delivery/",
+     "publisher": "TrendForce (citing Yonhap), 2026-01-28",
+     "date": "",
+     "quote": "NVIDIA is expected to allocate roughly two-thirds of its HBM4 demand for the Vera Rubin platform to SK hynix, with the company's share understood to be close to 70%."
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "71% of 2026 HBM3E, Daishin Securities forecast"
+  },
+  {
+   "source": "SK_HYNIX",
+   "target": "DELL",
+   "relation": "SUPPLIES",
+   "component": "Memory and storage parts (client SSDs confirmed)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "No public source gives SK hynix's share of Dell's DRAM or DDR5 purchases. Dell's own Public Supplier List (published December 2025, covering at least 95% of FY2025 spend) lists 'SK Hynix Semiconductor' at four sites (Cheongju, Icheon, Wuxi, Chongqing) as a 'Parts / Components' / 'Other direct material' supplier. It sits alongside other memory and storage suppliers on the same list: Samsung, Micron Technology, Kingston, Smart Modular, Adata, Kioxia and Western Digital. That makes SK hynix 'a supplier / one of several', which maps to 0.25 under the rule. Korea Times separately reports SK hynix supplying PQC21 SSDs to Dell from April 2026.",
+   "as_of": "Dell FY2025 (list published Dec 2025); SSD supply from April 2026",
+   "confidence": "low",
+   "notes": "Scope: Memory/storage components (Dell 'Parts / Components'; DDR5 modules not specifically disclosed; client SSDs confirmed)\n\nI downloaded and text-extracted the Dell supplier-list PDF myself (34 pages) and confirmed the quotes. The row quote joins table columns with ' | '. The Korea Times quote came through a page-summarizing fetch, not a raw read. Dell's FY2026 10-K and its Q2 FY2027 10-Q (filed 2026-09-08) do not name SK hynix, Samsung or Micron, and use only generic 'single-source or limited-source suppliers' language. SK hynix's 2026 SEC prospectus does not mention Dell. I found no evidence that SK hynix supplies DDR5 modules to Dell specifically. The listed Wuxi site is an SK hynix DRAM fab, which suggests DRAM supply but does not prove it. Do not substitute SK hynix's global DRAM share (29.1% of revenue in Q1 2026, per IDC in the SK hynix prospectus) as Dell's dependency; that is market-wide, not Dell-specific. If the app cannot accept a non-DDR5 component label, drop the DDR5-specific edge (keep=false, UNSOURCED) and keep only a generic memory-supplier edge.",
+   "sources": [
+    {
+     "url": "https://www.delltechnologies.com/asset/en-us/solutions/business-solutions/briefs-summaries/dell-public-supplier-list.pdf",
+     "publisher": "Dell Technologies, Public Supplier List, 2025-12",
+     "date": "",
+     "quote": "The list of supplier facilities includes original design manufacturers (ODMs), final assembly and material suppliers that Dell buys from directly and/or provide substantial product transformation. ... This list represents a snapshot covering at least 95% of Dell's spend during fiscal year 2025."
+    },
+    {
+     "url": "https://www.delltechnologies.com/asset/en-us/solutions/business-solutions/briefs-summaries/dell-public-supplier-list.pdf",
+     "publisher": "Dell Technologies, Public Supplier List, 2025-12",
+     "date": "",
+     "quote": "SK Hynix Semiconductor | 2091 Gyeongchung-Daero, Bubal-Eub, Icheon-Si, Gyeonggi-Do, South Korea | Parts / Components | Other direct material suppliers | SK Hynix | Yes"
+    },
+    {
+     "url": "https://www.koreatimes.co.kr/business/companies/20260408/sk-hynix-to-supply-advanced-storage-solution-designed-for-ai-pc-to-dell",
+     "publisher": "The Korea Times, 2026-04-08",
+     "date": "",
+     "quote": "SK hynix plans to begin full-fledged supply of an advanced storage solution for personal computers designed to carry out artificial intelligence (AI) tasks to Dell Technologies this month"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "TSMC",
+   "target": "NVDA",
+   "relation": "FABRICATES",
+   "component": "4N/4NP (Blackwell) and 3nm (Rubin) GPU dies",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "No filing or analyst gives a numeric share. NVIDIA's 10-K names 'foundries, such as TSMC and Samsung' for all of its wafers, which is company-wide and not specific to GPU dies. For this component, NVIDIA's own statements tie the dies to TSMC. Blackwell GPUs are 'manufactured using a custom-built TSMC 4NP process', which is TSMC's own process, so no other foundry can make those dies. For Rubin, CEO Jensen Huang said all six new chips (CPU, GPU, NVLink switch, networking chip, networking switch, silicon photonics) were taped out to TSMC: 'All these new chips are now in TSMC's fab.' 'All ... in TSMC's fab' is read as sole/only supplier, which maps to 0.95. Caveat: the rule's literal keywords (sole/exclusive/only) do not appear in any NVIDIA source. TrendForce (Jun 2026) calls TSMC NVIDIA's 'primary' partner, but that describes the whole company, not this component. Against: NVIDIA is only testing Intel 18A (evaluation/MPW stage, no production order), and the Samsung 4nm part in Vera Rubin is Groq's LPX/LP30, not an NVIDIA GPU die.",
+   "as_of": "2025-2026 (10-K for FY ending Jan 2026; Blackwell process disclosure Mar 2024; Rubin statement Aug 2025; re-checked 2026-09-24)",
+   "confidence": "medium",
+   "notes": "The 0.95 applies to GPU dies only. NVIDIA's wider leading-edge silicon is no longer 100% TSMC: Samsung makes the Groq LP30 inference chip on its 4nm node for Vera Rubin racks (SamMobile, Aug 2026). The 10-K also lists Samsung as a foundry. If the edge were meant as 'all NVIDIA wafers', the 10-K wording names two foundries and would map to 0.50, but that is not this component. The Huang quote is from the Taipei Times; CNBC's copy of the same remarks returned HTTP 403. I did not treat it as DISCLOSED because it is a verbal remark about one product generation, not a stated share. The old 0.92 had no source.",
+   "sources": [
+    {
+     "url": "https://www.taipeitimes.com/News/front/archives/2025/08/23/2003842521",
+     "publisher": "Taipei Times (quoting NVIDIA CEO Jensen Huang)",
+     "date": "2025-08-23",
+     "quote": "We have now taped out six brand new chips to TSMC. ... All these new chips are now in TSMC’s fab."
+    },
+    {
+     "url": "https://www.nvidia.com/en-us/data-center/technologies/blackwell-architecture/",
+     "publisher": "NVIDIA (official product page)",
+     "date": "undated, accessed 2026-09-24",
+     "quote": "NVIDIA Blackwell-architecture GPUs pack 208 billion transistors and are manufactured using a custom-built TSMC 4NP process."
+    },
+    {
+     "url": "https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing",
+     "publisher": "NVIDIA Newsroom (press release)",
+     "date": "2024-03-18",
+     "quote": "Blackwell-architecture GPUs are manufactured using a custom-built 4NP TSMC process with two-reticle limit GPU dies"
+    },
+    {
+     "url": "https://blogs.nvidia.com/blog/tsmc-blackwell-manufacturing/",
+     "publisher": "NVIDIA (official blog)",
+     "date": "2025-10-17",
+     "quote": "the first NVIDIA Blackwell wafer produced on U.S. soil, representing that Blackwell has reached volume production"
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+     "publisher": "NVIDIA Form 10-K (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "We utilize foundries, such as Taiwan Semiconductor Manufacturing Company Limited, or TSMC, and Samsung Electronics Co., Ltd., or Samsung, to produce our semiconductor wafers."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2026/06/09/news-intel-foundry-gains-momentum-as-google-reportedly-orders-3m-tpus-nvidia-evaluates-18a-for-multi-die-gpu-design/",
+     "publisher": "TrendForce",
+     "date": "2026-06-09",
+     "quote": "NVIDIA’s engagement with Intel remains at the evaluation stage ... TSMC currently remains the company’s primary manufacturing and advanced packaging partner. NVIDIA’s Rubin GPUs are being produced on TSMC’s 3nm process"
+    },
+    {
+     "url": "https://www.sammobile.com/news/samsung-foundry-mass-production-nvidia-groq-3-lpx-chip/",
+     "publisher": "SamMobile",
+     "date": "2026-08-25",
+     "quote": "Nvidia then used Groq's LP30 chip, made on Samsung Foundry's 4nm process node, in its latest Vera Rubin platform."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "TSMC",
+   "target": "AAPL",
+   "relation": "FABRICATES",
+   "component": "A-series / M-series SoCs (3nm and, from A20, 2nm)",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "Apple's 10-K does not name TSMC; it says only 'single or limited sources'. Trade press calls TSMC the sole or exclusive supplier of Apple's SoCs since the A10 in 2016. 'sole supplier' / 'exclusive supplier' maps to 0.95. Update: the earlier claim that Apple's talks with Intel and Samsung 'led to no orders' (TrendForce, May 2026) is out of date. In June 2026, President Trump said Apple agreed to build chips with Intel. The WSJ, via MacRumors (Jul 2026), reports that Apple plans Intel-made chips for Mac laptops and iPhones but gives no timeline. AppleInsider (Jun 2026) says Intel won't reach full production for Apple until mid-2027 at the earliest, and won't make the iPhone 18 Pro Max or M5-and-later chips. So as of 2026-09-24, every shipping A/M-series SoC still comes from TSMC, and 0.95 holds. Once Intel-made Apple chips ship, the best-sourced wording becomes 'majority' (MacRumors/WSJ), which maps to 0.70; revisit then.",
+   "as_of": "2026-09-24 (TSMC is sole maker of shipping SoCs; Apple-Intel supply agreement reported Jun-Jul 2026 with Intel production not before mid-2027)",
+   "confidence": "high",
+   "notes": "Watch for 2027. Several outlets say (Tom's Hardware, TweakTown, TechPowerUp, citing a WSJ report from May 2026) that Apple has a preliminary or formal deal for Intel to make its lowest-end M-series chips on 18A-P, with shipments expected around 2027. Once that starts, the share for M-series drops below 0.95. I did not open the WSJ article itself. Apple's 10-K never names TSMC, so this edge cannot be DISCLOSED. The old 0.95 happens to match the sourced figure, but it had no source before.",
+   "sources": [
+    {
+     "url": "https://appleinsider.com/articles/26/04/22/where-apple-products-are-assembled-and-where-their-parts-come-from",
+     "publisher": "AppleInsider",
+     "date": "2026-04-22",
+     "quote": "TSMC has effectively been the sole supplier of iPhone processing hardware since the A10 chip, which debuted with the iPhone 7 back in 2016."
+    },
+    {
+     "url": "https://www.macrumors.com/guide/tsmc/",
+     "publisher": "MacRumors",
+     "date": "undated guide, accessed 2026-09-24 (latest linked item 2026-07-21)",
+     "quote": "TSMC has been the exclusive supplier of Apple's systems-on-a-chip since 2016, but that 10-year streak could be nearing its end."
+    },
+    {
+     "url": "https://appleinsider.com/articles/26/06/18/trump-confirms-that-apple-will-buy-chips-made-by-intel",
+     "publisher": "AppleInsider",
+     "date": "2026-06-18",
+     "quote": "Intel will not be making the chips for the forthcoming iPhone 18 Pro Max, for instance, nor the M5 or later ones for the Mac. ... Intel will not reach full chip production for Apple until mid-2027 at the earliest."
+    },
+    {
+     "url": "https://www.macrumors.com/2026/07/13/apple-agreed-intel-chips-trump-tariff-talks/",
+     "publisher": "MacRumors (citing WSJ)",
+     "date": "2026-07-13",
+     "quote": "Apple is expected to remain reliant on Taiwan Semiconductor Manufacturing Company, or TSMC, for the majority of its custom silicon. ... The WSJ report gives no timeline for when Intel-made chips might appear in shipping Apple products"
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+     "publisher": "Apple Form 10-K (SEC EDGAR)",
+     "date": "2025-10-31",
+     "quote": "certain components are currently obtained from single or limited sources."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "TSMC",
+   "target": "AMD",
+   "relation": "FABRICATES",
+   "component": "CPU/GPU wafers at 7nm and below (5nm/3nm/2nm chiplets)",
+   "dependency": 1.0,
+   "provenance": "DISCLOSED",
+   "basis": "AMD's FY2025 10-K (filed 2026-02-04) says it relies on TSMC for 'all wafers for microprocessor and GPU products at 7 nanometer (nm) or smaller nodes'. That scope matches this component exactly, so the share is 100%. AMD's May 2026 press release confirms the 2nm EPYC 'Venice' ramp is also at TSMC.",
+   "as_of": "FY2025 10-K (filed 2026-02-04); reconfirmed by AMD press release 2026-05-21",
+   "confidence": "high",
+   "notes": "If the app caps dependencies at the 0.95 'sole' level, use 0.95. The filing itself supports 1.0. There is one unconfirmed report of a Samsung 2nm notebook-CPU order from AMD: Wccftech on 2026-05-10, citing Daishin Securities via a tipster. Neither company has confirmed it and it is not in production, so it does not change the current figure. Programmable-logic ICs (Xilinx) also use UMC and Samsung, but those are not this component. The old 0.88 had no source.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/2488/000000248826000018/amd-20251227.htm",
+     "publisher": "AMD Form 10-K (SEC EDGAR)",
+     "date": "2026-02-04",
+     "quote": "We rely on Taiwan Semiconductor Manufacturing Company Limited (TSMC) for the production of all wafers for microprocessor and GPU products at 7 nanometer (nm) or smaller nodes, and we rely primarily on GLOBALFOUNDRIES Inc. (GF) for wafers for microprocessor and GPU products manufactured at process nodes larger than 7 nm."
+    },
+    {
+     "url": "https://ir.amd.com/news-events/press-releases/detail/1287/amd-announces-production-ramp-of-next-generation-amd-epyc-processor-venice-on-tsmc-2nm-process-technology",
+     "publisher": "AMD Investor Relations (press release)",
+     "date": "2026-05-21",
+     "quote": "AMD (NASDAQ: AMD) today announced that its next-generation AMD EPYC™ processor, codenamed 'Venice,' is ramping production in Taiwan on TSMC's advanced 2nm process technology"
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "disclosed: all CPU/GPU wafers at 7nm and below (AMD 10-K)"
+  },
+  {
+   "source": "TSMC",
+   "target": "QCOM",
+   "relation": "FABRICATES",
+   "component": "Flagship (leading-edge 3nm/2nm) Snapdragon SoCs",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "At Snapdragon Summit in Maui on 2026-09-22 (local time), Qualcomm SVP Chris Patrick said both newly announced 2nm flagship Snapdragons (8 Elite Gen 6 and 8 Elite Gen 6 Extreme) are 'all manufactured by TSMC'. Digitimes reports Qualcomm is 'sticking with TSMC for both' chips, and Sammy Fans says they 'have gone exclusively to TSMC'. 'exclusively' maps to sole/exclusive, which is 0.95. The current 3nm flagship, Snapdragon 8 Elite Gen 5 (including the 'for Galaxy' version in the Galaxy Z Fold 8), is on TSMC 3nm. A Samsung-built 2nm Snapdragon was reported as likely in Jan 2026 but never shipped. Qualcomm keeps Samsung Foundry as a partner for future work, so revisit if Samsung wins a flagship. This covers leading-edge flagship SoCs only.",
+   "as_of": "2026-09",
+   "confidence": "medium",
+   "notes": "This figure is lower-confidence than the others. The Digitimes article is paywalled; I could only confirm its headline and lead sentence. The executive quote comes from iNews24, a Korean outlet, which I opened. If the edge means ALL Snapdragon SoCs, including mid and low tier, no public source gives a share. The 10-K names TSMC as one of three primary foundries for all Qualcomm ICs, which maps to 'one of several' = 0.25 for the whole company. There are unverified 2025-26 reports that a Samsung-made 2nm 'Snapdragon 8 Elite Gen 5 for Galaxy' would ship in the Galaxy Z Flip 8. I could not confirm that it did. Korean media also report Qualcomm-Samsung 2nm talks for 2027, so this figure could fall. The old 0.61 had no source.",
+   "sources": [
+    {
+     "url": "https://www.inews24.com/view/2008915",
+     "publisher": "iNews24 (quoting Qualcomm SVP Chris Patrick)",
+     "date": "2026-09-23 (article; statement made 2026-09-22 local time)",
+     "quote": "오늘 발표한 2나노 공정 2종은 모두 TSMC에서 제조된다 (\"The two 2-nanometer process products announced today are all manufactured by TSMC.\")"
+    },
+    {
+     "url": "https://www.digitimes.com/news/a20260924VL210/qualcomm-tsmc-snapdragon-samsung-2nm.html",
+     "publisher": "DIGITIMES Asia",
+     "date": "2026-09-24",
+     "quote": "Qualcomm is sticking with TSMC for both of its newly launched 2nm Snapdragon flagship processors"
+    },
+    {
+     "url": "https://www.sammyfans.com/2026/09/23/qualcomm-confirms-tsmc-makes-both-new-2nm-snapdragon-chips/",
+     "publisher": "Sammy Fans (citing iNews24)",
+     "date": "2026-09-23",
+     "quote": "Qualcomm has reaffirmed that Samsung Foundry remains an important manufacturing partner, but its latest 2nm smartphone chips have gone exclusively to TSMC."
+    },
+    {
+     "url": "https://sammyguru.com/your-ram-and-chipset-options-for-galaxy-z-fold-8-ultra-fold-8-flip-8/",
+     "publisher": "SammyGuru",
+     "date": "2026-07-24",
+     "quote": "Both the Galaxy Z Fold 8 Ultra and Fold 8 (Wide) are powered by Qualcomm’s Snapdragon 8 Elite Gen 5 for Galaxy chipset. Built on TSMC’s cutting-edge 3nm process"
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/804328/000080432825000085/qcom-20250928.htm",
+     "publisher": "Qualcomm Form 10-K (SEC EDGAR)",
+     "date": "2025-11-05",
+     "quote": "The primary foundry suppliers for our various digital, analog/mixed-signal, RF and PM integrated circuits include Taiwan Semiconductor Manufacturing Company (TSMC), Samsung Electronics and Global Foundries."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "TSMC",
+   "target": "AVGO",
+   "relation": "FABRICATES",
+   "component": "Outsourced wafers (custom AI ASICs / XPUs, SerDes, networking silicon)",
+   "dependency": 0.95,
+   "provenance": "DISCLOSED",
+   "basis": "Broadcom's FY2025 10-K states a number directly: 'approximately 95% of the wafers manufactured by our CMs were produced by TSMC' during fiscal year 2025. The custom ASIC and SerDes parts are standard CMOS, which Broadcom outsources, so they fall inside that outsourced-wafer base.",
+   "as_of": "FY2025 (fiscal year ended 2025-11-02; 10-K filed 2025-12-18)",
+   "confidence": "high",
+   "notes": "The 95% counts outsourced (contract-manufacturer) wafers only. Broadcom's own fabs make FBAR filters and lasers, which are outside this CMOS component. The share for leading-edge custom ASICs alone is probably close to 100%, but only the 95% blended figure is disclosed, so use 0.95. The latest 10-Q (filed 2026-09-10) has no updated figure. The old 0.74 had no source.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm",
+     "publisher": "Broadcom Form 10-K (SEC EDGAR)",
+     "date": "2025-12-18",
+     "quote": "During fiscal year 2025, approximately 95% of the wafers manufactured by our CMs were produced by TSMC. We believe our wafer requirements represent a meaningful portion of TSMC's total production capacity."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm",
+     "publisher": "Broadcom Form 10-K (SEC EDGAR)",
+     "date": "2025-12-18",
+     "quote": "We use our internal fabrication facilities for products utilizing our innovative and proprietary processes, such as our FBAR filters for wireless communications and our vertical-cavity surface emitting laser ... while outsourcing commodity processes such as standard CMOS."
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "disclosed: ~95% of outsourced wafers (Broadcom 10-K)"
+  },
+  {
+   "source": "ASML",
+   "target": "TSMC",
+   "relation": "SUPPLIES",
+   "component": "EUV lithography systems (Low-NA NXE and High-NA EXE scanners)",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "ASML's FY2025 Form 20-F, filed with the SEC on 2026-02-25, says: \"ASML is currently the world's only manufacturer of EUV lithography systems.\" Under the rule, \"only supplier/manufacturer\" maps to 0.95. The relationship itself is confirmed in three places. First, the same 20-F says ASML received the \"TSMC Supplier 'Excellence in Green Manufacturing' Award\" in November 2025. Second, the joint ASML-TSMC press release of 2026-09-08 is on record. Third, TSMC told The Register in 2024 that its EUV tools accounted for 56% of the global installed base in 2023. That 56% is a 2023 snapshot used only to show TSMC is a major EUV user. It is not a current figure and not the dependency. Because ASML is the only EUV maker, all of TSMC's EUV tools are ASML's. The 20-F gives only anonymous customer concentration: the largest customer was 23.9% of 2025 net sales. That is a revenue share, not a supply share, and TSMC is not named, so it is not used. No reputable outlet or analyst publishes a numeric supply share, so this cannot be REPORTED. The filing states the sole-supplier fact in words, so it is QUALITATIVE.",
+   "as_of": "2025-2026",
+   "confidence": "high",
+   "notes": "The 20-F quote was checked by downloading the full filing from EDGAR (accession 0001628280-26-011378) and searching its text. It appears once, word for word. The TSMC press release blocked curl (HTTP 403), so its quote comes from a WebFetch word-for-word reproduction of the page body. The Register and TrendForce quotes also come from WebFetch. As a fact, 'world's only manufacturer' means 100% of TSMC's EUV scanners come from ASML. The 0.95 is only the required word-to-number mapping. If the app accepts a value that follows logically from a filing as DISCLOSED, then 1.0 DISCLOSED is also defensible. TSMC's own FY2025 20-F does not mention ASML or EUV at all; it only says equipment is 'available from a limited number of suppliers'. The edge is still current and not obsolete. China's Shenzhen prototype and US startups such as Substrate are still in development. None has shipped a commercial EUV tool to any customer. ASML's 20-F says its largest customer took 23.9% of 2025 net sales but does not name it. That figure also measures the opposite direction (ASML's revenue), so it is not usable as this dependency. Consider renaming the component to 'EUV lithography systems' for accuracy.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+     "publisher": "ASML Holding N.V., Form 20-F FY2025 (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "ASML is currently the world’s only manufacturer of EUV lithography systems."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+     "publisher": "ASML Holding N.V., Form 20-F FY2025 (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "We compete primarily with Canon and Nikon in respect of DUV systems."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+     "publisher": "ASML Holding N.V., Form 20-F FY2025 (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "In November 2025, we were honored to receive the TSMC Supplier ‘Excellence in Green Manufacturing’ Award"
+    },
+    {
+     "url": "https://pr.tsmc.com/english/news/3338",
+     "publisher": "TSMC / ASML joint press release",
+     "date": "2026-09-08",
+     "quote": "TSMC intends to use ASML's High NA technology in high-volume manufacturing for advanced nodes starting in 2030."
+    },
+    {
+     "url": "https://www.theregister.com/2024/11/07/tsmc_highna_euv/",
+     "publisher": "The Register (quoting a TSMC statement)",
+     "date": "2024-11-07",
+     "quote": "our EUV tool count was ten times greater in 2023 versus 2019, accounting for 56 percent of the global installed base"
+    },
+    {
+     "url": "https://www.trendforce.com/insights/asml-euv",
+     "publisher": "TrendForce",
+     "date": "2025-12-23",
+     "quote": "ASML has emerged as the world's only supplier capable of EUV HVM"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "ASML",
+   "target": "SAMSUNG",
+   "relation": "SUPPLIES",
+   "component": "EUV lithography systems (Low-NA NXE and High-NA EXE scanners)",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE",
+   "basis": "ASML's FY2025 Form 20-F, filed with the SEC on 2026-02-25, says: \"ASML is currently the world's only manufacturer of EUV lithography systems.\" Under the rule, \"only supplier/manufacturer\" maps to 0.95. The relationship is confirmed by the joint Samsung-ASML press release of 2026-09-08. It cites Samsung's \"extensive experience with advanced EUV lithography\" and its plan to put ASML High NA EUV into DRAM volume production by 2028. No reputable outlet or analyst publishes a numeric share, so this cannot be REPORTED.",
+   "as_of": "2025-2026",
+   "confidence": "high",
+   "notes": "The 20-F quote was checked in the full EDGAR filing text. The ASML press release quotes come from a WebFetch word-for-word reproduction of the asml.com page. Samsung's own newsroom copy (news.samsung.com) timed out and could not be opened, so the ASML-hosted copy of the joint release was used instead. As a fact, 'world's only manufacturer' means 100% of Samsung's EUV scanners come from ASML. The 0.95 is only the required word-to-number mapping. If a value that follows logically from a filing is accepted as DISCLOSED, then 1.0 DISCLOSED is defensible. The edge is not obsolete: Samsung is expanding EUV use, including High NA in DRAM by 2028. No rival EUV tool has been commercially shipped; the Chinese prototype and US startups remain in development. Reports in 2024 that Samsung scaled back the planned joint ASML R&D centre in Hwaseong (Businesskorea) do not affect the supply relationship.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+     "publisher": "ASML Holding N.V., Form 20-F FY2025 (SEC EDGAR)",
+     "date": "2026-02-25",
+     "quote": "ASML is currently the world’s only manufacturer of EUV lithography systems."
+    },
+    {
+     "url": "https://www.asml.com/en/news/press-releases/2026/samsung-electronics-and-asml-expand-collaboration-on-next-generation-semiconductor-manufacturing",
+     "publisher": "ASML / Samsung Electronics joint press release",
+     "date": "2026-09-08",
+     "quote": "Samsung also plans to introduce ASML's High NA extreme ultraviolet (EUV) lithography into future DRAM high-volume manufacturing for the first time in the industry by 2028"
+    },
+    {
+     "url": "https://www.asml.com/en/news/press-releases/2026/samsung-electronics-and-asml-expand-collaboration-on-next-generation-semiconductor-manufacturing",
+     "publisher": "ASML / Samsung Electronics joint press release",
+     "date": "2026-09-08",
+     "quote": "Drawing on its leadership in both memory and foundry manufacturing, as well as its extensive experience with advanced EUV lithography, Samsung is positioned to play a critical role in the 12-inch photomask transition."
+    },
+    {
+     "url": "https://www.asml.com/en/news/press-releases/2026/samsung-electronics-and-asml-expand-collaboration-on-next-generation-semiconductor-manufacturing",
+     "publisher": "ASML / Samsung Electronics joint press release",
+     "date": "2026-09-08",
+     "quote": "Samsung has been one of ASML's most important innovation partners for many years."
+    },
+    {
+     "url": "https://www.trendforce.com/insights/asml-euv",
+     "publisher": "TrendForce",
+     "date": "2025-12-23",
+     "quote": "ASML has emerged as the world's only supplier capable of EUV HVM"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "SHIN_ETSU",
+   "target": "TSMC",
+   "relation": "SUPPLIES",
+   "component": "300mm silicon wafers",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "No public source gives Shin-Etsu's share of TSMC's wafer purchases. TSMC does not break it down by supplier, and Shin-Etsu does not name TSMC as a major customer. TSMC's FY2023 Form 20-F lists Shin-Etsu Handotai as one of six named 'principal suppliers' of its wafers. Together those six supplied 96.2% of TSMC's wafer needs in 2023. Shin-Etsu is therefore 'one of several' suppliers, which the rule maps to 0.25. The wording that was mapped: 'The principal suppliers for our wafers are Formosa SUMCO Technology Corporation of Taiwan, GlobalWafers of Taiwan, Shin-Etsu Handotai of Japan, Siltronic AG of Germany, Soitec Microelectronics of Singapore, and SUMCO Corporation of Japan.' The word 'principal' describes all six suppliers as a group, not Shin-Etsu alone, so the 'primary / main' (0.70) tier does not apply. The claimed 0.34 has no source.",
+   "as_of": "2023 (last year TSMC named its wafer suppliers); relationship reconfirmed Nov 2025",
+   "confidence": "medium",
+   "notes": "The relationship is firmly sourced (TSMC's own filings and press releases), so keep=true. The size of the dependency is not: 0.25 comes from the qualitative mapping rule, not a measured share. TSMC named its wafer suppliers in 20-Fs through the FY2023 filing. From the FY2024 20-F (filed 2025-04-17) onward it only says 'a limited number of suppliers'. Its FY2025 Annual Report (ch.5, 'Major Raw Materials Supply') lists the raw-wafer suppliers only as 'A Company' to 'E Company' (five of them). That annual report also has a 'Suppliers Accounting for at Least 10% of Annual Consolidated Net Procurement' table (Company A 26%, Company B 19%, Company C 10% in 2025), but the names are hidden and the table does not say which materials, so it cannot be tied to Shin-Etsu. The Nov 2025 TSMC award to Shin-Etsu Handotai (SEH), Shin-Etsu's wafer subsidiary, shows the relationship is current, not obsolete. Do not use the Dec 2023 Shin-Etsu 'TSMC Excellent Performance Award' release: it was for litho (photoresist) materials, not wafers. Global market-share figures are not TSMC's supplier mix and should not be used as the dependency. TrendForce says 'over 30%'. Other market-research sites give 27% to 42%. Those sites are low quality, contradict each other, and were not used. Component caveat: TSMC's disclosure covers raw silicon wafers of all sizes, not 300mm alone. No source I found states SEH's 300mm share at TSMC specifically. Verification: the SEC 20-F quotes were pulled directly from EDGAR text. The TSMC press-release and 2022 annual-report quotes came through a fetch-and-summarize tool, not raw HTML (curl on investor.tsmc.com was blocked by Cloudflare), so check their exact punctuation before displaying them verbatim. The 'the the' typo is as returned.",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+     "publisher": "TSMC, Form 20-F for FY2023 (SEC EDGAR)",
+     "date": "2024-04-18",
+     "quote": "The principal suppliers for our wafers are Formosa SUMCO Technology Corporation of Taiwan, GlobalWafers of Taiwan, Shin-Etsu Handotai of Japan, Siltronic AG of Germany, Soitec Microelectronics of Singapore, and SUMCO Corporation of Japan. Together they supplied approximately 96.0%, 95.0% and 96.2% of our total wafer needs in 2021, 2022 and 2023, respectively."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1046179/000162828026025362/tsm-20251231.htm",
+     "publisher": "TSMC, Form 20-F for FY2025 (SEC EDGAR)",
+     "date": "2026-04-16",
+     "quote": "In pursuit of high quality raw wafers, the majority of our raw wafers are supplied by a limited number of suppliers located in Taiwan, Japan, Germany, and Singapore."
+    },
+    {
+     "url": "https://pr.tsmc.com/english/news/3274",
+     "publisher": "TSMC press release (2025 Supply Chain Management Forum awards)",
+     "date": "2025-11-26",
+     "quote": "Shin-Etsu Handotai Co., Ltd. - Excellent Technology Development and Production Support"
+    },
+    {
+     "url": "https://pr.tsmc.com/english/news/2995",
+     "publisher": "TSMC press release (2022 Excellent Performance Award)",
+     "date": "2023-01-18",
+     "quote": "Shin-Etsu Handotai Co., Ltd. - Excellent Advanced Material Development and Production Support in Silicon Wafer"
+    },
+    {
+     "url": "https://investor.tsmc.com/static/annualReports/2022/english/ebook/files/basic-html/page106.html",
+     "publisher": "TSMC 2022 Annual Report, Raw Materials Supply table",
+     "date": "2023",
+     "quote": "FST GlobalWafers SEH Siltronic SK siltron SUMCO ... These 6 suppliers together provide over 90% of the the world's raw wafer supply"
+    },
+    {
+     "url": "https://www.trendforce.com/news/2023/08/14/news-silicon-wafer-long-term-contracts-unstable-major-foundry-seeks-price-cut-from-japanese-suppliers/",
+     "publisher": "TrendForce News (relaying Money UDN)",
+     "date": "2023-08-14",
+     "quote": "With over 30% market share, Shin-Etsu leads, closely followed by SUMCO, combining for around 55% to 60% global share."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "FOXCONN",
+   "target": "AAPL",
+   "relation": "ASSEMBLES",
+   "component": "iPhone final assembly",
+   "dependency": 0.575,
+   "provenance": "REPORTED",
+   "basis": "Bloomberg Intelligence analysts, as reported by Economic Daily News on 2025-12-27, say Foxconn will keep a 55–60% share of iPhone assembly over the next two years (through end-2026). 0.575 is the midpoint of that range. Older Economic Daily News figures, relayed by TrendForce in Feb 2024, fit this range: Foxconn had 'over 60%' of iPhone 15 assembly orders and 'over 50%' of iPhone 16 orders.",
+   "as_of": "2025-2026 (Bloomberg Intelligence estimate published Dec 2025)",
+   "confidence": "medium",
+   "notes": "The old 0.67 looks like it came from Foxconn's share of iPhones made in INDIA in FY2023 (TrendForce/Bloomberg, Apr 2024). That is not its global share, so it should not be used. The same Bloomberg Intelligence report puts Luxshare at about 30% of iPhone orders: '預計未來兩年將負責30%的iPhone訂單'. Neither Apple nor Hon Hai discloses the assembly split, so this is an analyst estimate. The Chinese article was opened and the quotes were checked. The TrendForce quotes come from a page-summarizing fetch, so the exact wording is high-likelihood but not character-checked. Bloomberg's own English original is paywalled (403) and could not be opened.",
+   "sources": [
+    {
+     "url": "https://money.udn.com/money/story/5612/9229756",
+     "publisher": "Economic Daily News (udn.com), citing Bloomberg Intelligence, 2025-12-27",
+     "date": "",
+     "quote": "儘管立訊精密、塔塔等對手的市占率將小幅增加，鴻海在未來兩年仍將維持55–60%的iPhone組裝占有率"
+    },
+    {
+     "url": "https://money.udn.com/money/story/5612/9229756",
+     "publisher": "Economic Daily News (udn.com), citing Bloomberg Intelligence, 2025-12-27",
+     "date": "",
+     "quote": "彭博行業研究分析師表示，即便立訊精密與印度塔塔公司逐步擴大市占，鴻海（2317）仍將在2026年底前維持iPhone組裝龍頭地位。"
+    },
+    {
+     "url": "https://www.trendforce.com/news/2024/02/15/news-iphone-manufacturing-dominance-one-leader-two-contenders-one-challenger/",
+     "publisher": "TrendForce (citing Economic Daily News), 2024-02-15",
+     "date": "",
+     "quote": "Foxconn Group, accounting for over 50% of the share"
+    },
+    {
+     "url": "https://www.trendforce.com/news/2024/04/11/news-apple-reportedly-doubles-iphone-production-in-india-while-foxconn-holds-67-share/",
+     "publisher": "TrendForce (citing Bloomberg), 2024-04-11",
+     "date": "",
+     "quote": "nearly 67% of iPhones produced in India last year were assembled by Taiwan's Foxconn, while Pegatron accounted for about 17%."
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "midpoint of 55-60% reported by Bloomberg Intelligence"
+  },
+  {
+   "source": "FOXCONN",
+   "target": "NVDA",
+   "relation": "ASSEMBLES",
+   "component": "GB200/GB300 NVL72 AI server rack assembly/integration",
+   "dependency": 0.39,
+   "provenance": "REPORTED",
+   "basis": "A Morgan Stanley supply-chain estimate, reported by TechNews on 2026-09-10, says Foxconn's share of the GB200/300 rack supply chain moves from 46% in 2025 to 39% in 2026 (Quanta 23% to 26%, Wistron steady at 22%). 0.39 is the current-year (2026E) share. For 2025 the same firm's data give 46%. An earlier Morgan Stanley count, reported by Economic Daily News on 2026-01-09, was about 14,700 of about 29,000 racks, roughly 51%.",
+   "as_of": "2026 (estimate published 2026-09-10); 2025 actual about 46%",
+   "confidence": "medium",
+   "notes": "The Morgan Stanley report itself is not public. The figures come from Taiwanese financial press relaying it, and the quotes were checked on those pages. The old 0.52 matches an unattributed '鴻海在AI伺服器市場拿下52%份額' line on a CMoney blog and should not be used. Related figures that should NOT be used as this edge: (a) TrendForce, Dec 2024, 'Foxconn supplies approximately 80% to 90% of the components, excluding the GPU and CPU' measures GB200 bill-of-materials content, not rack share; (b) the Hon Hai chairman's 'over 40%' covers the whole AI-server market, not NVIDIA racks only. A modelling caveat: most GB200/300 racks are sold to hyperscalers and OEMs, not to NVIDIA itself. Foxconn's direct supply to NVIDIA is compute boards (FII and Wistron build the Bianca/HGX boards and sell them back to NVIDIA). The rack-share figure is the best public proxy for Foxconn's weight in NVIDIA's GB-platform supply chain. Some articles cite 43% for 2025 and 55–60% for 2026 (BigGo, 'institutional estimates'). That has no named source, so it was not used.",
+   "sources": [
+    {
+     "url": "https://cdnfinance.technews.tw/2026/09/10/morgan-stanley-is-bullish-on-nvidias-rack-server-shipments-expecting-them-to-double-this-year/",
+     "publisher": "TechNews 科技新報, citing Morgan Stanley, 2026-09-10",
+     "date": "",
+     "quote": "鴻海在 GB200/300 機櫃供應鏈的份額預計將從 2025 年的 46% 調整至 2026 年的 39%"
+    },
+    {
+     "url": "https://cdnfinance.technews.tw/2026/09/10/morgan-stanley-is-bullish-on-nvidias-rack-server-shipments-expecting-them-to-double-this-year/",
+     "publisher": "TechNews 科技新報, citing Morgan Stanley, 2026-09-10",
+     "date": "",
+     "quote": "8 月 GB200/300 機櫃出貨量約 2,600 台（月增 6%），全年機櫃出貨預測維持在約 3.17 萬台"
+    },
+    {
+     "url": "https://money.udn.com/money/story/5607/9255810",
+     "publisher": "Economic Daily News (udn.com), citing Morgan Stanley, 2026-01-09",
+     "date": "",
+     "quote": "於2025年12月出貨約2,800櫃GB200機櫃，全年出貨量約14,700櫃"
+    },
+    {
+     "url": "https://money.udn.com/money/story/5607/9255810",
+     "publisher": "Economic Daily News (udn.com), citing Morgan Stanley, 2026-01-09",
+     "date": "",
+     "quote": "預估2025年全年GB200／300機櫃出貨量約2.9萬櫃"
+    },
+    {
+     "url": "https://www.rti.org.tw/en/news?uid=3&pid=211518",
+     "publisher": "Radio Taiwan International (Hon Hai AGM statement), 2026-05-29",
+     "date": "",
+     "quote": "Liu also said Hon Hai's global market share in the AI sector exceeded 40%."
+    },
+    {
+     "url": "https://www.foxconn.com/en-us/press-center/press-releases/latest-news/1867",
+     "publisher": "Hon Hai Technology Group (Foxconn) press release, 2025-10-28",
+     "date": "",
+     "quote": "Foxconn and NVIDIA share an excellent partnership."
+    }
+   ],
+   "counter_evidence": [],
+   "weight_note": "39% of 2026 GB200/300 racks, Morgan Stanley estimate"
+  },
+  {
+   "source": "FOXCONN",
+   "target": "DELL",
+   "relation": "ASSEMBLES",
+   "component": "PowerEdge server manufacturing (ODM / final assembly)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "Dell's own Public Supplier List (Dec 2025, covering at least 95% of FY2025 spend) confirms the relationship. It lists Foxconn's Ciudad Juarez and Tlaquepaque (Mexico) sites as final-assembly/ODM suppliers for PowerEdge servers, PowerEdge XE and Server/Storage. The list also includes Inventec, Wistron and Dell's own plants for servers. No source gives a numeric share. Wording mapped: 'The network already includes Wistron, Foxconn, Inventec, and MiTAC' -> 'one of several' -> 0.25.",
+   "as_of": "FY2025 (Dell supplier list published Dec 2025); 2025-2026 press",
+   "confidence": "low",
+   "notes": "The relationship is DISCLOSED by Dell's own supplier list, which was downloaded and read. The list uses tables, so the quotes are joined cells from pdftotext output. No public source gives Foxconn's share of Dell server output, so the size rests only on the qualitative rule. Economic Daily News (Oct 2025) reports that Dell reshuffled its AI-server supply chain: Compal won a large AI-server order and Compal and Inventec become the main 2026 AI-server suppliers. Foxconn's share of Dell AI servers may therefore be falling in 2026. The PowerEdge relationship is not obsolete: the Dec 2025 list still shows the Mexico server sites. The old 0.44 has no source.",
+   "sources": [
+    {
+     "url": "https://i.dell.com/sites/doccontent/corporate/corp-comm/en/Documents/dell-suppliers.pdf",
+     "publisher": "Dell Technologies, Public Supplier List, 2025-12",
+     "date": "",
+     "quote": "This list represents a snapshot covering at least 95% of Dell's spend during fiscal year 2025."
+    },
+    {
+     "url": "https://i.dell.com/sites/doccontent/corporate/corp-comm/en/Documents/dell-suppliers.pdf",
+     "publisher": "Dell Technologies, Public Supplier List, 2025-12",
+     "date": "",
+     "quote": "Foxconn  Boulevard Internacional No. 888, Colonia San Jeronimo, Ciudad Juarez, Chihuahua, Mexico ... Poweredge Servers ... Poweredge XE ... Final Assembly and/or Original Design Manufacturers"
+    },
+    {
+     "url": "https://i.dell.com/sites/doccontent/corporate/corp-comm/en/Documents/dell-suppliers.pdf",
+     "publisher": "Dell Technologies, Public Supplier List, 2025-12",
+     "date": "",
+     "quote": "Foxconn  Avenida del Bosque No. 1170. Parque, Industrial El Bosque Tlaquepaque, Jalisco, C.P. 45619, Mexico  Server Storage PCBA  Final Assembly and/or Original Design Manufacturers"
+    },
+    {
+     "url": "https://www.taiwannews.com.tw/news/6207413",
+     "publisher": "Taiwan News (citing Commercial Times), 2025-09-25",
+     "date": "",
+     "quote": "The network already includes Wistron, Foxconn, Inventec, and MiTAC."
+    },
+    {
+     "url": "https://money.udn.com/money/story/5612/9088518",
+     "publisher": "Economic Daily News (udn.com), 2025-10-22",
+     "date": "",
+     "quote": "仁寶（2324）奪下戴爾AI伺服器大單，而該訂單原本是由鴻海（2317）、緯創（3231）、英業達（2356）供應"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "PEGATRON",
+   "target": "AAPL",
+   "relation": "ASSEMBLES",
+   "component": "iPhone final assembly (Pegatron-controlled lines)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "No reputable source gives a specific 2025-2026 figure for Pegatron's share of global iPhone assembly, so REPORTED cannot be used. The relationship is current and clearly sourced in words: Taipei Times (Nov 2025) calls Pegatron 'one of Apple Inc's iPhone assemblers', and TrendForce (Feb 2024) says 'Pegatron's share is expected to decrease to third place'. Both map to 'one of several / a supplier', which the rule sets at 0.25. The claimed 0.19 has no source.",
+   "as_of": "2025-2026",
+   "confidence": "low",
+   "notes": "Scope: iPhone final assembly (Pegatron-controlled lines, mainly Shanghai; the India plant is now Tata-controlled and Kunshan has been sold to Luxshare)\n\nTHE RELATIONSHIP IS CURRENT, NOT OBSOLETE. Pegatron shipped iPhone 17 units in Sep-Oct 2025 (DIGITIMES). In Aug 2026 it spoke about the iPhone 18 launch schedule on its earnings call (AppleInsider). Its 2025 annual report still describes a smartphone business. Apple's latest supplier list found (FY2023, published Apr 2024) names Pegatron. Apple does not name its assemblers in its 10-K.\n\nITS iPHONE FOOTPRINT HAS SHRUNK A LOT:\n(1) Kunshan (Jiangsu): 62.5% sold to Luxshare in Dec 2023. On 2025-08-13 Pegatron's board approved selling its remaining shares of Luxsan Precision Industry (Kunshan) (2025 Annual Report).\n(2) India (Tamil Nadu): Tata took 60% in Jan 2025. Pegatron keeps a 40% minority stake in 'Tata Electronics Products and Solutions Private Limited' (2025 AR investment table), and Bloomberg (Aug 2026) says the plant is 'now controlled by the Tata Group'. Output from that plant belongs to Tata, not Pegatron.\n(3) Shanghai: the only large Pegatron-controlled iPhone site confirmed by sources (Bloomberg via AppleInsider, 2023). Its current iPhone volume is not disclosed.\nThe India share figures below no longer describe Pegatron and should not be used: Counterpoint (Sep 2023) put Pegatron at about 10% of India iPhone output, and Bloomberg via TrendForce (Apr 2024) put it at about 17% of India output for the prior year.\n\nWARNING: 0.25 IS PROBABLY TOO HIGH. It comes only from the mandated word-to-number rule. The one reputable quantitative source found is Bloomberg Intelligence (Dec 2025, via Economic Daily News). Its two-year forecast of global iPhone assembly share is Foxconn 55-60%, Luxshare 30% and Tata 10-15%. Those add up to 95-105%, and Pegatron is not named at all. That implies Pegatron's own share is about 0-5%. This is my arithmetic, not a figure any source reports. If the app wants a number that matches the evidence rather than the wording rule, the defensible options are: (a) cap the edge at about 0.05 and label it as a residual derived from Bloomberg Intelligence, or (b) set it to null until an analyst publishes a figure for Pegatron.\n\nSOURCES REJECTED AS NOT REPUTABLE OR NOT SOURCED:\n- 'Pegatron ~10%' from a Tianxia Gongchang Research report (2026-06). It admits the split is an unattributed 'research institution estimate'.\n- 'Pegatron ~20%' from a personal Substack post. It has no sourcing and still treats Wistron as an iPhone assembler.\n- 'Pegatron assembles 20-30%', attributed to Nikkei (2022). Stale, and from before the sales.\n\nCUSTOMER CONCENTRATION (the reverse direction; reference only, not this edge's dependency): Pegatron's 2025 AR shows 'A Company' at 57.34% of 2025 net sales (59.34% in 2024). The customer is not named.\n\nLIMITATIONS: The per-model iPhone 15 splits (TrendForce, 2023, reprinted by PhoneArena) could not be opened (403) and are pre-sale anyway. The DIGITIMES articles are paywalled beyond the lead paragraph. The web-search budget ran out before I could look for a 2026 analyst figure (TrendForce, Counterpoint, Jeff Pu) specific to Pegatron.",
+   "sources": [
+    {
+     "url": "https://www.taipeitimes.com/News/biz/archives/2025/11/13/2003847099",
+     "publisher": "Taipei Times",
+     "date": "2025-11-13",
+     "quote": "Pegatron Corp (和碩), one of Apple Inc’s iPhone assemblers, yesterday reported that net profit last quarter soared"
+    },
+    {
+     "url": "https://www.digitimes.com/news/a20251010PD200/pegatron-revenue-shipments-iphone-2025.html",
+     "publisher": "DIGITIMES",
+     "date": "2025-10-13",
+     "quote": "Pegatron saw its September 2025 revenue rebound, driven by strong shipments of Apple's new iPhone 17 series"
+    },
+    {
+     "url": "https://appleinsider.com/articles/26/08/12/pegatron-says-the-base-iphone-18-wont-launch-alongside-the-iphone-18-pro-lineup",
+     "publisher": "AppleInsider (citing United Daily News)",
+     "date": "2026-08-12",
+     "quote": "Pegatron, one of Apple's key iPhone manufacturers, has confirmed the split launch date at its August 12 earnings conference."
+    },
+    {
+     "url": "https://www.trendforce.com/news/2024/02/15/news-iphone-manufacturing-dominance-one-leader-two-contenders-one-challenger/",
+     "publisher": "TrendForce (citing Economic Daily News)",
+     "date": "2024-02-15",
+     "quote": "Luxshare ranks second, while Pegatron’s share is expected to decrease to third place."
+    },
+    {
+     "url": "https://money.udn.com/money/story/5612/9229756",
+     "publisher": "Economic Daily News / UDN (reporting Bloomberg Intelligence)",
+     "date": "2025-12-27",
+     "quote": "鴻海在未來兩年仍將維持55–60%的iPhone組裝占有率 ... 立訊精密...預計未來兩年將負責30%的iPhone訂單 ... 其次是塔塔，未來兩年其組裝占有率應能達到10–15%"
+    },
+    {
+     "url": "https://techcrunch.com/2025/01/24/tata-acquires-60-stake-in-apple-partner-pegatron-india-unit/",
+     "publisher": "TechCrunch",
+     "date": "2025-01-24",
+     "quote": "Tata Electronics has acquired a 60% controlling stake in the Indian arm of Apple assembly partner Pegatron"
+    },
+    {
+     "url": "https://macdailynews.com/2026/08/06/how-apple-and-india-built-an-alternative-iphone-production-hub/",
+     "publisher": "MacDailyNews (excerpting Bloomberg)",
+     "date": "2026-08-06",
+     "quote": "About 30 kilometers (19 miles) away stands another iPhone assembly facility, this one run by Pegatron Corp., now controlled by the Tata Group."
+    },
+    {
+     "url": "https://appleinsider.com/articles/23/12/29/rising-star-luxshare-secures-major-stake-in-pegatrons-iphone-factory",
+     "publisher": "AppleInsider (citing Bloomberg)",
+     "date": "2023-12-29",
+     "quote": "Luxshare is buying a 62.5% stake in Pegatron's Kunshan factory in eastern China. ... Pegatron, based in Taipei, currently assembles iPhones at its Kunshan campus and another site in Shanghai."
+    },
+    {
+     "url": "https://www.pegatroncorp.com/media/20260508074846949_2025_Annual_Report_Eng.pdf",
+     "publisher": "Pegatron Corporation, 2025 Annual Report",
+     "date": "2026-05",
+     "quote": "Tata Electronics Products and Solutions ... 40%  |  2025.08.13 ... Approved to sell the shares of Luxsan Precision Industry (Kunshan) Co., Ltd.  |  In smartphone business, Pegatron will continue leveraging its technical expertise and manufacturing capabilities to meet customer needs."
+    },
+    {
+     "url": "https://s203.q4cdn.com/367071867/files/doc_downloads/2024/04/Apple-Supplier-List.pdf",
+     "publisher": "Apple Inc., Supplier List (fiscal year 2023)",
+     "date": "2024-04",
+     "quote": "Pegatron Corporation   Jiangsu, Shanghai   China mainland   Tamil Nadu   India"
+    }
+   ],
+   "counter_evidence": []
+  }
+ ],
+ "removed": [
+  {
+   "source": "LYNAS",
+   "target": "SONY",
+   "previous_dependency": 0.22,
+   "reason": "No public source links Lynas to Sony, directly or through a named intermediary (Lynas quarterly reports, Sony's SEC filings and conflict-minerals report, English and Japanese news all checked). Lynas sells separated rare earth oxides to magnet makers; it does not make magnets.",
+   "sources": [
+    {
+     "url": "https://wcsecure.weblink.com.au/pdf/LYC/03113064.pdf",
+     "publisher": "Lynas Rare Earths Ltd (Quarterly Report for period ended 30 June 2026, ASX release)",
+     "date": "2026-07-22",
+     "quote": "Lynas is uniquely positioned to operate effectively in this evolving market environment as the only commercial producer of light and heavy rare earth oxides outside of China."
+    },
+    {
+     "url": "https://wcsecure.weblink.com.au/pdf/LYC/03113064.pdf",
+     "publisher": "Lynas Rare Earths Ltd (Quarterly Report for period ended 30 June 2026, ASX release)",
+     "date": "2026-07-22",
+     "quote": "Lynas will supply rare earth materials to the JS Link magnet factory in Yesan, South Korea"
+    },
+    {
+     "url": "https://announcements.asx.com.au/asxpdf/20251030/pdf/06r89kkr64drjj.pdf",
+     "publisher": "Lynas Rare Earths Ltd (Quarterly Report for period ended 30 September 2025, ASX release)",
+     "date": "2025-10-30",
+     "quote": "increased demand from key strategic customers including Japanese magnet maker customers who continue to win new end customer contracts."
+    },
+    {
+     "url": "https://announcements.asx.com.au/asxpdf/20251030/pdf/06r89kkr64drjj.pdf",
+     "publisher": "Lynas Rare Earths Ltd (Quarterly Report for period ended 30 September 2025, ASX release)",
+     "date": "2025-10-30",
+     "quote": "In Japan, Lynas has a strategic partnership with the Japanese government (JOGMEC) and Sojitz Corporation through Japan Australia Rare Earths (JARE)"
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/313838/000199937126011486/ex1-01.htm",
+     "publisher": "Sony Group Corporation, Form SD Exhibit 1.01 Conflict Minerals Report (SEC EDGAR)",
+     "date": "2026-05",
+     "quote": "Sony does not purchase raw ore or unrefined minerals from or conduct business directly with SORs. Sony is “downstream” from SORs, typically with many layers of suppliers positioned between ourselves and 3TG SORs and mines."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/313838/000119312516624169/d168822d20f.htm",
+     "publisher": "Sony Corporation, Form 20-F (SEC EDGAR)",
+     "date": "2016-06-17",
+     "quote": "the price of rare earth elements, such as neodymium, may impact the cost of magnetic parts to be used for products such as camera modules and disc drives"
+    },
+    {
+     "url": "https://efts.sec.gov/LATEST/search-index?q=%22Lynas%22&ciks=0000313838",
+     "publisher": "SEC EDGAR full-text search (all Sony Group filings, CIK 313838)",
+     "date": "2026-09-24",
+     "quote": "\"total\":{\"value\":0,\"relation\":\"eq\"}"
+    }
+   ]
+  },
+  {
+   "source": "MAERSK",
+   "target": "AAPL",
+   "previous_dependency": 0.28,
+   "reason": "No filing, company statement, outlet or analyst gives any share of Apple's freight carried by Maersk, or clearly confirms Maersk carries it at all. Maersk's annual report says it has no particular concentration of customers.",
+   "sources": [
+    {
+     "url": "https://s203.q4cdn.com/367071867/files/doc_downloads/2024/04/Apple-Supplier-List.pdf",
+     "publisher": "Apple Inc. (Supplier List, FY2023)",
+     "date": "2024-04",
+     "quote": "The Apple supplier list represents 98 percent of our direct spend for materials, manufacturing, and assembly of our products worldwide for fiscal year 2023."
+    },
+    {
+     "url": "https://www.maersk.com/~/media_sc9/maersk/corporate/sustainability/files/resources/2024/maersk-annual-report-2024.pdf",
+     "publisher": "A.P. Moller - Maersk A/S, Annual Report 2024",
+     "date": "2025-02",
+     "quote": "The Group has exposure to financial and commercial counterparties but has no particular concentration of customers or suppliers."
+    },
+    {
+     "url": "https://www.macrumors.com/2021/02/08/apple-measures-to-minimize-shipping-delays/",
+     "publisher": "MacRumors (citing The Information)",
+     "date": "2021-02-08",
+     "quote": "In the third quarter of last year, the company greatly increased ocean freight for older model iPhones, whose delivery is less time sensitive, to free up air cargo space for the new iPhone 12"
+    },
+    {
+     "url": "https://efts.sec.gov/LATEST/search-index?q=%22Maersk%22&ciks=0000320193",
+     "publisher": "SEC EDGAR full-text search",
+     "date": "2026-09-24",
+     "quote": "\"hits\":{\"total\":{\"value\":0,\"relation\":\"eq\"}"
+    }
+   ]
+  },
+  {
+   "source": "MAERSK",
+   "target": "DELL",
+   "previous_dependency": 0.31,
+   "reason": "No filing, company statement, outlet or analyst gives any share of Dell's freight carried by Maersk, or clearly confirms Maersk carries it at all. Maersk's annual report says it has no particular concentration of customers.",
+   "sources": [
+    {
+     "url": "https://i.dell.com/sites/csdocuments/Corporate_corp-Comm_Documents/en/dell-suppliers.pdf",
+     "publisher": "Dell Technologies (Public Supplier List)",
+     "date": "2025-12",
+     "quote": "The list of supplier facilities includes original design manufacturers (ODMs), final assembly and material suppliers that Dell buys from directly and/or provide substantial product transformation. ... This list represents a snapshot covering at least 95% of Dell's spend during fiscal year 2025."
+    },
+    {
+     "url": "https://www.maersk.com/~/media_sc9/maersk/corporate/sustainability/files/resources/2024/maersk-annual-report-2024.pdf",
+     "publisher": "A.P. Moller - Maersk A/S, Annual Report 2024",
+     "date": "2025-02",
+     "quote": "The Group has exposure to financial and commercial counterparties but has no particular concentration of customers or suppliers."
+    },
+    {
+     "url": "https://efts.sec.gov/LATEST/search-index?q=%22Maersk%22&ciks=0001571996",
+     "publisher": "SEC EDGAR full-text search",
+     "date": "2026-09-24",
+     "quote": "\"hits\":{\"total\":{\"value\":0,\"relation\":\"eq\"}"
+    }
+   ]
+  }
+ ]
+}

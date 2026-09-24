@@ -1,73 +1,122 @@
-"""Curated seed graph.
+"""The supply-chain graph the agent reasons over.
 
-Topology here is real and public (ASML -> TSMC -> fabless designers ->
-assemblers -> brands). The dependency *weights* are hand-curated estimates,
-so every seed edge is marked ESTIMATED. Edges promoted to DISCLOSED carry an
-EDGAR citation and are written by app.ingest.edgar.
+Nodes are 16 companies in the electronics supply chain. Node size is the
+latest full fiscal year's revenue from the company's income statement, as
+served by Yahoo Finance, converted to USD at the exchange rate on the fiscal
+year-end date.
+
+Edges live in data/edges.json, each with the evidence behind its dependency
+figure: the sources (URL, publisher, date and a quote that appears on the
+page), the reasoning from sources to number, the period it describes, a
+confidence grade, caveats and any counter-evidence. They came from a research
+pass on 2026-09-24 in which each supplier's links were researched from primary
+pages and then independently re-checked.
+
+Provenance classes (weakest wins along a path, see app.traversal):
+
+    DISCLOSED    the share is stated in a filing or official statement
+    REPORTED     a specific share published by a named analyst or outlet
+    QUALITATIVE  the relationship is sourced, but only described in words;
+                 the number comes from one fixed mapping:
+                     sole / only / exclusive supplier   0.95
+                     primary / main supplier            0.70
+                     one of two named suppliers         0.50
+                     one of several named suppliers     0.25
+
+Links that could not be sourced were removed, not kept with a guessed weight;
+data/edges.json lists them under "removed" with the reason. That removal left
+Lynas Rare Earths and A.P. Moller-Maersk with no sourced link to any other
+company, so they are no longer in the graph.
 
 Tickers are underlying equities, which on Bitget trade as stock perpetual
 futures (f"{ticker}USDT") and can therefore be shorted. Tokenized xStocks
 (AAPLx, NVDAx) are spot-only and deliberately not referenced.
 """
 
-from app.models import GraphEdge, GraphNode, Provenance, Tier
+import json
+from pathlib import Path
+
+from app.models import GraphEdge, GraphNode, Tier
+
+_YF = "Yahoo Finance income statement"
+
+
+def _node(
+    id: str,
+    name: str,
+    tier: Tier,
+    country: str,
+    revenue_b: float,
+    fy_end: str,
+    yf: str,
+    fx: str | None = None,
+    ticker: str | None = None,
+) -> GraphNode:
+    return GraphNode(
+        id=id,
+        name=name,
+        tier=tier,
+        country=country,
+        revenue_b=revenue_b,
+        revenue_period=f"fiscal year ending {fy_end}",
+        revenue_source=f"{_YF} ({yf})",
+        revenue_note=fx,
+        ticker=ticker,
+    )
+
 
 NODES: list[GraphNode] = [
     # Upstream materials & tooling
-    GraphNode(id="ASML", name="ASML Holding", tier=Tier.MATERIAL, country="NL", revenue_b=30.2, ticker="ASML"),
-    GraphNode(id="SHIN_ETSU", name="Shin-Etsu Chemical", tier=Tier.MATERIAL, country="JP", revenue_b=17.1),
-    GraphNode(id="LYNAS", name="Lynas Rare Earths", tier=Tier.MATERIAL, country="AU", revenue_b=0.5),
+    _node("ASML", "ASML Holding", Tier.MATERIAL, "NL", 38.38, "2025-12-31", "ASML",
+          "EUR 32.67B at 1.17473 USD/EUR on 2025-12-31", ticker="ASML"),
+    _node("SHIN_ETSU", "Shin-Etsu Chemical", Tier.MATERIAL, "JP", 16.10, "2026-03-31", "4063.T",
+          "JPY 2,574.0B at 0.00625622 USD/JPY on 2026-03-31"),
 
     # Fabrication & components
-    GraphNode(id="TSMC", name="Taiwan Semiconductor", tier=Tier.SUPPLIER, country="TW", revenue_b=87.9, ticker="TSM"),
-    GraphNode(id="SK_HYNIX", name="SK Hynix", tier=Tier.SUPPLIER, country="KR", revenue_b=41.3),
-    GraphNode(id="SAMSUNG", name="Samsung Electronics", tier=Tier.SUPPLIER, country="KR", revenue_b=198.4),
-    GraphNode(id="SONY", name="Sony Semiconductor", tier=Tier.SUPPLIER, country="JP", revenue_b=88.2, ticker="SONY"),
-    GraphNode(id="CATL", name="CATL", tier=Tier.SUPPLIER, country="CN", revenue_b=56.0),
+    _node("TSMC", "Taiwan Semiconductor", Tier.SUPPLIER, "TW", 121.91, "2025-12-31", "2330.TW",
+          "TWD 3,809.1B at 0.0320066 USD/TWD on 2025-12-31", ticker="TSM"),
+    _node("SK_HYNIX", "SK Hynix", Tier.SUPPLIER, "KR", 67.56, "2025-12-31", "000660.KS",
+          "KRW 97,146.7B at 0.000695454 USD/KRW on 2025-12-31"),
+    _node("SAMSUNG", "Samsung Electronics", Tier.SUPPLIER, "KR", 232.01, "2025-12-31", "005930.KS",
+          "KRW 333,605.9B at 0.000695454 USD/KRW on 2025-12-31"),
+    # The whole group: SONY is Sony Group's listing, and the image sensors
+    # Apple buys come from its semiconductor segment.
+    _node("SONY", "Sony Group", Tier.SUPPLIER, "JP", 78.08, "2026-03-31", "SONY",
+          "JPY 12,479.6B at 0.00625622 USD/JPY on 2026-03-31", ticker="SONY"),
+    _node("CATL", "CATL", Tier.SUPPLIER, "CN", 60.56, "2025-12-31", "300750.SZ",
+          "CNY 423.70B at 0.142937 USD/CNY on 2025-12-31"),
 
-    # Assembly & logistics
-    GraphNode(id="FOXCONN", name="Hon Hai / Foxconn", tier=Tier.MANUFACTURER, country="TW", revenue_b=214.6),
-    GraphNode(id="PEGATRON", name="Pegatron", tier=Tier.MANUFACTURER, country="TW", revenue_b=38.4),
-    GraphNode(id="MAERSK", name="A.P. Moller-Maersk", tier=Tier.LOGISTICS, country="DK", revenue_b=51.1),
+    # Assembly
+    _node("FOXCONN", "Hon Hai / Foxconn", Tier.MANUFACTURER, "TW", 259.35, "2025-12-31", "2317.TW",
+          "TWD 8,103.1B at 0.0320066 USD/TWD on 2025-12-31"),
+    _node("PEGATRON", "Pegatron", Tier.MANUFACTURER, "TW", 35.76, "2025-12-31", "4938.TW",
+          "TWD 1,117.2B at 0.0320066 USD/TWD on 2025-12-31"),
 
     # Tradable downstream
-    GraphNode(id="NVDA", name="NVIDIA", tier=Tier.BRAND, country="US", revenue_b=130.5, ticker="NVDA"),
-    GraphNode(id="AAPL", name="Apple", tier=Tier.BRAND, country="US", revenue_b=391.0, ticker="AAPL"),
-    GraphNode(id="AMD", name="Advanced Micro Devices", tier=Tier.BRAND, country="US", revenue_b=25.8, ticker="AMD"),
-    GraphNode(id="QCOM", name="Qualcomm", tier=Tier.BRAND, country="US", revenue_b=39.0, ticker="QCOM"),
-    GraphNode(id="AVGO", name="Broadcom", tier=Tier.BRAND, country="US", revenue_b=51.6, ticker="AVGO"),
-    GraphNode(id="TSLA", name="Tesla", tier=Tier.BRAND, country="US", revenue_b=97.7, ticker="TSLA"),
-    GraphNode(id="DELL", name="Dell Technologies", tier=Tier.BRAND, country="US", revenue_b=95.6, ticker="DELL"),
+    _node("NVDA", "NVIDIA", Tier.BRAND, "US", 215.94, "2026-01-25", "NVDA", ticker="NVDA"),
+    _node("AAPL", "Apple", Tier.BRAND, "US", 416.16, "2025-09-27", "AAPL", ticker="AAPL"),
+    _node("AMD", "Advanced Micro Devices", Tier.BRAND, "US", 34.64, "2025-12-27", "AMD", ticker="AMD"),
+    _node("QCOM", "Qualcomm", Tier.BRAND, "US", 44.28, "2025-09-28", "QCOM", ticker="QCOM"),
+    _node("AVGO", "Broadcom", Tier.BRAND, "US", 63.89, "2025-11-02", "AVGO", ticker="AVGO"),
+    _node("TSLA", "Tesla", Tier.BRAND, "US", 94.83, "2025-12-31", "TSLA", ticker="TSLA"),
+    _node("DELL", "Dell Technologies", Tier.BRAND, "US", 113.54, "2026-01-30", "DELL", ticker="DELL"),
 ]
 
-_E = Provenance.ESTIMATED
+EDGES_PATH = Path(__file__).parent / "data" / "edges.json"
+FILING_FACTS_PATH = Path(__file__).parent / "data" / "filing_facts.json"
 
-EDGES: list[GraphEdge] = [
-    GraphEdge(source="ASML", target="TSMC", relation="SUPPLIES", component="EUV lithography", dependency=1.0, provenance=_E),
-    GraphEdge(source="ASML", target="SAMSUNG", relation="SUPPLIES", component="EUV lithography", dependency=1.0, provenance=_E),
-    GraphEdge(source="SHIN_ETSU", target="TSMC", relation="SUPPLIES", component="300mm wafers", dependency=0.34, provenance=_E),
-    GraphEdge(source="LYNAS", target="SONY", relation="SUPPLIES", component="rare earth magnets", dependency=0.22, provenance=_E),
 
-    GraphEdge(source="TSMC", target="NVDA", relation="FABRICATES", component="4N / 3nm GPU dies", dependency=0.92, provenance=_E),
-    GraphEdge(source="TSMC", target="AAPL", relation="FABRICATES", component="3nm A-series / M-series", dependency=0.95, provenance=_E),
-    GraphEdge(source="TSMC", target="AMD", relation="FABRICATES", component="5nm CPU/GPU chiplets", dependency=0.88, provenance=_E),
-    GraphEdge(source="TSMC", target="QCOM", relation="FABRICATES", component="4nm Snapdragon SoC", dependency=0.61, provenance=_E),
-    GraphEdge(source="TSMC", target="AVGO", relation="FABRICATES", component="custom ASIC / SerDes", dependency=0.74, provenance=_E),
-    GraphEdge(source="SAMSUNG", target="QCOM", relation="FABRICATES", component="4nm SoC (dual-source)", dependency=0.39, provenance=_E),
+def load_edges(path: Path = EDGES_PATH) -> list[GraphEdge]:
+    raw = json.loads(path.read_text())
+    return [GraphEdge(**e) for e in raw["edges"]]
 
-    GraphEdge(source="SK_HYNIX", target="NVDA", relation="SUPPLIES", component="HBM3E stacks", dependency=0.68, provenance=_E),
-    GraphEdge(source="SAMSUNG", target="NVDA", relation="SUPPLIES", component="HBM3E stacks", dependency=0.24, provenance=_E),
-    GraphEdge(source="SK_HYNIX", target="DELL", relation="SUPPLIES", component="DDR5 modules", dependency=0.41, provenance=_E),
 
-    GraphEdge(source="SONY", target="AAPL", relation="SUPPLIES", component="CMOS image sensors", dependency=0.81, provenance=_E),
-    GraphEdge(source="CATL", target="TSLA", relation="SUPPLIES", component="LFP cells", dependency=0.46, provenance=_E),
-    GraphEdge(source="SAMSUNG", target="TSLA", relation="FABRICATES", component="FSD inference SoC", dependency=0.83, provenance=_E),
+def load_filing_facts(path: Path = FILING_FACTS_PATH) -> dict[str, list[dict]]:
+    """Customer-concentration facts read by hand from each company's latest
+    annual filing, each with the sentence it came from. Display only: they
+    describe how concentrated a company's revenue is, not a supply link."""
+    return json.loads(path.read_text())["facts"]
 
-    GraphEdge(source="FOXCONN", target="AAPL", relation="ASSEMBLES", component="iPhone final assembly", dependency=0.67, provenance=_E),
-    GraphEdge(source="PEGATRON", target="AAPL", relation="ASSEMBLES", component="iPhone final assembly", dependency=0.19, provenance=_E),
-    GraphEdge(source="FOXCONN", target="NVDA", relation="ASSEMBLES", component="GB200 rack integration", dependency=0.52, provenance=_E),
-    GraphEdge(source="FOXCONN", target="DELL", relation="ASSEMBLES", component="server chassis", dependency=0.44, provenance=_E),
 
-    GraphEdge(source="MAERSK", target="AAPL", relation="SHIPS", component="TPEB container freight", dependency=0.28, provenance=_E),
-    GraphEdge(source="MAERSK", target="DELL", relation="SHIPS", component="TPEB container freight", dependency=0.31, provenance=_E),
-]
+EDGES: list[GraphEdge] = load_edges()
+FILING_FACTS: dict[str, list[dict]] = load_filing_facts()
