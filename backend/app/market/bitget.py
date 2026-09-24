@@ -13,6 +13,7 @@ Instrument note: shorting requires the stock PERPETUAL FUTURES product
 (AAPLx, NVDAx) are spot-only and cannot be shorted.
 """
 
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -34,10 +35,59 @@ def perp_symbol(ticker: str) -> str:
     return f"{ticker.upper()}USDT"
 
 
+# Every viewer polls the tape; without a cache each poll would be its own
+# request to Bitget. A few seconds is far below any price's meaningful change
+# and keeps us well inside Bitget's public rate limits.
+TICKER_TTL_SECONDS = 3.0
+CONTRACTS_TTL_SECONDS = 600.0
+# After a failed refresh, callers get the same error for this long instead of
+# each retrying Bitget - a burst of page views during an outage must not turn
+# into a burst of outbound requests.
+FAILURE_TTL_SECONDS = 5.0
+
+
+class _Cached:
+    """One cached upstream call: concurrent misses share a single request,
+    and a failure is remembered briefly rather than retried per caller."""
+
+    def __init__(self, ttl: float):
+        self._ttl = ttl
+        self._value: tuple[float, Any] | None = None
+        self._error: tuple[float, Exception] | None = None
+        self._lock = asyncio.Lock()
+
+    async def get(self, fetch) -> Any:
+        if (hit := self._fresh()) is not None:
+            return hit
+        async with self._lock:
+            # Another caller may have refreshed while this one waited.
+            if (hit := self._fresh()) is not None:
+                return hit
+            if self._error and time.monotonic() - self._error[0] < FAILURE_TTL_SECONDS:
+                raise self._error[1]
+            # Stamped when the call finishes, not when it starts: a request
+            # that times out after 15s must still be remembered as failed by
+            # every caller that queued behind it.
+            try:
+                value = await fetch()
+            except Exception as exc:
+                self._error = (time.monotonic(), exc)
+                raise
+            self._value, self._error = (time.monotonic(), value), None
+            return value
+
+    def _fresh(self) -> Any | None:
+        if self._value and time.monotonic() - self._value[0] < self._ttl:
+            return self._value[1]
+        return None
+
+
 class BitgetClient:
     def __init__(self, settings: Settings, client: httpx.AsyncClient | None = None):
         self._s = settings
         self._client = client or httpx.AsyncClient(base_url=BASE_URL, timeout=15.0)
+        self._tickers = _Cached(TICKER_TTL_SECONDS)
+        self._contracts = _Cached(CONTRACTS_TTL_SECONDS)
 
     async def aclose(self) -> None:
         await self._client.aclose()
@@ -45,31 +95,71 @@ class BitgetClient:
     # ---------------------------------------------------------------- public
 
     async def contracts(self) -> list[dict[str, Any]]:
-        r = await self._client.get(
-            "/api/v2/mix/market/contracts", params={"productType": PRODUCT_TYPE}
-        )
-        r.raise_for_status()
-        return r.json().get("data") or []
+        async def fetch():
+            r = await self._client.get(
+                "/api/v2/mix/market/contracts", params={"productType": PRODUCT_TYPE}
+            )
+            r.raise_for_status()
+            return r.json().get("data") or []
+
+        return await self._contracts.get(fetch)
 
     async def tickers(self) -> dict[str, dict[str, Any]]:
-        r = await self._client.get(
-            "/api/v2/mix/market/tickers", params={"productType": PRODUCT_TYPE}
-        )
-        r.raise_for_status()
-        return {t["symbol"]: t for t in (r.json().get("data") or [])}
+        async def fetch():
+            r = await self._client.get(
+                "/api/v2/mix/market/tickers", params={"productType": PRODUCT_TYPE}
+            )
+            r.raise_for_status()
+            return {t["symbol"]: t for t in (r.json().get("data") or [])}
+
+        return await self._tickers.get(fetch)
 
     async def listed_symbols(self) -> set[str]:
         return {c["symbol"] for c in await self.contracts()}
 
     async def marks(self, tickers: list[str]) -> dict[str, float]:
-        """Last traded price per underlying ticker. Unlisted names are omitted
-        rather than defaulted — a missing price must not silently become 0."""
+        """Bitget's MARK price per underlying ticker - the price the exchange
+        itself uses to value perp positions (falls back to last trade if a row
+        lacks it). Unlisted names are omitted, never defaulted: a missing price
+        must not silently become 0."""
         snap = await self.tickers()
         out: dict[str, float] = {}
         for t in tickers:
             row = snap.get(perp_symbol(t))
-            if row and row.get("lastPr"):
-                out[t] = float(row["lastPr"])
+            if not row:
+                continue
+            px = row.get("markPrice") or row.get("lastPr")
+            if px:
+                out[t] = float(px)
+        return out
+
+    async def quotes(self, tickers: list[str]) -> list[dict[str, Any]]:
+        """Full live quote per ticker for the price tape: last, mark, and
+        Bitget's own 24h open/high/low/change. Nothing here is derived locally."""
+        snap = await self.tickers()
+        out: list[dict[str, Any]] = []
+        for t in tickers:
+            row = snap.get(perp_symbol(t))
+            if not row:
+                continue
+            f = lambda k: float(row[k]) if row.get(k) not in (None, "") else None
+            out.append(
+                {
+                    "ticker": t,
+                    "symbol": perp_symbol(t),
+                    "last": f("lastPr"),
+                    "mark": f("markPrice"),
+                    "open24h": f("open24h"),
+                    "high24h": f("high24h"),
+                    "low24h": f("low24h"),
+                    # Bitget reports change24h as a fraction; expose percent.
+                    "change24h_pct": (f("change24h") or 0.0) * 100.0
+                    if row.get("change24h") not in (None, "")
+                    else None,
+                    "volume_usdt": f("usdtVolume"),
+                    "ts": int(row["ts"]) if row.get("ts") else None,
+                }
+            )
         return out
 
     # --------------------------------------------------------------- private
