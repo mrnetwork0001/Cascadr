@@ -1,0 +1,135 @@
+{
+ "_about": "Customer-concentration facts read by hand from each company's latest annual filing on 2026-09-24, each re-checked by an independent verifier against the filing on SEC EDGAR. 'pct' is the largest single customer's share of revenue; null where the filing discloses none. Display only: these describe how concentrated a company's revenue is, not a supply link.",
+ "facts": {
+  "NVDA": [
+   {
+    "pct": 22,
+    "customer": "Largest direct customer (unnamed); the second-largest was 14%",
+    "fiscal_year": "FY2026 (fiscal year ended January 25, 2026)",
+    "quote": "Direct Customers – For fiscal year 2026, sales to one direct customer represented 22% of total revenue and sales to another direct customer represented 14% of total revenue, all of which were primarily attributable to the Compute & Networking segment.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+    "accession": "0001045810-26-000021",
+    "filing_date": "2026-02-25",
+    "verified": "confirmed"
+   }
+  ],
+  "AMD": [
+   {
+    "pct": null,
+    "customer": "No customer reached 10% of revenue in FY2025 or FY2024",
+    "fiscal_year": "FY2025 (fiscal year ended December 27, 2025)",
+    "quote": "No customer accounted for at least 10% of the Company’s consolidated net revenue in fiscal years 2025 and 2024. One Client and Gaming segment customer accounted for 18 % of consolidated net revenue in fiscal year 2023.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/2488/000000248826000018/amd-20251227.htm",
+    "accession": "0000002488-26-000018",
+    "filing_date": "2026-02-04",
+    "verified": "confirmed"
+   }
+  ],
+  "QCOM": [
+   {
+    "pct": 21,
+    "customer": "Largest customer/licensee (unnamed); the 10-K names Apple, Samsung and Xiaomi as each 10% or more",
+    "fiscal_year": "FY2025 (fiscal year ended September 28, 2025)",
+    "quote": "Revenues from each customer/licensee that were 10% or greater of total revenues were as follows: 2025 2024 2023 Customer/licensee (x) 21 % 22 % 27 % Customer/licensee (y) 20 19 21 Customer/licensee (z) 13 12 * * Less than 10%",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/804328/000080432825000085/qcom-20250928.htm",
+    "accession": "0000804328-25-000085",
+    "filing_date": "2025-11-05",
+    "verified": "confirmed"
+   }
+  ],
+  "AVGO": [
+   {
+    "pct": 32,
+    "customer": "One customer (an unnamed distributor)",
+    "fiscal_year": "FY2025 (fiscal year ended November 2, 2025)",
+    "quote": "During fiscal years 2025, 2024 and 2023, one customer accounted for 32 %, 28 % and 21 % of our net revenue, respectively.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016825000121/avgo-20251102.htm",
+    "accession": "0001730168-25-000121",
+    "filing_date": "2025-12-18",
+    "verified": "confirmed"
+   }
+  ],
+  "DELL": [
+   {
+    "pct": 12,
+    "customer": "One customer (unnamed), almost all Infrastructure Solutions Group sales",
+    "fiscal_year": "Fiscal 2026 (52 weeks ended January 30, 2026)",
+    "quote": "One customer accounted for 12% of the Company's consolidated net revenue for the fiscal year ended January 30, 2026, with substantially all of such net revenue attributable to the sale of ISG offerings.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/1571996/000157199626000008/dell-20260130.htm",
+    "accession": "0001571996-26-000008",
+    "filing_date": "2026-03-16",
+    "verified": "corrected"
+   }
+  ],
+  "AAPL": [
+   {
+    "pct": null,
+    "customer": "No single customer's share of net sales is disclosed",
+    "fiscal_year": "FY2025 (fiscal year ended September 27, 2025)",
+    "quote": "As of September 27, 2025, the Company had one customer that represented 10% or more of total trade receivables, which accounted for 12%.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm",
+    "accession": "0000320193-25-000079",
+    "filing_date": "2025-10-31",
+    "verified": "confirmed"
+   }
+  ],
+  "TSLA": [
+   {
+    "pct": null,
+    "customer": "No customer's share of revenue is disclosed",
+    "fiscal_year": "FY2025 (year ended December 31, 2025)",
+    "quote": "As of December 31, 2025 and 2024, no entity represented 10% or more of our total receivables balance.",
+    "form": "10-K",
+    "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm",
+    "accession": "0001628280-26-003952",
+    "filing_date": "2026-01-29",
+    "verified": "confirmed"
+   }
+  ],
+  "TSMC": [
+   {
+    "pct": 19,
+    "customer": "Largest customer (unnamed, 'Customer A')",
+    "fiscal_year": "FY2025 (year ended 2025-12-31)",
+    "quote": "Our largest customer in 2023, 2024 and 2025 accounted for 25%, 22% and 19% of our net revenue in the respective year.",
+    "form": "20-F",
+    "url": "https://www.sec.gov/Archives/edgar/data/1046179/000162828026025362/tsm-20251231.htm",
+    "accession": "0001628280-26-025362",
+    "filing_date": "2026-04-16",
+    "verified": "corrected"
+   }
+  ],
+  "ASML": [
+   {
+    "pct": 23.9,
+    "customer": "Largest customer (unnamed)",
+    "fiscal_year": "FY2025 (year ended December 31, 2025)",
+    "quote": "Total net sales to our largest customer amounted to €7,796.7 million, or 23.9% of total net sales in 2025, compared with €4,682.4 million, or 16.6% of total net sales in 2024.",
+    "form": "20-F",
+    "url": "https://www.sec.gov/Archives/edgar/data/937966/000162828026011378/asml-20251231.htm",
+    "accession": "0001628280-26-011378",
+    "filing_date": "2026-02-25",
+    "verified": "confirmed"
+   }
+  ],
+  "SONY": [
+   {
+    "pct": null,
+    "customer": "No single major external customer",
+    "fiscal_year": "Fiscal year ended March 31, 2026",
+    "quote": "There were no sales with any single major external customer for the fiscal years ended March 31, 2024, 2025 and 2026.",
+    "form": "20-F",
+    "url": "https://www.sec.gov/Archives/edgar/data/313838/000119312526274893/d28719d20f.htm",
+    "accession": "0001193125-26-274893",
+    "filing_date": "2026-06-18",
+    "verified": "corrected"
+   }
+  ]
+ }
+}

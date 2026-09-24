@@ -43,9 +43,7 @@ ALIASES: dict[str, str] = {
     "foxconn": "FOXCONN",
     "pegatron": "PEGATRON",
     "catl": "CATL",
-    "maersk": "MAERSK",
     "shin-etsu": "SHIN_ETSU",
-    "lynas": "LYNAS",
 }
 
 _ALIAS_RE = re.compile(
