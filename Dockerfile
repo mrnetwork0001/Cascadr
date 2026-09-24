@@ -8,10 +8,11 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Baked in at build time: NEXT_PUBLIC_* is inlined into the client bundle,
-# so this must be the URL the browser will use, not an internal hostname.
-ARG NEXT_PUBLIC_CASCADR_API
-ENV NEXT_PUBLIC_CASCADR_API=$NEXT_PUBLIC_CASCADR_API
+# The browser only ever calls same-origin /api; next.config.mjs rewrites it to
+# BACKEND_URL on the server side, so an internal hostname works here. The
+# rewrite is compiled at build time.
+ARG BACKEND_URL=http://backend:8010
+ENV BACKEND_URL=$BACKEND_URL
 RUN npm run build
 
 FROM node:22-alpine AS runner
@@ -24,4 +25,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 4010
 ENV PORT=4010 HOSTNAME=0.0.0.0
+# The landing page is rendered on the server from live API data.
+ENV BACKEND_INTERNAL_URL=http://backend:8010
 CMD ["node", "server.js"]

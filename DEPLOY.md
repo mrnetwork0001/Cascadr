@@ -20,7 +20,9 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER && newgrp docker
 ```
 
-Open ports `4010` (frontend) and `8010` (backend) in the firewall.
+Open port `4010` (frontend) in the firewall. The backend needs no public port:
+the browser only calls same-origin `/api`, which the frontend server proxies to
+the backend over the compose network.
 
 ## 2. Copy the project up
 
@@ -39,22 +41,25 @@ Check it landed with the right permissions:
 ssh user@your-vps 'chmod 600 /opt/cascadr/backend/.env'
 ```
 
-## 3. Point the build at the public address
+## 3. Set the admin token and CORS origin
 
-The frontend calls the API **from the browser**, so it needs an address the
-browser can reach. An internal Docker hostname will not work.
+Every endpoint that writes, trades or spends LLM credits is locked behind an
+admin token. Generate one into `backend/.env`:
+
+```bash
+echo "CASCADR_ADMIN_TOKEN=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" \
+  >> /opt/cascadr/backend/.env
+```
+
+Send it as the `X-Admin-Token` header when you call those endpoints. Without it
+they answer 503, so a missing token fails closed.
+
+`PUBLIC_SITE_URL` becomes the backend's CORS allow-list (reads only):
 
 ```bash
 cd /opt/cascadr
-cat > .env <<'ENV'
-PUBLIC_API_URL=http://YOUR_VPS_IP:8010
-PUBLIC_SITE_URL=http://YOUR_VPS_IP:4010
-ENV
+echo "PUBLIC_SITE_URL=http://YOUR_VPS_IP:4010" > .env
 ```
-
-Substitute a domain if you have one. `PUBLIC_SITE_URL` becomes the CORS
-allow-list on the backend; get it wrong and the browser silently blocks every
-API call while the site itself loads fine.
 
 ## 4. Arm the agent
 
@@ -65,6 +70,7 @@ CASCADR_AUTONOMOUS=true      # exactly "true" — nothing else arms it
 CASCADR_POLL_SECONDS=600     # sense every 10 minutes
 CASCADR_SHOCK_FLOOR=0.45     # below this, no trade is even considered
 CASCADR_MAX_LLM_PER_HOUR=60  # bounds spend if a feed floods
+CASCADR_PAPER_EQUITY=100000  # starting equity of the paper account
 
 CASCADR_PAPER_TRADING=true   # LEAVE THIS. See below.
 ```
@@ -91,7 +97,7 @@ Acting on 0 is normal and correct — most headlines are not disruptions.
 ## 6. Verify
 
 ```bash
-curl -s http://YOUR_VPS_IP:8010/health | python3 -m json.tool
+curl -s http://YOUR_VPS_IP:4010/api/health | python3 -m json.tool
 ```
 
 Check four things:
@@ -102,39 +108,61 @@ Check four things:
 | `autonomous.armed` | `true` |
 | `paper_trading` | `true` |
 | `sweep.healthy` | `true` |
+| `admin_endpoints` | `true` (a token is configured) |
 
-Then open `http://YOUR_VPS_IP:4010` and confirm the terminal status bar reads
-`ENGINE BACKEND`. If it reads `ENGINE LOCAL`, the browser cannot reach the API
-— almost always `PUBLIC_API_URL` or CORS.
+Then open `http://YOUR_VPS_IP:4010/terminal` and check the status bar: `API`,
+`AGENT`, `LLM`, `NEWS` and `BITGET` should all be green. There is no local
+fallback — if the API is unreachable, the panels say so.
+
+Confirm the write endpoints are locked:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' -X POST http://YOUR_VPS_IP:4010/api/agent/cycle
+# 401 (or 503 if no token is configured) — never 200
+```
 
 ## 7. Watch it work
 
 ```bash
 # Decisions, including the refusals — the refusals are the interesting part
-curl -s http://YOUR_VPS_IP:8010/agent/decisions | python3 -m json.tool | head -50
+curl -s http://YOUR_VPS_IP:4010/api/agent/decisions | python3 -m json.tool | head -50
 
 # Paper performance, which is half the Agentic Trading score
-curl -s http://YOUR_VPS_IP:8010/paper/report | python3 -m json.tool
+curl -s http://YOUR_VPS_IP:4010/api/paper/report | python3 -m json.tool
 
 # Exposure and cluster concentration
-curl -s http://YOUR_VPS_IP:8010/risk | python3 -m json.tool
+curl -s http://YOUR_VPS_IP:4010/api/risk | python3 -m json.tool
 ```
 
 ---
 
 ## If you add a domain
 
-Put nginx or Caddy in front for TLS. Caddy is two lines:
+Put Caddy in front for TLS. With Docker Compose, send everything to the
+frontend; it forwards `/api` to the backend itself:
 
 ```
-your-domain.com      { reverse_proxy localhost:4010 }
-api.your-domain.com  { reverse_proxy localhost:8010 }
+your-domain.com { reverse_proxy localhost:4010 }
 ```
 
-Then set `PUBLIC_API_URL=https://api.your-domain.com` and
-`PUBLIC_SITE_URL=https://your-domain.com` and rebuild the frontend
-(`NEXT_PUBLIC_*` is baked in at build time, so a restart alone will not pick
-it up).
+If the backend listens on the host instead (as on the live deployment), route
+`/api/*` straight to it, stripping the prefix:
+
+```
+your-domain.com {
+    handle_path /api/* {
+        reverse_proxy localhost:8010
+    }
+    reverse_proxy localhost:4010
+}
+```
+
+Then set `PUBLIC_SITE_URL=https://your-domain.com`. Nothing is baked into the
+frontend bundle, so no rebuild is needed.
+
+The live deployment runs this way without Docker: two systemd units
+(`cascadr-api` on 127.0.0.1:8010, `cascadr-web` on 127.0.0.1:4010 with
+`BACKEND_INTERNAL_URL=http://127.0.0.1:8010`) behind a Caddy site block.
 
 ## Data you must not lose
 

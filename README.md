@@ -1,113 +1,100 @@
 # CASCADR
 
-**Supply Chain Knowledge Graph Arbitrage Agent** — Bitget AI Hackathon (Arbitrage track).
+**An autonomous, event-driven trading agent** — Bitget AI Hackathon, Agentic
+Trading → Event-driven Agent track.
 
-Cascadr maps the global electronics supply chain as a knowledge graph, then trades
-*downstream contagion*: when an upstream node is disrupted, it traverses the graph to
-find exposed listed companies and shorts their Bitget tokenized equities before the
-market prices the second-order effect in.
+Cascadr reads live news about the companies in the electronics supply chain.
+When a headline signals a disruption, an LLM judges how severe it is, a
+source-cited supply-chain graph works out which downstream companies are
+exposed, and the agent paper-trades Bitget stock perpetuals against them. Every
+decision, including every refusal, is recorded with its reasoning.
+
+> **Paper trading only.** No exchange keys are configured and no order is ever
+> sent. Fills are simulated at Bitget's live prices with modelled slippage.
+> Nothing here is a trading signal.
 
 ---
 
-## Status
+## What is real
 
-The frontend terminal plus a Python backend that scores contagion server-side,
-reads **live** Bitget market data, and extracts **real** SEC filing disclosures.
-Orders are built against real stock-perp contracts but held behind a paper-trading
-gate. Neo4j is scaffolded but not populated, and supply-side dependency weights
-are still curated estimates.
+Everything the site shows comes from the running system. There is no demo mode,
+no scripted feed and no fallback data: if the API is unreachable, the UI says so.
 
-> **Instruments:** shorting requires Bitget **stock perpetual futures**
-> (`NVDAUSDT`), not tokenized xStocks (`NVDAx`) — those are spot-only and cannot
-> be shorted.
-
-| Layer | State |
+| Layer | What runs |
 | --- | --- |
-| Next.js 14 terminal UI | ✅ built |
-| Force-directed knowledge graph | ✅ built (mock topology) |
-| Contagion traversal + scoring | ✅ built (runs client-side over the mock graph) |
-| Agent execution log + Bitget order bodies | ✅ built (payloads are shaped, not sent) |
-| Python backend (FastAPI) | ✅ built — see [backend/](backend/) |
-| Bitget market data | ✅ live (public API, no key needed) |
-| SEC EDGAR filing ingestion | ✅ built — real 10-K extraction with citations |
-| Bitget order execution | ✅ built, **paper-gated** — never sends by default |
-| Neo4j store | ⬜ repository + schema written, not populated |
-| Premise backtest | ✅ event study — see [backend/research/](backend/research/) |
-| Terminal ↔ backend | ✅ live, with local fallback when the service is down |
+| News | Google News RSS, one query per company, every 10 minutes |
+| Oracle | `claude-opus-5` via 0G Private Computer; each call records the 0G provider that ran it |
+| Graph | 16 companies, 19 links, each with cited sources — see [backend/app/graph/data/edges.json](backend/app/graph/data/edges.json) |
+| Contagion | server-side, 3-hop traversal: `shock × ∏ dependency × 0.62^hops` |
+| Market data | Bitget public API — live quotes and mark prices for stock perps |
+| Portfolio | paper book in SQLite, marked to Bitget's mark price every minute, cluster/symbol caps, drawdown halt, stop-loss / take-profit / time stop |
+| Execution | paper fills; order signing for Bitget exists but is gated off |
+
+### Where the numbers come from
+
+- **Supply-chain links.** Each link carries its evidence class, the sources
+  behind it (URL, publisher, date and a quote that appears on the page), the
+  reasoning from source to number, caveats and any counter-evidence.
+  - `DISCLOSED` — the share is stated in a filing (e.g. AMD's 10-K: TSMC makes
+    *all* its CPU and GPU wafers at 7nm and below).
+  - `REPORTED` — a specific share published by a named analyst or outlet.
+  - `QUALITATIVE` — the relationship is sourced but only described in words;
+    the number comes from one fixed rule: sole 0.95, primary 0.70, one of two
+    0.50, one of several 0.25.
+
+  Links nobody could source were removed; the file lists them and why.
+- **Company size** is the latest fiscal year's revenue from the income
+  statement, converted to USD at the fiscal-year-end rate.
+- **Prices** are Bitget's.
+- **Decisions** are the LLM's, on real headlines, stored with the article link.
 
 ---
 
 ## Run it
 
+The frontend proxies `/api` to a backend (the deployed one by default; set
+`BACKEND_URL` to point elsewhere):
+
 ```bash
 npm install
-npm run dev
+npm run dev -- -p 4010
 ```
+
+The backend is in [backend/](backend/) — see its README.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Landing page — the thesis, the pipeline, a worked cascade, and the build status |
-| `/terminal` | The live terminal |
-
-Open the printed URL and hit **Launch terminal**, then **RUN SCENARIO** in the top right.
-
-### What the demo does
-
-1. **NLP News Oracle** ingests a scripted wire feed (M6.4 quake → TSMC Fab 18 offline)
-   and resolves the headline to graph entities.
-2. **Traversal** walks the downstream cone from the shocked node up to 3 hops,
-   multiplying edge dependencies and decaying per hop.
-3. **Graph** cascades outward one hop at a time — nodes escalate
-   `NOMINAL → WATCH → STRESSED → CRITICAL`, and the active route animates in red.
-4. **Execution agent** shorts every exposed name above the trade threshold, printing
-   the Bitget `POST /api/v2/mix/order` body it would send (click **body** on any
-   `EXEC` line to expand it).
-5. **Positions blotter** marks to a live tape that drifts down in proportion to each
-   name's exposure, so P&L follows from the thesis rather than being decoration.
-
-**RESET** returns the graph to nominal and clears the book.
+| `/` | Landing page, rendered from live API data |
+| `/terminal` | The live terminal: news and verdicts, the graph coloured by the selected decision, the agent log, the paper book, the Bitget tape |
 
 ---
 
-## Architecture
+## Layout
 
 ```
-app/page.tsx              landing page (server component)
-app/terminal/page.tsx     single-screen terminal layout
-hooks/useCascadrEngine.ts scenario state machine: news → traversal → orders → P&L
-lib/traversal.ts          contagion propagation + exposure scoring
-lib/mock/graph.ts         the knowledge graph (stand-in for Neo4j)
-lib/mock/scenario.ts      the scripted wire feed (stand-in for a news socket)
-lib/types.ts              domain model — the contract the Python backend will fill
+app/page.tsx              landing page (server component, reads the API)
+app/terminal/page.tsx     the terminal
+hooks/useCascadr.ts       polls the API: quotes 5s, positions 10s, feed 15s
+lib/api.ts                API client — no fallback data
+lib/types.ts              the API's response shapes
 components/graph/         force-directed canvas, legend, node inspector
-components/panels/        news oracle, exposure ranking, execution log, blotter
-components/landing/       hero graph preview, section shell, launch CTA
+components/panels/        news oracle, exposure ranking, agent log, positions
+components/terminal/      top bar (live tape, agent state), status bar
+backend/app/agent.py      the autonomous loop: sense → reason → propagate → act
+backend/app/graph/        the sourced graph
+backend/research/         the event study behind the premise
 ```
-
-### Swapping mocks for the real thing
-
-The mock boundary is deliberately narrow — three files:
-
-- `lib/mock/graph.ts` → replace with a fetch against Neo4j. `GraphNode` maps to a
-  `:Company` node and `GraphEdge` to a `[:SUPPLIES]` relationship.
-- `lib/mock/scenario.ts` → replace with a websocket subscription to the live news feed.
-- `useCascadrEngine.submitOrder` → replace the logged payload with a real call to the
-  Bitget Agent Hub. The body it already builds is the request shape.
-
-`lib/traversal.ts` is real logic, not a mock: exposure scores are computed from the
-graph, so editing dependencies in `graph.ts` changes what the agent trades.
 
 ---
 
-## Notes on the data
+## Does the premise hold?
 
-Node revenues and the supply-chain topology are real and public
-(ASML → TSMC → fabless designers → assemblers → brands). The `dependency` weights are
-illustrative estimates, not sourced figures, and the tokenized symbols follow the
-xStocks convention (`NVDAX`, `AAPLX`) used for tokenized equities.
-
-Prices in this build are seeded constants with a random walk on top. Nothing here is
-a trading signal.
+[backend/research/](backend/research/) runs an event study over three
+verified historical disruptions (seven company pairs): downstream names barely
+moved on the day of the news, then drifted lower over the following week,
+surviving a semiconductor-sector control. Three is far too few to call it
+proven, and five of the pairs share one earthquake; the README there lists
+every caveat, and the events that were dropped after checking.
 
 ---
 
