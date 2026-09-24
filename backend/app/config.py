@@ -61,6 +61,15 @@ class Settings(BaseSettings):
     # and the paper journal survive a redeploy.
     cascadr_db: str = "cascadr.db"
 
+    # Required on every state-changing endpoint (X-Admin-Token header). Unset
+    # means those endpoints are disabled outright - they spend LLM credits and
+    # move the paper book, so they must never be open to anonymous callers.
+    cascadr_admin_token: str | None = None
+
+    # Starting balance of the paper account, USDT. A configuration of the
+    # simulated account, not market data.
+    cascadr_paper_equity: float = 100_000.0
+
     @property
     def paper_trading(self) -> bool:
         return self.cascadr_paper_trading.strip().lower() != "false"
