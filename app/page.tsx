@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
+import { MobileNav } from "@/components/landing/MobileNav";
 import { Card, Section } from "@/components/landing/Section";
 import { LaunchButton } from "@/components/landing/LaunchButton";
 import { GraphPreview } from "@/components/landing/GraphPreview";
@@ -80,6 +81,12 @@ const STACK = [
   ["Knowledge graph store", "Neo4j repository + schema (unpopulated)", "PLANNED"],
 ] as const;
 
+/** One list feeds both the desktop links and the mobile menu. */
+const NAV_LINKS = [
+  { label: "How it works", href: "#how" },
+  { label: "Architecture", href: "#architecture" },
+];
+
 interface FooterLink {
   label: string;
   href: string;
@@ -134,19 +141,19 @@ export default function LandingPage() {
             <Logo height={26} priority />
           </Link>
           {/* No CTA here: the hero's Launch terminal is the single entry point. */}
-          <div className="ml-auto flex items-center gap-4">
-            <Link
-              href="#how"
-              className="text-2xs uppercase tracking-widest text-term-dim hover:text-amber"
-            >
-              How it works
-            </Link>
-            <Link
-              href="#architecture"
-              className="text-2xs uppercase tracking-widest text-term-dim hover:text-amber"
-            >
-              Architecture
-            </Link>
+          <div className="ml-auto hidden items-center gap-4 md:flex">
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="text-2xs uppercase tracking-widest text-term-dim hover:text-amber"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+          <div className="ml-auto md:hidden">
+            <MobileNav links={NAV_LINKS} />
           </div>
         </div>
       </nav>
@@ -163,7 +170,7 @@ export default function LandingPage() {
         />
 
         <div className="relative mx-auto grid max-w-[81rem] gap-10 px-5 py-14 md:px-6 md:py-20 lg:grid-cols-[1.05fr_1fr] lg:items-center">
-          <div>
+          <div className="min-w-0">
             <div className="inline-flex items-center gap-2 border border-term-edge px-2 py-1">
               <span className="h-[6px] w-[6px] animate-pulse-alarm rounded-full bg-signal-red" />
               <span className="text-2xs uppercase tracking-[0.2em] text-term-dim">
@@ -209,7 +216,7 @@ export default function LandingPage() {
           </div>
 
           {/* Live traversal, computed by the same engine the terminal uses. */}
-          <div className="border border-term-line bg-term-panel">
+          <div className="min-w-0 border border-term-line bg-term-panel">
             <div className="flex items-center justify-between border-b border-term-line bg-term-raised px-2 py-1">
               <span className="text-2xs font-semibold uppercase tracking-[0.18em] text-amber">
                 Live traversal · TSMC Fab 18

@@ -16,7 +16,7 @@ interface SectionProps {
  */
 export function Section({ index, eyebrow, title, lede, children, id }: SectionProps) {
   return (
-    <section id={id} className="border-t border-term-line px-5 py-14 md:px-6 md:py-20">
+    <section id={id} className="scroll-mt-14 border-t border-term-line px-5 py-14 md:px-6 md:py-20">
       <div className="mx-auto max-w-[81rem]">
         <div className="flex items-center gap-3">
           <span className="text-2xs font-semibold text-amber">{index}</span>
