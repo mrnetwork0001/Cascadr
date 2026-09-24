@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import type {
   ForceGraphMethods,
   ForceGraphProps,
@@ -80,10 +86,15 @@ export function GraphCanvas(props: Props) {
       nodes: NODES.map((n) => ({ ...n })) as NodeDatum[],
       links: EDGES.map((e) => ({ ...e })) as LinkDatum[],
     }),
-    []
+    [],
   );
 
-  const state = useRef<PaintState>({ contagion, exposure, activePath, selected });
+  const state = useRef<PaintState>({
+    contagion,
+    exposure,
+    activePath,
+    selected,
+  });
   state.current = { contagion, exposure, activePath, selected };
 
   useEffect(() => {
@@ -107,7 +118,9 @@ export function GraphCanvas(props: Props) {
     g.d3Force("link")?.distance(44);
     g.d3Force(
       "collide",
-      forceCollide<NodeDatum>((n) => radiusOf(n) + 9).strength(1).iterations(3)
+      forceCollide<NodeDatum>((n) => radiusOf(n) + 9)
+        .strength(1)
+        .iterations(3),
     );
   }, [ForceGraph2D]);
 
@@ -122,43 +135,52 @@ export function GraphCanvas(props: Props) {
   };
 
   return (
-    <div ref={wrap} className="relative h-full w-full">
+    // The canvas is taken out of flow (absolute, inset 0) so its pixel width
+    // can never prop the container open. In flow, a grid or flex parent could
+    // not shrink below the canvas, the ResizeObserver never saw a smaller box,
+    // and after rotating a phone to portrait the graph stayed landscape-wide
+    // and ran 426px off the right edge.
+    <div ref={wrap} className="relative h-full w-full min-w-0 overflow-hidden">
       {ForceGraph2D && size.w > 0 ? (
-        <ForceGraph2D
-          ref={fg}
-          width={size.w}
-          height={size.h}
-          graphData={data}
-          backgroundColor={COLORS.void}
-          nodeRelSize={1}
-          cooldownTicks={140}
-          onEngineStop={() => fg.current?.zoomToFit(500, 24)}
-          // --- edges ---------------------------------------------------------
-          linkColor={(l) => (isActiveEdge(l) ? COLORS.red : "rgba(43,54,68,0.9)")}
-          linkWidth={(l) => (isActiveEdge(l) ? 1.8 : 0.5)}
-          linkDirectionalParticles={(l) => (isActiveEdge(l) ? 4 : 0)}
-          linkDirectionalParticleWidth={2}
-          linkDirectionalParticleColor={() => COLORS.red}
-          linkDirectionalArrowLength={3}
-          linkDirectionalArrowRelPos={0.92}
-          linkDirectionalArrowColor={() => "rgba(92,107,127,0.9)"}
-          linkLabel={(l) =>
-            `${l.component} · ${Math.round((l.dependency ?? 0) * 100)}% dependency`
-          }
-          // --- nodes ---------------------------------------------------------
-          onNodeClick={(n) => onSelect(String(n.id))}
-          onBackgroundClick={() => onSelect(null)}
-          nodeCanvasObject={(node, ctx, scale) =>
-            paintNode(node, ctx, scale, state.current)
-          }
-          nodePointerAreaPaint={(node, color, ctx) => {
-            if (node.x == null || node.y == null) return;
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, radiusOf(node) + 3, 0, 2 * Math.PI);
-            ctx.fill();
-          }}
-        />
+        <div className="absolute inset-0">
+          <ForceGraph2D
+            ref={fg}
+            width={size.w}
+            height={size.h}
+            graphData={data}
+            backgroundColor={COLORS.void}
+            nodeRelSize={1}
+            cooldownTicks={140}
+            onEngineStop={() => fg.current?.zoomToFit(500, 24)}
+            // --- edges ---------------------------------------------------------
+            linkColor={(l) =>
+              isActiveEdge(l) ? COLORS.red : "rgba(43,54,68,0.9)"
+            }
+            linkWidth={(l) => (isActiveEdge(l) ? 1.8 : 0.5)}
+            linkDirectionalParticles={(l) => (isActiveEdge(l) ? 4 : 0)}
+            linkDirectionalParticleWidth={2}
+            linkDirectionalParticleColor={() => COLORS.red}
+            linkDirectionalArrowLength={3}
+            linkDirectionalArrowRelPos={0.92}
+            linkDirectionalArrowColor={() => "rgba(92,107,127,0.9)"}
+            linkLabel={(l) =>
+              `${l.component} · ${Math.round((l.dependency ?? 0) * 100)}% dependency`
+            }
+            // --- nodes ---------------------------------------------------------
+            onNodeClick={(n) => onSelect(String(n.id))}
+            onBackgroundClick={() => onSelect(null)}
+            nodeCanvasObject={(node, ctx, scale) =>
+              paintNode(node, ctx, scale, state.current)
+            }
+            nodePointerAreaPaint={(node, color, ctx) => {
+              if (node.x == null || node.y == null) return;
+              ctx.fillStyle = color;
+              ctx.beginPath();
+              ctx.arc(node.x, node.y, radiusOf(node) + 3, 0, 2 * Math.PI);
+              ctx.fill();
+            }}
+          />
+        </div>
       ) : (
         <div className="flex h-full items-center justify-center text-2xs uppercase tracking-widest text-term-dim">
           initialising force layout…
@@ -189,7 +211,7 @@ function paintNode(
   node: NodeDatum,
   ctx: CanvasRenderingContext2D,
   scale: number,
-  s: PaintState
+  s: PaintState,
 ) {
   if (node.x == null || node.y == null) return;
 
@@ -263,7 +285,7 @@ function paintNode(
     ctx.fillText(
       `${(score * 100).toFixed(0)}%`,
       node.x,
-      node.y + r + 3.5 + fontPx(6.6, scale)
+      node.y + r + 3.5 + fontPx(6.6, scale),
     );
   }
 }
