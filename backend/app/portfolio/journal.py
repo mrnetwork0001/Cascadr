@@ -14,6 +14,8 @@ import math
 import sqlite3
 from datetime import UTC, datetime
 
+from app import db
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS equity_snapshots (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,10 +53,10 @@ class Journal:
 
     async def record(self, realized: float, unrealized: float, gross: float, n: int):
         async with self._lock:
-            await asyncio.to_thread(self._record, realized, unrealized, gross, n)
+            await db.run(self._record, realized, unrealized, gross, n)
 
     async def series(self, limit: int = 20_000) -> list[dict]:
-        rows = await asyncio.to_thread(
+        rows = await db.run(
             lambda: self._conn.execute(
                 "SELECT * FROM equity_snapshots ORDER BY at LIMIT ?", (limit,)
             ).fetchall()
