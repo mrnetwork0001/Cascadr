@@ -10,23 +10,27 @@ import { ExecutionLog } from "@/components/panels/ExecutionLog";
 import { PositionsBlotter } from "@/components/panels/PositionsBlotter";
 
 /**
- * Single-screen terminal: nothing scrolls except the panels themselves, so the
- * whole pipeline — wire feed, graph, exposure, orders — stays visible at once.
+ * Desktop (lg+): a single screen where nothing scrolls except the panels, so
+ * the whole pipeline - wire feed, graph, exposure, orders - is visible at once.
+ *
+ * Narrower screens cannot fit three columns, and squeezing them hid the graph
+ * entirely (it measured 2px wide on a phone). There the panels stack into one
+ * scrolling column, graph first because it is the thing people come to see.
  */
 export default function TerminalPage() {
   const e = useCascadrEngine();
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-term-void">
+    <main className="flex min-h-screen flex-col bg-term-void lg:h-screen lg:overflow-hidden">
       <TopBar phase={e.phase} prices={e.prices} onRun={e.run} onReset={e.reset} />
 
-      <div className="flex min-h-0 flex-1 gap-px bg-term-line p-px">
+      <div className="flex flex-col gap-px bg-term-line p-px lg:min-h-0 lg:flex-1 lg:flex-row">
         {/* Left rail: what the oracle saw, and who it hurts. */}
-        <div className="flex w-[300px] shrink-0 flex-col gap-px">
-          <div className="min-h-0 flex-[3]">
+        <div className="order-3 flex w-full flex-col gap-px lg:order-1 lg:w-[300px] lg:shrink-0">
+          <div className="h-[320px] lg:h-auto lg:min-h-0 lg:flex-[3]">
             <NewsOracle news={e.news} />
           </div>
-          <div className="min-h-0 flex-[4]">
+          <div className="h-[380px] lg:h-auto lg:min-h-0 lg:flex-[4]">
             <ExposureRanking
               exposure={e.exposure}
               contagion={e.contagion}
@@ -37,7 +41,7 @@ export default function TerminalPage() {
         </div>
 
         {/* Centre: the graph, with the resulting book underneath it. */}
-        <div className="flex min-w-0 flex-1 flex-col gap-px">
+        <div className="order-1 flex w-full flex-col gap-px lg:order-2 lg:min-w-0 lg:flex-1">
           <GraphPanel
             contagion={e.contagion}
             exposure={e.exposure}
@@ -46,7 +50,7 @@ export default function TerminalPage() {
             selected={e.selected}
             onSelect={e.setSelected}
           />
-          <div className="h-[186px] shrink-0">
+          <div className="h-[280px] lg:h-[186px] lg:shrink-0">
             <PositionsBlotter
               positions={e.positions}
               pnl={e.pnl}
@@ -56,7 +60,7 @@ export default function TerminalPage() {
         </div>
 
         {/* Right rail: the agent thinking out loud. */}
-        <div className="w-[420px] shrink-0 2xl:w-[480px]">
+        <div className="order-2 h-[480px] w-full lg:order-3 lg:h-auto lg:w-[420px] lg:shrink-0 2xl:w-[480px]">
           <ExecutionLog logs={e.logs} />
         </div>
       </div>

@@ -16,7 +16,7 @@ export function StatusBar({ positions, logs, backend }: Props) {
   const online = backend !== null;
 
   return (
-    <footer className="flex shrink-0 items-center gap-4 border-t border-term-line bg-term-panel px-3 py-1 text-2xs text-term-dim">
+    <footer className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-term-line bg-term-panel px-3 py-1 text-2xs text-term-dim">
       <Service
         label="ENGINE"
         state={online ? "BACKEND" : "LOCAL"}
@@ -39,7 +39,7 @@ export function StatusBar({ positions, logs, backend }: Props) {
       </span>
       <span className="hidden md:inline">POS {positions}</span>
       <span className="hidden md:inline">EVT {logs}</span>
-      <span className="ml-auto tracking-widest">
+      <span className="ml-auto hidden tracking-widest sm:inline">
         NETLAYER LABS · BITGET AI HACKATHON
       </span>
     </footer>

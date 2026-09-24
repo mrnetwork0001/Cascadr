@@ -30,7 +30,9 @@ export function GraphPanel({
     <Panel
       title="Supply Chain Knowledge Graph"
       flush
-      className="min-h-0 flex-1"
+      // Stacked (mobile) the panel needs its own height; in the desktop column
+      // it fills whatever the positions blotter leaves.
+      className="h-[440px] min-h-0 sm:h-[520px] lg:h-auto lg:flex-1"
       meta={
         <span className="flex items-center gap-3">
           <span>
