@@ -96,3 +96,47 @@ async def test_recorded_exposures_carry_their_factors(tmp_path):
         expected = 0.8 * product * e["hop_decay"] ** len(e["links"])
         assert math.isclose(e["score"], round(expected, 4), abs_tol=1e-4)
         assert [l["source"] for l in e["links"]] + [e["target"]] == e["hops"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("llm_configured", [True, False])
+async def test_keyword_fallback_is_never_traded(tmp_path, llm_configured):
+    """If the LLM fails, a keyword match ('TSMC ... earthquake' scores 0.45)
+    must not open positions. A transient failure leaves the headline unseen
+    for the next cycle; with no LLM at all it is recorded and declined."""
+    from datetime import UTC, datetime
+    from app.ingest.feeds import Headline
+    from app.ingest.oracle import NewsOracle
+
+    h = Headline("Taiwan Semiconductor fabs halted by earthquake", "Test", "https://x", datetime.now(UTC))
+    seen, executed = [], []
+
+    class Feeds:
+        stats = {}
+        async def poll(self, nodes):
+            return [h]
+        async def mark_seen(self, headline, acted):
+            seen.append(headline.title)
+
+    class Oracle:
+        async def analyse(self, title, nodes):
+            return NewsOracle._heuristic(title, nodes)
+
+    Oracle.llm_configured = llm_configured
+
+    async def execute(exposures, headline, source):
+        executed.append(headline)
+        return {"opened": [], "skipped": []}
+
+    conn = sqlite3.connect(tmp_path / "a.db", check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    a = AutonomousAgent(conn=conn, feeds=Feeds(), oracle=Oracle(),
+                        repo=MemoryGraphRepository(), execute_fn=execute)
+    assert NewsOracle._heuristic(h.title, await a._repo.nodes()).shock >= 0.40
+    await a.cycle(execute=True)
+    assert executed == []
+    rows = await a.decisions(10)
+    if llm_configured:
+        assert rows == [] and seen == []  # retried with the LLM next cycle
+    else:
+        assert rows[0]["action"] == "DECLINED" and seen == [h.title]

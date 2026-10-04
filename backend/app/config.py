@@ -49,7 +49,8 @@ class Settings(BaseSettings):
     cascadr_autonomous: str = "false"
     cascadr_poll_seconds: int = 600
     # Shock below this never reaches the risk layer.
-    cascadr_shock_floor: float = 0.45
+    # Calibrated: research/README.md "Calibrating the agent".
+    cascadr_shock_floor: float = 0.40
     cascadr_max_llm_per_hour: int = 60
     cascadr_news_max_age_hours: float = 6.0
 

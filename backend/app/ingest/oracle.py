@@ -81,6 +81,10 @@ class NewsOracle:
     def __init__(self, llm: LLMClient):
         self._llm = llm
 
+    @property
+    def llm_configured(self) -> bool:
+        return bool(self._llm.describe().get("configured"))
+
     async def analyse(self, headline: str, nodes: list[GraphNode]) -> OracleVerdict:
         catalogue = "\n".join(
             f"- {n.id}: {n.name} ({n.tier}, {n.country})" for n in nodes

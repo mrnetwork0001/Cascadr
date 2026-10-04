@@ -44,12 +44,12 @@ from app.risk import RiskLimits, RiskManager
 from app.traversal import (
     HOP_DECAY,
     MAX_HOPS,
+    TRADE_THRESHOLD,
     implied_drawdown_pct,
     score_to_contagion,
     traverse_contagion,
 )
 
-TRADE_THRESHOLD = 0.32
 # How often open positions are marked and tested against their exit rules.
 SWEEP_SECONDS = 60
 

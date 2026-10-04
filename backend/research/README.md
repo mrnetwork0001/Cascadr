@@ -90,6 +90,42 @@ gap** (median 26%) — unreachable for a cash-equity trader, fully tradeable on 
 perpetual. That is a structural reason to run this on Bitget stock perps
 specifically, and it does not depend on the drift result at all.
 
+## Calibrating the agent
+
+The study above says the drift follows real disruptions. The agent's
+thresholds decide whether it would actually trade one. `calibrate.py` scores
+real headlines from each verified event with the live agent's LLM
+(`claude-opus-5`, two headlines per event, repeated) and replays them through
+the sourced graph. Two runs on 2026-10-04, 8 calls per event:
+
+| Event | LLM shock | Downstream exposure at the lowest shock |
+| --- | --- | --- |
+| Hualien earthquake | 0.45-0.55 | AMD 0.279; NVDA, AAPL, QCOM, AVGO 0.265 |
+| Foxconn Zhengzhou lockdown | 0.55-0.60 | AAPL 0.196 |
+| Texas storm Uri | 0.48-0.65 | QCOM below the 0.08 floor |
+
+Against that, the 1,466 live headlines the agent read from 2026-09-24 to
+2026-10-04 peaked at a shock of 0.33 (Apple's iPhone cellular defect), and
+none implied a downstream exposure above 0.13. Not one reached a trade.
+
+- **Shock floor 0.45 → 0.40.** One real-disruption call scored exactly 0.45,
+  leaving no margin. 0.40 sits between every real-disruption call (≥ 0.45)
+  and every live headline (≤ 0.33), so the floor alone keeps noise out.
+- **Trade threshold 0.32 → 0.18.** 0.32 dated from the guessed weights the
+  graph had before it was sourced. On the sourced graph it would have traded
+  none of the events this study is built on. 0.18 trades the Hualien and
+  Foxconn names on every call, and adds no trade on live noise, which never
+  reaches the floor. Texas storm's Qualcomm link stays untraded: Samsung is
+  one of three primary foundries for Qualcomm, so its weight is the lowest
+  bucket.
+- **Keyword fallback is never traded.** If the LLM fails, the headline is
+  left for the next cycle instead of being decided on keywords.
+
+This is calibrated on the same three events it is checked on, so it is a
+consistency check, not an out-of-sample result. `tests/test_calibration.py`
+pins it: if the graph or the thresholds change, the test says whether the
+agent would still trade the events its own research supports.
+
 ## Verdict
 
 Not falsified, and the shape is the one the thesis predicts: nothing on day 0,

@@ -54,12 +54,15 @@ With `CASCADR_AUTONOMOUS=true` a background loop runs every
    and shown in `/health`, not swallowed.
 2. **Reason** — the LLM names the directly disrupted companies (checked against
    the graph), scores the shock 0–1, and states its reasoning and what would
-   change its mind. Below `CASCADR_SHOCK_FLOOR` the headline is declined.
+   change its mind. Below `CASCADR_SHOCK_FLOOR` (0.40) the headline is
+   declined. If the LLM fails, the headline waits for the next cycle; a
+   keyword match is never traded.
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.
 3. **Propagate** — each disrupted company's downstream cone is scored; where
    several paths reach one company, the strongest wins.
-4. **Act** — exposures at or above the trade threshold go through the risk
-   engine to the paper book.
+4. **Act** — exposures at or above the trade threshold (0.18) go through the
+   risk engine to the paper book. Both thresholds are calibrated against the
+   verified historical events: see [research/README.md](research/README.md#calibrating-the-agent).
 
 Every headline that reaches the LLM becomes a decision row, with the
 exposures it implies (each with the edges and constants its score was
@@ -141,7 +144,7 @@ Measured difference on the same headline
 
 | Engine | shock | Outcome |
 | --- | --- | --- |
-| keyword fallback | 0.45 | everything stays `WATCH` — **nothing trades** |
+| keyword fallback | 0.45 | never traded — recorded only when no LLM is configured |
 | `claude-opus-5` | 0.60-0.87 | `STRESSED` — **orders fire** |
 
 The LLM is the difference between trading and not trading.

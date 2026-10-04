@@ -107,7 +107,7 @@ class AutonomousAgent:
         oracle: NewsOracle,
         repo,
         execute_fn: ExecuteFn,
-        shock_floor: float = 0.45,
+        shock_floor: float = 0.40,
         max_llm_calls_per_hour: int = 60,
     ):
         self._conn = conn
@@ -334,6 +334,20 @@ class AutonomousAgent:
 
             self._llm_calls.append(datetime.now(UTC))
             verdict = await self._oracle.analyse(h.title, nodes)
+            if verdict.engine != "llm":
+                # A keyword match is never traded: it cannot judge severity.
+                if getattr(self._oracle, "llm_configured", False):
+                    # The LLM failed this time. Leave the headline unseen so
+                    # the next cycle asks it again, rather than recording a
+                    # keyword guess as the agent's decision.
+                    self.stats["last_error"] = (verdict.detail or "LLM unavailable")[:200]
+                    continue
+                await self._record(
+                    h, verdict, DECLINED, "no LLM configured; keyword match only, never traded",
+                    await self.exposures_for(verdict.entities, verdict.shock),
+                )
+                await self._feeds.mark_seen(h, acted=False)
+                continue
             self.stats["reasoned"] += 1
             exposures = await self.exposures_for(verdict.entities, verdict.shock)
 
