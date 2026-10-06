@@ -19,6 +19,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.market.bitget import BitgetClient, perp_symbol
+from app.alerts import Alerts
 from app.market.bitget_demo import BitgetDemo
 from app.market.paper import PaperBroker
 from app.risk import RiskDecision, RiskManager
@@ -39,6 +40,7 @@ class PortfolioManager:
         risk: RiskManager | None = None,
         paper: PaperBroker | None = None,
         demo: BitgetDemo | None = None,
+        alerts: Alerts | None = None,
     ):
         self._store = store
         self._bitget = bitget
@@ -46,6 +48,7 @@ class PortfolioManager:
         # then placed there and Bitget keeps the record. Otherwise the local
         # simulator fills them.
         self._demo = demo if demo is not None and demo.configured else None
+        self._alerts = alerts
         self._risk = risk or RiskManager()
         self._paper = paper or PaperBroker()
         # One close at a time per position: the sweeper and an operator close
@@ -160,11 +163,50 @@ class PortfolioManager:
         cluster and part of the thesis key.
         """
         async with self._open_lock:
-            return await self._open_short(
+            position, detail, kind = await self._open_short(
                 ticker=ticker, notional_usdt=notional_usdt, leverage=leverage, mark=mark,
                 thesis=thesis, origin=origin, target_pct=target_pct,
                 policy=policy, source=source,
             )
+        if position is not None:
+            await self._alert_open(position)
+        return position, detail, kind
+
+    # Alerts are best-effort: a push that fails must never fail the trade.
+
+    async def _alert_open(self, p: Position) -> None:
+        if self._alerts is None:
+            return
+        venue = "Bitget demo" if p.venue == "bitget-demo" else "simulated"
+        try:
+            await self._alerts.send(
+                f"Cascadr opened a short: {p.symbol}",
+                f"SHORT {p.symbol} {p.notional_usdt:,.0f} USDT at {p.entry_price:,.2f} "
+                f"({p.leverage}x, {venue}, {p.source}).\n{p.thesis[:300]}",
+                tags="chart_with_downwards_trend",
+                priority="high",
+            )
+        except Exception as exc:
+            print(f"[alerts] open alert skipped ({type(exc).__name__})", flush=True)
+
+    async def _alert_close(self, pid: str) -> None:
+        if self._alerts is None:
+            return
+        try:
+            p = await self._store.get(pid)
+            # Rejected or partial closes leave the position open: no alert.
+            if p is None or p.status != "CLOSED":
+                return
+            pnl = p.realized_pnl_usdt or 0.0
+            reason = p.close_reason.value if p.close_reason else "CLOSED"
+            await self._alerts.send(
+                f"Cascadr closed {p.symbol}: {pnl:+,.2f} USDT",
+                f"{reason}: {p.symbol} closed at {p.exit_price or 0:,.2f} "
+                f"(entry {p.entry_price:,.2f}). Realized P&L {pnl:+,.2f} USDT.",
+                tags="white_check_mark" if pnl >= 0 else "x",
+            )
+        except Exception as exc:
+            print(f"[alerts] close alert skipped ({type(exc).__name__})", flush=True)
 
     async def _open_short(
         self,
@@ -431,7 +473,9 @@ class PortfolioManager:
             current = await self._store.get(p.id)
             if current is None or current.status != "OPEN":
                 return "already closed"
-            return await self._close(current, mark, reason)
+            detail = await self._close(current, mark, reason)
+        await self._alert_close(current.id)
+        return detail
 
     async def _close(
         self, p: Position, mark: float, reason: CloseReason

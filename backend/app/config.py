@@ -61,6 +61,13 @@ class Settings(BaseSettings):
     # First-order trades: also short the company a headline names as directly
     # disrupted (shock at or above the floor), not only its downstream.
     cascadr_trade_origin: str = "true"
+
+    # Trade alerts via ntfy: a private topic the operator subscribes to on
+    # their phone (ntfy app) or in a browser. Unset: no alerts.
+    cascadr_alert_ntfy_topic: str | None = None
+    cascadr_alert_ntfy_server: str = "https://ntfy.sh"
+    # Public site address, used as the alert's tap-through link.
+    cascadr_public_url: str | None = None
     cascadr_max_llm_per_hour: int = 60
     cascadr_news_max_age_hours: float = 6.0
 

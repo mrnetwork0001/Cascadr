@@ -1,4 +1,4 @@
-"""Tests never reach a real exchange account.
+"""Tests never reach a real exchange account, or the operator's phone.
 
 backend/.env may hold real Bitget keys (live or demo) for local runs. Settings
 reads that file, so without this every test that starts the app would trade
@@ -12,6 +12,8 @@ import pytest
 EXCHANGE_KEYS = (
     "BITGET_API_KEY", "BITGET_API_SECRET", "BITGET_PASSPHRASE",
     "BITGET_DEMO_API_KEY", "BITGET_DEMO_API_SECRET", "BITGET_DEMO_PASSPHRASE",
+    # The trade-alert topic: a test trade must not push a real notification.
+    "CASCADR_ALERT_NTFY_TOPIC",
 )
 
 

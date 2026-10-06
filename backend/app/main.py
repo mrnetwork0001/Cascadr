@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.agent import AutonomousAgent
+from app.alerts import Alerts
 from app.config import get_settings
 from app.graph.repository import MemoryGraphRepository, index
 from app.graph.repository import fingerprint as graph_fingerprint
@@ -63,6 +64,7 @@ async def lifespan(app: FastAPI):
     state["settings"] = s
     state["bitget"] = BitgetClient(s)
     state["demo"] = BitgetDemo(s)
+    state["alerts"] = Alerts(s)
     state["edgar"] = EdgarClient(s.sec_user_agent)
     state["llm"] = LLMClient(s)
     state["oracle"] = NewsOracle(state["llm"])
@@ -97,6 +99,7 @@ async def lifespan(app: FastAPI):
         RiskManager(RiskLimits.for_equity(s.cascadr_paper_equity)),
         PaperBroker(),
         demo=state["demo"],
+        alerts=state["alerts"],
     )
     state["journal"] = Journal(store.conn, starting_equity=s.cascadr_paper_equity)
     state["feeds"] = FeedReader(
@@ -212,6 +215,7 @@ async def lifespan(app: FastAPI):
 
     await state["bitget"].aclose()
     await state["demo"].aclose()
+    await state["alerts"].aclose()
     await state["edgar"].aclose()
     await state["llm"].aclose()
     if hasattr(state["repo"], "aclose"):
@@ -357,6 +361,11 @@ async def health():
         "paper_venue": state["portfolio"].venue,
         "trading_credentials": s.has_trading_credentials,
         "admin_endpoints": bool(s.cascadr_admin_token),
+        "trade_alerts": {
+            "configured": state["alerts"].configured,
+            "sent": state["alerts"].sent,
+            "failed": state["alerts"].failed,
+        },
         "llm": state["llm"].describe(),
         "autonomous": {
             "armed": s.autonomous,
