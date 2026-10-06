@@ -222,12 +222,14 @@ correlated when the thesis is wrong. `app/risk.py` vets every proposed open
 | Limit | Default | Why |
 | --- | --- | --- |
 | `max_positions_per_cluster` | 3 | one shock is one bet |
-| `max_cluster_notional_usdt` | 100k | caps the correlated exposure |
+| `max_cluster_notional_usdt` | 1× equity | caps the correlated exposure |
 | `max_positions_per_symbol` | 1 | two clusters naming NVDA is one exposure |
-| `max_gross_notional_usdt` | 250k | whole-book ceiling |
+| `max_gross_notional_usdt` | 2.5× equity | whole-book ceiling |
 | `max_drawdown_pct` | 15% | kill switch — halts all new risk |
 
-Clusters are keyed by originating shock. Where a request exceeds headroom it is
+Notional caps and position sizes (18–60% of equity, by exposure) scale with
+`CASCADR_PAPER_EQUITY`, so they fit the paper account; at 100,000 USDT they are
+100k and 250k. Clusters are keyed by originating shock. Where a request exceeds headroom it is
 **scaled down** rather than rejected, until headroom falls below
 `min_notional_usdt`. `GET /risk` shows live utilisation per cluster.
 

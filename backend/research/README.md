@@ -104,7 +104,7 @@ the sourced graph. Two runs on 2026-10-04, 8 calls per event:
 | Foxconn Zhengzhou lockdown | 0.55-0.60 | AAPL 0.196 |
 | Texas storm Uri | 0.48-0.65 | QCOM below the 0.08 floor |
 
-Against that, the 1,466 live headlines the agent read from 2026-09-24 to
+Against that, the 1,466 live headlines the LLM scored from 2026-09-24 to
 2026-10-04 peaked at a shock of 0.33 (Apple's iPhone cellular defect), and
 none implied a downstream exposure above 0.13. Not one reached a trade.
 

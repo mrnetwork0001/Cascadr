@@ -20,7 +20,7 @@ MIN_SCORE = 0.08
 # Calibrated on 2026-10-04 against the verified historical disruptions in
 # research/events.py (research/README.md, "Calibrating the agent"). Over 8
 # LLM calls per event, their real headlines scored 0.45-0.65; the 1,466 live
-# headlines read from 2026-09-24 to 10-04 peaked at 0.33. A 0.40 floor keeps
+# headlines the LLM scored from 2026-09-24 to 10-04 peaked at 0.33. A 0.40 floor keeps
 # a margin on both sides, so the floor alone separates disruption from noise.
 # At the lowest recorded shocks the events' documented downstream names score
 # 0.196-0.28 on the sourced graph. The old threshold, 0.32, dated from guessed

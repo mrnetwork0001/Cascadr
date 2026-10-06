@@ -3,7 +3,7 @@
 Shocks below are the lowest the agent's LLM gave the verified historical
 disruptions' real headlines over 8 calls each (research/calibrate.py, two runs
 on 2026-10-04); the noise
-ceiling is the highest shock among the 1,466 live headlines read from
+ceiling is the highest shock among the 1,466 live headlines the LLM scored from
 2026-09-24 to 2026-10-04. If the graph or the thresholds change, these say
 whether the agent would still trade the events its own research supports.
 """
