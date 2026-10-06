@@ -1,0 +1,1154 @@
+/*
+ * Cascadr landing hero - the first screen (header + hero) of the landing page.
+ *
+ * Built on a pixel-measured 1280x960 comp: every size and offset is written in
+ * --u, one reference pixel of that comp, so the foreground keeps its measured
+ * proportions while the background plate stretches to the viewport. All
+ * variables and classes are scoped under .cx-hero so nothing leaks into the
+ * rest of the page (which scrolls on below this section).
+ */
+
+.cx-hero {
+  --u: min(100vw / 1280, 100vh / 960);
+  --t: var(--u);
+  --pad: 52;
+  --ink: #020c21;
+  --ink-soft: #0f182f;
+  --muted: #59627e;
+  --muted2: #4d5b77;
+  --frame: #e6edf6;
+  --cta: #0f1b31;
+  --cta-knob: #384b64;
+  --meet-knob: #1a2b45;
+  --accent: #4a78b0;
+  --track: #dde4ee;
+  --focus: #2f5f9e;
+
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+  /* What shows before the canvas plate fades in, and with no JS at all. */
+  background:
+    radial-gradient(ellipse 70% 62% at 66% 20%, rgba(250, 252, 255, 0.92), rgba(250, 252, 255, 0) 72%),
+    radial-gradient(ellipse 60% 55% at 8% 96%, rgba(205, 217, 233, 0.45), rgba(205, 217, 233, 0) 70%),
+    var(--frame);
+  color: var(--ink);
+  font-family: var(--font-sans), Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  font-size: calc(16 * var(--u));
+  line-height: 1.2;
+  letter-spacing: normal;
+}
+@supports (height: 100dvh) {
+  .cx-hero {
+    --u: min(100vw / 1280, 100dvh / 960);
+    height: 100dvh;
+  }
+}
+
+/* ------------------------------------------------------------ plate + tint */
+.cx-hero .cx-bg {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  z-index: 0;
+  overflow: hidden;
+  transform: scale(1.002);
+  opacity: 0;
+  transition: opacity 1.4s cubic-bezier(0.22, 0.7, 0.25, 1);
+  pointer-events: none;
+}
+.cx-hero .cx-bg[data-ready] {
+  opacity: 1;
+}
+.cx-hero .cx-bg > * {
+  position: absolute;
+  display: block;
+}
+/* Static, painted once per size: the plate's grade lives here, not on the
+   animated layers, so it is never re-filtered per frame. */
+.cx-hero .cx-bg-back {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  filter: brightness(1.006) saturate(0.965);
+}
+.cx-hero .cx-bg-wall {
+  opacity: 0;
+}
+/* Melts the plate's lower edge into the page frame below the hero. */
+.cx-hero .cx-bg-fade {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 16%;
+  background: linear-gradient(to bottom, rgba(230, 237, 246, 0), #e6edf6);
+}
+.cx-hero .cx-tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 249, 240, 0.05);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ------------------------------------------- the absolute-position helpers */
+.cx-hero .cx-stack,
+.cx-hero .cx-row,
+.cx-hero .cx-blk,
+.cx-hero .cx-tagrow {
+  display: contents;
+}
+.cx-hero .cx-l {
+  position: absolute;
+  z-index: 2;
+}
+.cx-hero .cx-t {
+  left: calc((var(--x) + 13) * var(--u));
+  top: calc((var(--y) + 15) * var(--u));
+}
+.cx-hero .cx-c {
+  left: calc((var(--x) + 13) * var(--u));
+  top: calc(50% + (var(--y) - 2) * var(--u));
+}
+.cx-hero .cx-b {
+  left: calc((var(--x) + 13) * var(--u));
+  bottom: calc((var(--y) + 19) * var(--u));
+}
+.cx-hero .cx-r {
+  left: auto;
+  right: calc((var(--x) + 19) * var(--u));
+}
+.cx-hero .cx-sx {
+  display: inline-block;
+  transform-origin: left top;
+  transform: scaleX(var(--sx, 1));
+}
+
+/* ------------------------------------------------------------------ brand */
+.cx-hero .cx-brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  height: calc(39 * var(--u));
+}
+.cx-hero .cx-mark {
+  width: calc(39 * var(--u));
+  height: calc(39 * var(--u));
+  display: block;
+  flex: none;
+}
+.cx-hero .cx-brand b {
+  font-size: calc(22 * var(--u));
+  font-weight: 520;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-left: calc(7.7 * var(--u));
+  color: var(--ink);
+}
+
+/* --------------------------------------------------------------- nav pill */
+.cx-hero .cx-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(calc(-50% - 3 * var(--u)));
+  top: calc((31 + 15) * var(--u));
+  width: calc(294 * var(--u));
+  height: calc(67 * var(--u));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(calc(40 * var(--u)));
+  backdrop-filter: blur(calc(40 * var(--u)));
+  box-shadow:
+    0 0 0 calc(1.3 * var(--u)) rgba(120, 145, 180, 0.2),
+    0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(28, 52, 92, 0.05);
+  z-index: 2;
+}
+.cx-hero .cx-nav > * {
+  position: absolute;
+}
+/* Each link spans its icon and label; the icon sits where the comp puts it. */
+.cx-hero .cx-nlink {
+  display: flex;
+  align-items: center;
+  top: calc(9 * var(--u));
+  height: calc(47 * var(--u));
+  padding: 0 calc(12 * var(--u));
+  border-radius: 999px;
+  color: #202940;
+  text-decoration: none;
+  transition: background-color 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.cx-hero .cx-nlink:hover {
+  background: rgba(32, 41, 64, 0.05);
+}
+.cx-hero .cx-nlink:focus-visible {
+  outline-offset: 0;
+}
+.cx-hero .cx-nlink span {
+  font-size: calc(15 * var(--u));
+  font-weight: 570;
+  letter-spacing: -0.0561em;
+  line-height: 1;
+  color: #202940;
+  white-space: nowrap;
+}
+.cx-hero .cx-nlink svg {
+  display: block;
+  flex: none;
+}
+.cx-hero .cx-n1 {
+  left: calc(24 * var(--u));
+}
+.cx-hero .cx-n1 svg {
+  width: calc(21.3 * var(--u));
+  height: calc(22.4 * var(--u));
+  margin-right: calc(14.7 * var(--u));
+}
+.cx-hero .cx-ndiv {
+  left: calc(134.6 * var(--u));
+  top: calc(18 * var(--u));
+  width: calc(1.5 * var(--u));
+  height: calc(31 * var(--u));
+  background: #ced5e0;
+  border: 0;
+  display: block;
+}
+.cx-hero .cx-n2 {
+  left: calc(146.6 * var(--u));
+}
+.cx-hero .cx-n2 svg {
+  width: calc(20.2 * var(--u));
+  height: calc(20.2 * var(--u));
+  margin-right: calc(15.6 * var(--u));
+}
+
+/* ------------------------------------------------------------ primary CTA */
+.cx-hero .cx-cta {
+  width: calc(241 * var(--u));
+  height: calc(70 * var(--u));
+  border-radius: 999px;
+  background: var(--cta);
+  text-decoration: none;
+  display: block;
+  box-shadow: 0 calc(10 * var(--u)) calc(24 * var(--u)) rgba(11, 26, 50, 0.18);
+}
+.cx-hero .cx-cta span {
+  position: absolute;
+  left: calc(34.8 * var(--u));
+  top: calc(27.55 * var(--u));
+  font-size: calc(17.5 * var(--u));
+  font-weight: 400;
+  letter-spacing: -0.0442em;
+  line-height: 1;
+  color: #fff;
+  white-space: nowrap;
+}
+.cx-hero .cx-knob {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--cta-knob);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cx-hero .cx-cta .cx-knob {
+  left: auto;
+  right: calc(12 * var(--u));
+  top: calc(10.5 * var(--u));
+  width: calc(49 * var(--u));
+  height: calc(49 * var(--u));
+}
+.cx-hero .cx-knob svg {
+  width: calc(17 * var(--u));
+  height: calc(17 * var(--u));
+  display: block;
+}
+
+/* -------------------------------------------------------------- hero type */
+.cx-hero .cx-eyebrow {
+  font-size: calc(16 * var(--u));
+  font-weight: 470;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.cx-hero .cx-h1 {
+  font-size: calc(98 * var(--u));
+  font-weight: 360;
+  letter-spacing: -0.035em;
+  line-height: calc(90 * var(--u));
+  color: var(--ink);
+  white-space: nowrap;
+}
+.cx-hero .cx-play {
+  width: calc(50.5 * var(--u));
+  height: calc(50.5 * var(--u));
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 calc(6 * var(--u)) calc(18 * var(--u)) rgba(28, 52, 92, 0.1);
+}
+.cx-hero .cx-play svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+  display: block;
+}
+.cx-hero .cx-tag {
+  font-size: calc(24 * var(--u));
+  font-weight: 470;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------- glass panel: agent status */
+.cx-hero .cx-panel {
+  width: calc(275 * var(--u));
+  height: calc(288 * var(--u));
+  border-radius: calc(28 * var(--u));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.16));
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(calc(40 * var(--u))) saturate(112%);
+  backdrop-filter: blur(calc(40 * var(--u))) saturate(112%);
+  box-shadow:
+    inset calc(1 * var(--u)) calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.55),
+    inset calc(-1 * var(--u)) calc(-1 * var(--u)) 0 rgba(255, 255, 255, 0.18),
+    0 calc(18 * var(--u)) calc(40 * var(--u)) rgba(28, 52, 92, 0.07);
+}
+.cx-hero .cx-panel > * {
+  position: absolute;
+}
+.cx-hero .cx-ptitle {
+  --fs: 24;
+  left: calc(29 * var(--u));
+  top: calc((44.7 + (24 - var(--fs)) / 2) * var(--u));
+  font-size: calc(var(--fs) * var(--u));
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/*
+ * The longer state titles are set smaller so the dot never meets the badge.
+ * --dl is the dot's left edge in the comp, --dl3 on phones (where titles are
+ * not optically condensed), both measured from the title's set width.
+ */
+.cx-hero .cx-panel[data-state="paused"] .cx-ptitle {
+  --fs: 21;
+}
+.cx-hero .cx-panel[data-state="unknown"] .cx-ptitle {
+  --fs: 18;
+}
+.cx-hero .cx-dot {
+  --dl: 141;
+  --dl3: 153;
+  left: calc(var(--dl) * var(--u));
+  top: calc(53 * var(--u));
+  width: calc(10 * var(--u));
+  height: calc(10 * var(--u));
+  border-radius: 50%;
+  background: var(--accent);
+}
+.cx-hero .cx-panel[data-state="paused"] .cx-dot {
+  --dl: 158;
+  --dl3: 178;
+  background: #a86512;
+}
+.cx-hero .cx-panel[data-state="unknown"] .cx-dot {
+  --dl: 157;
+  --dl3: 177;
+  background: #a3acbd;
+}
+/* A live agent breathes: a soft ring leaves the dot every few seconds. */
+.cx-hero .cx-panel[data-state="live"] .cx-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cx-hero .cx-panel[data-state="live"] .cx-dot::after {
+    animation: cx-ping 3.2s cubic-bezier(0.16, 1, 0.3, 1) 2.2s infinite;
+  }
+}
+@keyframes cx-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  70%,
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+.cx-hero .cx-badge {
+  left: calc(177 * var(--u));
+  top: calc(46 * var(--u));
+  width: calc(73 * var(--u));
+  height: calc(73 * var(--u));
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 calc(26 * var(--u)) calc(10 * var(--u)) rgba(255, 255, 255, 0.5),
+    0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(28, 52, 92, 0.06);
+}
+.cx-hero .cx-badge svg {
+  width: calc(34 * var(--u));
+  height: calc(34 * var(--u));
+  display: block;
+}
+.cx-hero .cx-psub {
+  left: calc(29 * var(--u));
+  top: calc(94.35 * var(--u));
+  font-size: calc(18 * var(--u));
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: calc(20.4 * var(--u));
+  color: var(--muted2);
+  white-space: nowrap;
+}
+/*
+ * Two label/value rows under the sub-lines: the paper venue's reach, then the
+ * cascade shock that the track below draws. They share the text column.
+ */
+.cx-hero .cx-kv {
+  left: calc(29 * var(--u));
+  width: calc(217 * var(--u));
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: calc(12 * var(--u));
+  font-size: calc(15 * var(--u));
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #586580;
+  white-space: nowrap;
+}
+.cx-hero .cx-kv b {
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.cx-hero .cx-venue {
+  top: calc(182 * var(--u));
+}
+.cx-hero .cx-scale {
+  top: calc(207 * var(--u));
+}
+.cx-hero .cx-track {
+  left: calc(29 * var(--u));
+  top: calc(239 * var(--u));
+  width: calc(217 * var(--u));
+  height: calc(8 * var(--u));
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+.cx-hero .cx-track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #5f88b4;
+  transform-origin: left center;
+}
+
+/* -------------------------------------------------------------- stats row */
+/*
+ * The comp places each figure absolutely; live figures change width as they
+ * grow, so the row flows instead, with the comp's gaps and vertical offsets
+ * (labels hang 16.7u below a figure's top, the slash 9.4u).
+ */
+.cx-hero .cx-stats {
+  display: flex;
+  align-items: flex-start;
+}
+.cx-hero .cx-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(29 * var(--u));
+}
+.cx-hero .cx-num {
+  order: -1;
+  font-size: calc(100 * var(--u));
+  font-weight: 200;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.cx-hero .cx-lbl {
+  margin-top: calc(16.7 * var(--u));
+  font-size: calc(19 * var(--u));
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: calc(23.5 * var(--u));
+  color: #39455f;
+  white-space: nowrap;
+}
+.cx-hero .cx-slash {
+  flex: none;
+  margin: calc(9.4 * var(--u)) calc(39 * var(--u)) 0 calc(42 * var(--u));
+  width: calc(23 * var(--u));
+  height: calc(75 * var(--u));
+  background: linear-gradient(
+    to top left,
+    transparent calc(50% - 0.85 * var(--u)),
+    #a7b4c6 calc(50% - 0.85 * var(--u)),
+    #a7b4c6 calc(50% + 0.85 * var(--u)),
+    transparent calc(50% + 0.85 * var(--u))
+  );
+}
+
+/* --------------------------------------------------------------- meet pill */
+.cx-hero .cx-meet {
+  width: calc(279 * var(--u));
+  height: calc(86 * var(--u));
+  border-radius: 999px;
+  display: block;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.325);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(calc(40 * var(--u)));
+  backdrop-filter: blur(calc(40 * var(--u)));
+  box-shadow:
+    0 0 0 calc(1.2 * var(--u)) rgba(120, 145, 180, 0.1),
+    inset calc(1 * var(--u)) calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.5),
+    0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(28, 52, 92, 0.035);
+}
+.cx-hero .cx-meet > * {
+  position: absolute;
+}
+.cx-hero .cx-thumb {
+  left: calc(12 * var(--u));
+  top: calc(11 * var(--u));
+  width: calc(64 * var(--u));
+  height: calc(64 * var(--u));
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 calc(1 * var(--u)) rgba(255, 255, 255, 0.45);
+}
+.cx-hero .cx-thumb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cx-hero .cx-meet b {
+  left: calc(89.8 * var(--u));
+  top: calc(34.55 * var(--u));
+  font-size: calc(17.5 * var(--u));
+  font-weight: 425;
+  letter-spacing: -0.0681em;
+  line-height: 1;
+  color: #1b2a44;
+  white-space: nowrap;
+}
+.cx-hero .cx-meet .cx-knob {
+  left: auto;
+  right: calc(13 * var(--u));
+  top: calc(17 * var(--u));
+  width: calc(50 * var(--u));
+  height: calc(50 * var(--u));
+  background: var(--meet-knob);
+}
+
+/* ---------------------------------------------------------------- burger */
+.cx-hero .cx-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.78);
+  border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(calc(40 * var(--u)));
+  backdrop-filter: blur(calc(40 * var(--u)));
+  box-shadow:
+    0 0 0 calc(1.3 * var(--u)) rgba(120, 145, 180, 0.2),
+    0 calc(2 * var(--u)) calc(10 * var(--u)) rgba(28, 52, 92, 0.05);
+}
+.cx-hero .cx-burger i {
+  display: block;
+  width: calc(20 * var(--u));
+  height: calc(1.8 * var(--u));
+  border-radius: 999px;
+  background: #202940;
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
+    opacity 0.3s;
+}
+.cx-hero .cx-burger[aria-expanded="true"] i:first-child {
+  transform: translateY(calc(3.9 * var(--u))) rotate(45deg);
+}
+.cx-hero .cx-burger[aria-expanded="true"] i:last-child {
+  transform: translateY(calc(-3.9 * var(--u))) rotate(-45deg);
+}
+.cx-hero .cx-menu {
+  display: contents;
+}
+
+/* ---------------------------------------------------------- hover + focus */
+.cx-hero a:focus-visible,
+.cx-hero button:focus-visible {
+  outline: max(2px, calc(2 * var(--u))) solid var(--focus);
+  outline-offset: max(2px, calc(3 * var(--u)));
+}
+.cx-hero .cx-nlink:focus-visible {
+  outline-offset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cx-hero .cx-cta,
+  .cx-hero .cx-meet,
+  .cx-hero .cx-play {
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1),
+      box-shadow 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .cx-hero .cx-cta:hover,
+  .cx-hero .cx-meet:hover,
+  .cx-hero .cx-play:hover {
+    transform: translateY(calc(-2 * var(--u)));
+  }
+  .cx-hero .cx-knob svg {
+    transition: translate 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .cx-hero .cx-cta:hover .cx-knob svg,
+  .cx-hero .cx-meet:hover .cx-knob svg {
+    translate: calc(1.5 * var(--u)) 0;
+  }
+  .cx-hero .cx-play svg {
+    transition: translate 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+  .cx-hero .cx-play:hover svg {
+    translate: 0 calc(1.5 * var(--u));
+  }
+}
+.cx-hero .cx-play:hover {
+  box-shadow: 0 calc(9 * var(--u)) calc(22 * var(--u)) rgba(28, 52, 92, 0.14);
+}
+
+/* ======================================================================
+ * TIER 2 - COMPACT: keyed to the frame's shape, not the device width.
+ * ==================================================================== */
+@media (max-aspect-ratio: 87/80), (max-width: 899px), (max-height: 639px) {
+  .cx-hero {
+    --u: min(100vw / 880, 100vh / 1220);
+    --pad: 52;
+    height: auto;
+    min-height: 100vh;
+  }
+  @supports (height: 100dvh) {
+    .cx-hero {
+      --u: min(100vw / 880, 100dvh / 1220);
+      min-height: 100dvh;
+    }
+  }
+  /* The stack flows (and may grow the hero) instead of being pinned. */
+  .cx-hero .cx-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    padding: calc(var(--pad) * var(--u));
+  }
+  @supports (height: 100dvh) {
+    .cx-hero .cx-stack {
+      min-height: 100dvh;
+    }
+  }
+  .cx-hero .cx-row,
+  .cx-hero .cx-blk,
+  .cx-hero .cx-stats,
+  .cx-hero .cx-stat,
+  .cx-hero .cx-tagrow {
+    display: flex;
+  }
+  .cx-hero .cx-row {
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .cx-hero .cx-blk {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin: calc(30 * var(--u)) 0;
+  }
+  .cx-hero .cx-tagrow {
+    align-items: center;
+    gap: calc(16 * var(--u));
+    margin-top: calc(28 * var(--u));
+    max-width: 100%;
+  }
+  .cx-hero .cx-stats {
+    align-items: flex-end;
+    gap: calc(26 * var(--u));
+    flex-wrap: wrap;
+  }
+  .cx-hero .cx-stat {
+    align-items: flex-end;
+    gap: calc(16 * var(--u));
+  }
+  .cx-hero .cx-lbl {
+    margin-top: 0;
+  }
+  .cx-hero .cx-slash {
+    margin: 0;
+  }
+  .cx-hero .cx-l,
+  .cx-hero .cx-t,
+  .cx-hero .cx-c,
+  .cx-hero .cx-b,
+  .cx-hero .cx-r {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+  }
+  .cx-hero .cx-h1 {
+    margin-top: calc(16 * var(--u));
+  }
+  .cx-hero .cx-play {
+    flex: none;
+  }
+  .cx-hero .cx-panel {
+    align-self: flex-end;
+    margin-top: calc(36 * var(--u));
+  }
+  .cx-hero .cx-foot {
+    flex-wrap: wrap;
+    row-gap: calc(24 * var(--u));
+  }
+  .cx-hero .cx-meet {
+    margin-left: auto;
+  }
+  .cx-hero .cx-nav {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    flex: none;
+  }
+
+  @media (min-aspect-ratio: 1/1) {
+    .cx-hero {
+      --u: min(100vw / 1240, 100vh / 820);
+      --pad: 46;
+    }
+    @supports (height: 100dvh) {
+      .cx-hero {
+        --u: min(100vw / 1240, 100dvh / 820);
+      }
+    }
+    @media (max-height: 520px) {
+      .cx-hero {
+        --u: min(100vw / 900, 100vh / 560);
+        --pad: 30;
+      }
+      @supports (height: 100dvh) {
+        .cx-hero {
+          --u: min(100vw / 900, 100dvh / 560);
+        }
+      }
+    }
+    .cx-hero .cx-blk {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: calc(46 * var(--u));
+      align-items: end;
+      margin: calc(24 * var(--u)) 0;
+    }
+    .cx-hero .cx-eyebrow {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .cx-hero .cx-h1 {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .cx-hero .cx-tagrow {
+      grid-column: 1;
+      grid-row: 3;
+    }
+    .cx-hero .cx-panel {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      align-self: center;
+      margin-top: 0;
+    }
+    .cx-hero .cx-foot {
+      flex-wrap: nowrap;
+    }
+  }
+
+  /* ------------------------------ TIER 3 - MOBILE (nested inside tier 2) */
+  @media (max-width: 640px) and (max-aspect-ratio: 1/1) {
+    .cx-hero {
+      --u: min(100vw / 600, 100vh / 940);
+      --t: max(var(--u), min(0.85px, 100vh / 780));
+      --pad: 40;
+    }
+    @supports (height: 100dvh) {
+      .cx-hero {
+        --u: min(100vw / 600, 100dvh / 940);
+        --t: max(var(--u), min(0.85px, 100dvh / 780));
+      }
+    }
+    .cx-hero .cx-sx {
+      transform: none;
+    }
+    .cx-hero .cx-brand {
+      height: auto;
+    }
+    .cx-hero .cx-mark {
+      width: calc(36 * var(--t));
+      height: calc(36 * var(--t));
+    }
+    .cx-hero .cx-brand b {
+      font-size: calc(21 * var(--t));
+      margin-left: calc(8 * var(--t));
+    }
+    .cx-hero .cx-h1 {
+      font-size: calc(66 * var(--u));
+      line-height: calc(64 * var(--u));
+      margin-top: calc(12 * var(--u));
+    }
+    .cx-hero .cx-eyebrow {
+      font-size: calc(16 * var(--t));
+    }
+    .cx-hero .cx-blk {
+      margin: calc(24 * var(--u)) 0;
+    }
+    .cx-hero .cx-tagrow {
+      gap: calc(14 * var(--t));
+      margin-top: calc(22 * var(--u));
+    }
+    .cx-hero .cx-tag {
+      font-size: calc(19 * var(--t));
+      line-height: calc(25 * var(--t));
+      white-space: normal;
+    }
+    .cx-hero .cx-play {
+      width: calc(48 * var(--t));
+      height: calc(48 * var(--t));
+    }
+    .cx-hero .cx-play svg {
+      width: calc(14 * var(--t));
+      height: calc(14 * var(--t));
+    }
+    .cx-hero .cx-panel {
+      width: 100%;
+      align-self: stretch;
+      height: calc(250 * var(--t));
+      margin-top: calc(24 * var(--u));
+    }
+    .cx-hero .cx-ptitle {
+      left: calc(30 * var(--t));
+      top: calc((30 + (24 - var(--fs)) / 2) * var(--t));
+      font-size: calc(var(--fs) * var(--t));
+    }
+    .cx-hero .cx-dot {
+      left: calc(var(--dl3) * var(--t));
+      top: calc(40 * var(--t));
+      width: calc(10 * var(--t));
+      height: calc(10 * var(--t));
+    }
+    .cx-hero .cx-badge {
+      left: auto;
+      right: calc(26 * var(--t));
+      top: calc(22 * var(--t));
+      width: calc(64 * var(--t));
+      height: calc(64 * var(--t));
+    }
+    .cx-hero .cx-badge svg {
+      width: calc(30 * var(--t));
+      height: calc(30 * var(--t));
+    }
+    .cx-hero .cx-psub {
+      left: calc(31 * var(--t));
+      top: calc(80 * var(--t));
+      font-size: calc(17 * var(--t));
+      line-height: calc(21 * var(--t));
+    }
+    .cx-hero .cx-kv {
+      left: calc(31 * var(--t));
+      width: calc(100% - 62 * var(--t));
+      font-size: calc(14 * var(--t));
+    }
+    .cx-hero .cx-venue {
+      top: calc(162 * var(--t));
+    }
+    .cx-hero .cx-scale {
+      top: calc(186 * var(--t));
+    }
+    .cx-hero .cx-track {
+      left: calc(31 * var(--t));
+      top: calc(214 * var(--t));
+      width: calc(100% - 62 * var(--t));
+      height: calc(8 * var(--t));
+    }
+    .cx-hero .cx-stats {
+      gap: calc(18 * var(--u));
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    .cx-hero .cx-stat {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: calc(6 * var(--t));
+    }
+    .cx-hero .cx-num {
+      font-size: calc(76 * var(--u));
+    }
+    .cx-hero .cx-lbl {
+      font-size: calc(15 * var(--t));
+      line-height: calc(19 * var(--t));
+    }
+    .cx-hero .cx-slash {
+      height: calc(92 * var(--t));
+      width: calc(29 * var(--t));
+      align-self: center;
+    }
+    .cx-hero .cx-meet {
+      width: 100%;
+      height: calc(72 * var(--t));
+    }
+    .cx-hero .cx-thumb {
+      left: calc(9 * var(--t));
+      top: calc(5 * var(--t));
+      width: calc(62 * var(--t));
+      height: calc(62 * var(--t));
+    }
+    .cx-hero .cx-meet b {
+      left: calc(84 * var(--t));
+      top: calc(28 * var(--t));
+      font-size: calc(17 * var(--t));
+    }
+    .cx-hero .cx-meet .cx-knob {
+      left: auto;
+      right: calc(11 * var(--t));
+      top: calc(11 * var(--t));
+      width: calc(50 * var(--t));
+      height: calc(50 * var(--t));
+    }
+  }
+}
+
+/* ======================================================================
+ * NAV COLLAPSE - a separate rule keyed only to the frame's shape:
+ * portrait collapses into the burger, landscape never does.
+ * ==================================================================== */
+@media (max-aspect-ratio: 1/1) {
+  .cx-hero .cx-burger {
+    display: flex;
+  }
+  .cx-hero .cx-menu {
+    display: block;
+    position: absolute;
+    z-index: 9;
+    top: calc((var(--pad) + 68) * var(--u));
+    right: calc(var(--pad) * var(--u));
+    width: calc(304 * var(--u));
+    padding: calc(16 * var(--u));
+    border-radius: calc(30 * var(--u));
+    background: rgba(255, 255, 255, 0.82);
+    border: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(calc(40 * var(--u)));
+    backdrop-filter: blur(calc(40 * var(--u)));
+    box-shadow:
+      0 0 0 calc(1.3 * var(--u)) rgba(120, 145, 180, 0.2),
+      0 calc(16 * var(--u)) calc(34 * var(--u)) rgba(28, 52, 92, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(-10 * var(--u))) scale(0.97);
+    transform-origin: top right;
+    transition:
+      opacity 0.26s cubic-bezier(0.2, 0.7, 0.3, 1),
+      transform 0.26s cubic-bezier(0.2, 0.7, 0.3, 1),
+      visibility 0.26s;
+  }
+  .cx-hero .cx-menu[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .cx-hero .cx-menu .cx-nav {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: calc(4 * var(--u));
+    padding: calc(2 * var(--u)) 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .cx-hero .cx-menu .cx-nav > * {
+    position: relative;
+    left: auto;
+    top: auto;
+  }
+  .cx-hero .cx-menu .cx-nlink {
+    height: auto;
+    padding: calc(10 * var(--u)) calc(10 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-nlink span {
+    font-size: calc(19 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-n1 svg {
+    width: calc(21 * var(--u));
+    height: calc(22 * var(--u));
+    margin-right: calc(16 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-n2 svg {
+    width: calc(21 * var(--u));
+    height: calc(21 * var(--u));
+    margin-right: calc(16 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-ndiv {
+    width: auto;
+    height: calc(1.2 * var(--u));
+    margin: calc(2 * var(--u)) calc(10 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-cta {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    width: 100%;
+    height: calc(64 * var(--u));
+    margin-top: calc(14 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-cta span {
+    left: calc(28 * var(--u));
+    top: calc(23 * var(--u));
+    font-size: calc(19 * var(--u));
+  }
+  .cx-hero .cx-menu .cx-cta .cx-knob {
+    left: auto;
+    right: calc(9 * var(--u));
+    top: calc(7 * var(--u));
+    width: calc(50 * var(--u));
+    height: calc(50 * var(--u));
+  }
+  /* Re-measured in --t on phones so the menu stays thumb-sized. */
+  @media (max-width: 640px) {
+    .cx-hero .cx-burger {
+      width: calc(56 * var(--t));
+      height: calc(56 * var(--t));
+      gap: calc(6 * var(--t));
+    }
+    .cx-hero .cx-burger i {
+      width: calc(20 * var(--t));
+      height: calc(1.8 * var(--t));
+    }
+    .cx-hero .cx-burger[aria-expanded="true"] i:first-child {
+      transform: translateY(calc(3.9 * var(--t))) rotate(45deg);
+    }
+    .cx-hero .cx-burger[aria-expanded="true"] i:last-child {
+      transform: translateY(calc(-3.9 * var(--t))) rotate(-45deg);
+    }
+    .cx-hero .cx-menu {
+      width: auto;
+      left: calc(var(--pad) * var(--u));
+      right: calc(var(--pad) * var(--u));
+      top: calc(var(--pad) * var(--u) + 68 * var(--t));
+      padding: calc(14 * var(--t));
+      border-radius: calc(28 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-nlink {
+      padding: calc(10 * var(--t)) calc(10 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-nlink span {
+      font-size: calc(18 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-n1 svg,
+    .cx-hero .cx-menu .cx-n2 svg {
+      width: calc(20 * var(--t));
+      height: calc(20 * var(--t));
+      margin-right: calc(15 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-cta {
+      height: calc(60 * var(--t));
+      margin-top: calc(12 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-cta span {
+      left: calc(26 * var(--t));
+      top: calc(21 * var(--t));
+      font-size: calc(18 * var(--t));
+    }
+    .cx-hero .cx-menu .cx-cta .cx-knob {
+      right: calc(7 * var(--t));
+      top: calc(6 * var(--t));
+      width: calc(48 * var(--t));
+      height: calc(48 * var(--t));
+    }
+  }
+}
+
+/* ======================================================================
+ * ENTRANCE pre-states. .cx-pre is added to the hero root by an inline
+ * script before first paint and removed when the timeline finishes (or by
+ * a 4 s self-heal). No JS / no WAAPI / reduced motion: never added.
+ * ==================================================================== */
+.cx-hero.cx-pre .cx-brand,
+.cx-hero.cx-pre .cx-nav,
+.cx-hero.cx-pre .cx-cta,
+.cx-hero.cx-pre .cx-burger,
+.cx-hero.cx-pre .cx-eyebrow,
+.cx-hero.cx-pre .cx-play,
+.cx-hero.cx-pre .cx-tag,
+.cx-hero.cx-pre .cx-panel,
+.cx-hero.cx-pre .cx-lbl,
+.cx-hero.cx-pre .cx-meet {
+  opacity: 0;
+}
+.cx-hero.cx-pre .cx-h1 .cx-sx,
+.cx-hero.cx-pre .cx-num {
+  clip-path: inset(100% 0 -14% 0);
+}
+.cx-hero.cx-pre .cx-slash {
+  scale: 1 0;
+}
+.cx-hero.cx-pre .cx-track i {
+  scale: 0 1;
+}
+.cx-hero.cx-pre .cx-dot {
+  scale: 0;
+}
