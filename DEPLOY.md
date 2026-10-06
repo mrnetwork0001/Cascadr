@@ -134,6 +134,10 @@ curl -s http://YOUR_VPS_IP:4010/api/paper/report | python3 -m json.tool
 curl -s http://YOUR_VPS_IP:4010/api/risk | python3 -m json.tool
 ```
 
+To get a push on your phone for every trade, set a long random
+`CASCADR_ALERT_NTFY_TOPIC` in `backend/.env`, restart the API, and subscribe
+to that topic in the ntfy app (or open `https://ntfy.sh/<topic>`).
+
 ---
 
 ## If you add a domain

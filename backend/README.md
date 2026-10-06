@@ -139,6 +139,16 @@ in the decision and skipped with the outcome `NOT_ON_VENUE`.
 
 Without a demo key, fills are simulated locally at Bitget's live prices.
 
+## Trade alerts
+
+With `CASCADR_ALERT_NTFY_TOPIC` set, the server sends a push notification
+through [ntfy](https://ntfy.sh) whenever a position opens (symbol, size,
+price, venue and the thesis) or fully closes (reason and realized P&L).
+Rejected and partial closes send nothing. Subscribe to the topic in the ntfy
+app or at `https://ntfy.sh/<topic>`; the topic name is the only secret, so make
+it long and random. Sending is best-effort with a short timeout: a failed push
+is counted in `/health` (`trade_alerts`) and never affects the trade.
+
 ## Safety
 
 `place_order` simulates unless **all** of the following hold:
