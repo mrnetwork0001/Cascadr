@@ -111,7 +111,9 @@ export default async function LandingPage() {
     <div className="min-h-screen bg-term-void">
       {/* ---------------------------------------------------------------- nav */}
       <nav className="sticky top-0 z-30 border-b border-term-line bg-term-void/90 backdrop-blur">
-        <div className="mx-auto flex max-w-[calc(50%_+_43.5rem)] items-center gap-4 px-5 py-2.5 md:px-6">
+        {/* Side margin is half the content sections' margin at every width
+            (12.5% - 162px, never under 12px); phones keep their 20px. */}
+        <div className="mx-auto flex w-full items-center gap-4 px-5 py-2.5 md:px-[max(0.75rem,calc(12.5%_-_10.125rem))]">
           <Link href="/" aria-label="Cascadr home" className="flex items-center">
             <Logo height={26} priority />
           </Link>
