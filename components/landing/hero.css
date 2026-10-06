@@ -498,6 +498,9 @@
   color: var(--ink);
   white-space: nowrap;
 }
+.cx-hero .cx-sep {
+  margin: 0 -0.075em 0 -0.06em;
+}
 .cx-hero .cx-lbl {
   margin-top: calc(16.7 * var(--u));
   font-size: calc(19 * var(--u));

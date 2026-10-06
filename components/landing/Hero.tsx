@@ -29,7 +29,18 @@ function every(seconds: number): string {
   return m < 60 ? `${m} min` : `${+(m / 60).toFixed(1)} h`;
 }
 
-const count = (n: number | undefined) => (n == null ? "—" : n.toLocaleString("en-US"));
+/** Big figures. At this size and weight Inter's comma carries wide spacing,
+ *  so the thousands separator is set in its own tightened span. */
+const count = (n: number | undefined) => {
+  if (n == null) return "—";
+  const parts = n.toLocaleString("en-US").split(",");
+  return parts.map((p, i) => (
+    <span key={i}>
+      {i > 0 && <span className="cx-sep">,</span>}
+      {p}
+    </span>
+  ));
+};
 
 /**
  * The landing page's first screen: header and hero. Every figure and state on
