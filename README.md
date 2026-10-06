@@ -2,14 +2,14 @@
 
 **An autonomous, event-driven trading agent that prices the second-order effects of supply-chain disruptions.**
 
-Built by NetLayer Labs for the **Bitget AI Hackathon** — Agentic Trading track, *Event-Driven Agent* theme.
+Built by NetLayer Labs for the **Bitget AI Hackathon** - Agentic Trading track, *Event-Driven Agent* theme.
 
 | | |
 | --- | --- |
 | **Live site** | https://cascadr.38.49.216.120.sslip.io |
 | **Live terminal** | https://cascadr.38.49.216.120.sslip.io/terminal |
 | **Public API** | https://cascadr.38.49.216.120.sslip.io/api/health |
-| **Trading** | Paper only — orders are placed on **Bitget's demo exchange** (Demo Trading, no real funds) |
+| **Trading** | Paper only - orders are placed on **Bitget's demo exchange** (Demo Trading, no real funds) |
 
 ---
 
@@ -34,9 +34,9 @@ Built by NetLayer Labs for the **Bitget AI Hackathon** — Agentic Trading track
 
 ## The idea
 
-Markets react to the headline. When an earthquake shuts a TSMC fab, TSMC moves. The companies that depend on TSMC — the ones the headline never names — are slower to reprice, because working out who depends on whom, and by how much, takes a map of the supply chain.
+Markets react to the headline. When an earthquake shuts a TSMC fab, TSMC moves. The companies that depend on TSMC - the ones the headline never names - are slower to reprice, because working out who depends on whom, and by how much, takes a map of the supply chain.
 
-Cascadr keeps that map. It reads live news about the companies in the graph, has an LLM judge whether a headline is a genuine disruption and how severe it is, propagates the shock through source-cited supply links to the exposed downstream companies, and shorts them — autonomously, around the clock, with every decision recorded.
+Cascadr keeps that map. It reads live news about the companies in the graph, has an LLM judge whether a headline is a genuine disruption and how severe it is, propagates the shock through source-cited supply links to the exposed downstream companies, and shorts them - autonomously, around the clock, with every decision recorded.
 
 Bitget's stock perpetuals make this tradeable: they can be shorted, and they trade 24/7, including the overnight hours when most supply-chain news from Asia breaks and US cash equities are closed.
 
@@ -73,7 +73,7 @@ Everything the site shows is read from the running system; nothing is replayed o
 | Endpoint | What it shows |
 | --- | --- |
 | [`/api/health`](https://cascadr.38.49.216.120.sslip.io/api/health) | Agent state, last cycle, LLM, news feed, exit loop, paper venue |
-| [`/api/agent/decisions`](https://cascadr.38.49.216.120.sslip.io/api/agent/decisions) | Every decision — including every refusal — with the headline, article link, LLM reasoning, uncertainty, 0G provider and implied exposures |
+| [`/api/agent/decisions`](https://cascadr.38.49.216.120.sslip.io/api/agent/decisions) | Every decision - including every refusal - with the headline, article link, LLM reasoning, uncertainty, 0G provider and implied exposures |
 | [`/api/positions`](https://cascadr.38.49.216.120.sslip.io/api/positions) | The paper book, each position with its venue, fills, fees and P&L |
 | [`/api/venue`](https://cascadr.38.49.216.120.sslip.io/api/venue) | **Bitget's own view** of the demo account: balances and open positions |
 | [`/api/paper/report`](https://cascadr.38.49.216.120.sslip.io/api/paper/report) | Paper performance: return, Sharpe, max drawdown, win rate, closed trades |
@@ -83,7 +83,7 @@ Everything the site shows is read from the running system; nothing is replayed o
 
 ## Paper trading on Bitget
 
-Paper trades are placed on **Bitget's demo exchange** — the environment Bitget's own Agent Hub uses for `--paper-trading` — through the v3 (Unified Account) API with a Demo API key and the `paptrading: 1` header. Bitget fills each order and keeps the order, position and P&L record; Cascadr books exactly what Bitget reports (average fill price, quantity and fees) and `GET /api/venue` exposes Bitget's view of the account for cross-checking.
+Paper trades are placed on **Bitget's demo exchange** - the environment Bitget's own Agent Hub uses for `--paper-trading` - through the v3 (Unified Account) API with a Demo API key and the `paptrading: 1` header. Bitget fills each order and keeps the order, position and P&L record; Cascadr books exactly what Bitget reports (average fill price, quantity and fees) and `GET /api/venue` exposes Bitget's view of the account for cross-checking.
 
 | | |
 | --- | --- |
@@ -104,7 +104,7 @@ Real-money trading is implemented but disabled: it requires a separate live key 
 | `REPORTED` | A specific share published by a named analyst or outlet | 4 |
 | `QUALITATIVE` | The relationship is sourced but only described in words; the number comes from one fixed rule: sole 0.95, primary 0.70, one of two 0.50, one of several 0.25 | 13 |
 
-- Each link was researched from primary pages and then re-checked by an independent verifier. Links nobody could source were **removed, not guessed** — Lynas→Sony and Maersk→Apple/Dell — which took Lynas and Maersk out of the graph.
+- Each link was researched from primary pages and then re-checked by an independent verifier. Links nobody could source were **removed, not guessed** - Lynas→Sony and Maersk→Apple/Dell - which took Lynas and Maersk out of the graph.
 - **Company size** is the latest fiscal year's revenue from the income statement, converted to USD at the fiscal-year-end rate.
 - **Customer concentration** (shown per company in the terminal) is read by hand from each company's latest 10-K or 20-F, with the sentence, form and accession number. Where a filing discloses no qualifying customer, the record says so instead of showing a number.
 
@@ -114,9 +114,9 @@ Real-money trading is implemented but disabled: it requires a separate live key 
 
 | | Result (3 events, 7 company pairs) |
 | --- | --- |
-| Day of the news | Downstream names fell in only **43%** of cases — the market does not price the contagion on day 0 |
+| Day of the news | Downstream names fell in only **43%** of cases - the market does not price the contagion on day 0 |
 | Days +1 to +5, vs the semiconductor ETF | **−3.29%** average, negative in **every** case |
-| Overnight share of the day-0 move | **42%** on average — hours only a 24/7 venue can trade |
+| Overnight share of the day-0 move | **42%** on average - hours only a 24/7 venue can trade |
 
 Three of the six originally listed events failed verification and were dropped (a quake with no disruption, a shipping event with no sourced link, a fire at a company outside the graph). **This is a keep-going result, not proof:** seven pairs is a small sample, and five of them share one earthquake. The research README lists every caveat.
 
@@ -147,7 +147,7 @@ Every proposed order is vetted before it reaches Bitget. Five shorts opened from
 
 ## Explainability
 
-Each decision is stored with: the headline and article link; the LLM's named entities, shock, severity, confidence, reasoning and stated uncertainty; the 0G provider that ran the inference; every implied exposure with the exact links and constants its score was multiplied from; and an outcome that names what happened — `TRADED`, `DECLINED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`, `NOT_ON_VENUE`, `NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NO_TRADABLE_EXPOSURE` or `EXECUTION_FAILED`.
+Each decision is stored with: the headline and article link; the LLM's named entities, shock, severity, confidence, reasoning and stated uncertainty; the 0G provider that ran the inference; every implied exposure with the exact links and constants its score was multiplied from; and an outcome that names what happened - `TRADED`, `DECLINED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`, `NOT_ON_VENUE`, `NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NO_TRADABLE_EXPOSURE` or `EXECUTION_FAILED`.
 
 The landing page's *A real decision* section rebuilds one decision's arithmetic from those stored factors. In the terminal, clicking a company shows every supply link's sources, quotes, caveats and counter-evidence.
 
@@ -157,7 +157,7 @@ The landing page's *A real decision* section rebuilds one decision's arithmetic 
 | --- | --- |
 | **Model** | `claude-opus-5`, served through **0G Private Computer** (`router-api.0g.ai`) |
 | **Function** | News oracle only: for each candidate headline, identify the directly disrupted graph company, score the shock (0–1), severity and confidence, and explain its reasoning and uncertainty |
-| **Not used for** | Position sizing, risk, exits or order execution — those are deterministic code |
+| **Not used for** | Position sizing, risk, exits or order execution - those are deterministic code |
 | **Audit** | Each call records the 0G provider that executed it |
 
 ## Architecture
@@ -169,7 +169,7 @@ Browser ──► Caddy (TLS) ──► /api/* ──► FastAPI agent  (127.0.0
 FastAPI agent
 ├── news loop (10 min) ── Google News RSS ── LLM oracle (0G) ── graph traversal ── risk ── Bitget demo
 ├── exit loop (60 s) ──── Bitget marks ───── exit rules ─────── Bitget demo
-└── SQLite (WAL, serialised) — decisions, headlines, positions, events, equity journal
+└── SQLite (WAL, serialised) - decisions, headlines, positions, events, equity journal
 ```
 
 | Layer | Technology |
@@ -199,7 +199,7 @@ backend/tests/             114 tests
 
 ## Running it locally
 
-**Frontend** — proxies `/api` to the deployed backend by default (set `BACKEND_URL` to use another):
+**Frontend** - proxies `/api` to the deployed backend by default (set `BACKEND_URL` to use another):
 
 ```bash
 npm install

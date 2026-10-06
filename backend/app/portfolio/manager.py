@@ -6,9 +6,9 @@ against the exchange's.
 
 Exit precedence is deliberate and ordered worst-first:
 
-    1. STOP_LOSS    — the trade is wrong; capital preservation outranks patience
-    2. TAKE_PROFIT  — the modelled move arrived; stop pressing
-    3. TIME_STOP    — the validated window elapsed without payoff
+    1. STOP_LOSS    - the trade is wrong; capital preservation outranks patience
+    2. TAKE_PROFIT  - the modelled move arrived; stop pressing
+    3. TIME_STOP    - the validated window elapsed without payoff
 
 A thesis with no exit is not a thesis. The default 168h hold is the window the
 event study in research/ actually measured (5 US trading days = 7 calendar days).
@@ -335,7 +335,7 @@ class PortfolioManager:
         if self._demo is None:
             detail = "Bitget demo key not configured"
             await self._store.close_rejected(p.id, detail)
-            return f"close REJECTED, position left OPEN — {detail}"
+            return f"close REJECTED, position left OPEN - {detail}"
         oid = "cz" + p.id.replace("-", "")[:22] + f"{p.close_attempts % 100:02d}"
         try:
             ex = await self._demo.close_short(p.symbol, p.size, oid)
@@ -345,7 +345,7 @@ class PortfolioManager:
         if ex is None or ex.qty <= 0:
             detail = detail if ex is None else ex.detail("BUY", p.symbol)
             await self._store.close_rejected(p.id, detail)
-            return f"close REJECTED, position left OPEN — {detail}"
+            return f"close REJECTED, position left OPEN - {detail}"
 
         fill_detail = ex.detail("BUY", p.symbol)
         price_pnl = self._slice_pnl(p, ex.qty, ex.avg_price)
@@ -356,7 +356,7 @@ class PortfolioManager:
                 p.id, p.size, remaining, round(remaining * p.entry_price, 2), slice_pnl, fill_detail,
             ):
                 return "position changed while closing; nothing booked"
-            return f"PARTIAL close {ex.qty:g}/{p.size:g}; {remaining:g} still open — {fill_detail}"
+            return f"PARTIAL close {ex.qty:g}/{p.size:g}; {remaining:g} still open - {fill_detail}"
 
         # Realized P&L is net of Bitget's fees: this close's, and the open's.
         final_pnl = price_pnl - ex.fees - p.fees_usdt
@@ -374,7 +374,7 @@ class PortfolioManager:
     def evaluate_exit(
         p: Position, mark: float, now: datetime | None = None
     ) -> CloseReason | None:
-        """Pure decision function — no I/O, so it is directly testable."""
+        """Pure decision function - no I/O, so it is directly testable."""
         move = p.pnl_pct(mark)  # positive = in our favour
 
         if -move >= p.policy.stop_loss_pct:
@@ -445,7 +445,7 @@ class PortfolioManager:
             # A failed close must never be recorded as closed, or the book and
             # the exchange silently diverge.
             await self._store.close_rejected(p.id, detail)
-            return f"close REJECTED, position left OPEN — {detail}"
+            return f"close REJECTED, position left OPEN - {detail}"
 
         exit_price = mark
         if paper:
@@ -460,7 +460,7 @@ class PortfolioManager:
             )
             if not fill.accepted:
                 await self._store.close_rejected(p.id, fill.detail)
-                return f"close REJECTED, position left OPEN — {fill.detail}"
+                return f"close REJECTED, position left OPEN - {fill.detail}"
 
             exit_price = fill.avg_price
 
@@ -476,7 +476,7 @@ class PortfolioManager:
                     return "position changed while closing; nothing booked"
                 return (
                     f"PARTIAL close {fill.filled_size:.4f}/{p.size:.4f}; "
-                    f"{remaining:.4f} still open, slice pnl {slice_pnl:+.2f} — {fill.detail}"
+                    f"{remaining:.4f} still open, slice pnl {slice_pnl:+.2f} - {fill.detail}"
                 )
             detail = f"{detail} {fill.detail}"
 
@@ -530,7 +530,7 @@ class PortfolioManager:
         """Compare our book against the exchange's.
 
         Without credentials this reports `exchange_available=False` rather than
-        an empty exchange — "cannot check" and "nothing open" look identical in
+        an empty exchange - "cannot check" and "nothing open" look identical in
         the data and mean opposite things.
         """
         ours = await self._store.open_positions()

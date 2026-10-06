@@ -128,7 +128,7 @@ export function GraphPanel({ graph, graphError, decision, following, onFollow, q
               aria-hidden="true"
               className={`h-1.5 w-1.5 rounded-full ${graphError ? "bg-signal-red" : "bg-accent/70 motion-safe:animate-pulse"}`}
             />
-            {graphError ? "graph unavailable — cannot reach the API" : "loading graph…"}
+            {graphError ? "graph unavailable - cannot reach the API" : "loading graph…"}
           </div>
         )}
         {decision && (

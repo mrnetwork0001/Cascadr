@@ -1,4 +1,4 @@
-"""News sensing — the agent's eyes.
+"""News sensing - the agent's eyes.
 
 Polls public RSS for headlines about companies in the graph. Free, keyless,
 and good enough to make the agent genuinely autonomous rather than a button
@@ -14,7 +14,7 @@ gets any of them wrong is dangerous rather than merely broken:
     mention a graph entity are sent for reasoning. Everything else is dropped
     before it costs anything.
   * **Old news is not news.** Anything published outside the freshness window
-    is recorded as seen and skipped — a week-old outage is already priced.
+    is recorded as seen and skipped - a week-old outage is already priced.
 """
 
 import asyncio
@@ -202,7 +202,7 @@ class FeedReader:
     async def poll(self, nodes: list[GraphNode], per_entity: int = 6) -> list[Headline]:
         """New, fresh, on-topic headlines. Everything else is marked seen.
 
-        Queries per entity so results arrive pre-targeted — cheaper and far
+        Queries per entity so results arrive pre-targeted - cheaper and far
         more precise than filtering a general business feed.
         """
         # Query by name, not id: "SK_HYNIX" is not a phrase anyone writes.

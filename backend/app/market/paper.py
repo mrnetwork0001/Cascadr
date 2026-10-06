@@ -5,9 +5,9 @@ succeeds, every size is exact, and the first time real slippage or a reject
 appears is with real money. This models the three things that actually break
 execution logic:
 
-  * slippage  — you never get the mark; larger orders get worse prices
-  * partial fills — you asked for 100, you got 62, and you still owe 38
-  * rejects   — the venue says no, and the position must stay open
+  * slippage  - you never get the mark; larger orders get worse prices
+  * partial fills - you asked for 100, you got 62, and you still owe 38
+  * rejects   - the venue says no, and the position must stay open
 
 Deterministic given (client_oid, attempt): the same order always produces the
 same outcome, so tests are stable and a demo is reproducible. Set
@@ -38,7 +38,7 @@ class PaperFill:
 
 
 def _unit(seed: str) -> float:
-    """Stable pseudo-random in [0,1) from a string — no global RNG state."""
+    """Stable pseudo-random in [0,1) from a string - no global RNG state."""
     h = hashlib.sha256(seed.encode()).digest()
     return int.from_bytes(h[:8], "big") / 2**64
 

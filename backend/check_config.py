@@ -31,9 +31,9 @@ async def main() -> int:
 
     # --- safety first ----------------------------------------------------
     if s.paper_trading:
-        print(f"{OK} PAPER TRADING ON — orders are simulated, nothing is sent")
+        print(f"{OK} PAPER TRADING ON - orders are simulated, nothing is sent")
     else:
-        print(f"{BAD} LIVE TRADING ARMED — CASCADR_PAPER_TRADING is exactly 'false'")
+        print(f"{BAD} LIVE TRADING ARMED - CASCADR_PAPER_TRADING is exactly 'false'")
         print("   Real orders will be sent if Bitget credentials are present.")
         print(f"   Per-order cap: {s.cascadr_max_order_usdt:,.0f} USDT")
 
@@ -41,19 +41,19 @@ async def main() -> int:
     if s.has_trading_credentials:
         print(f"{OK} Bitget credentials present (needed only for orders + reconcile)")
     else:
-        print(f"{WARN} Bitget credentials absent — market data still works (public API)")
+        print(f"{WARN} Bitget credentials absent - market data still works (public API)")
         print("   /positions/reconcile will report 'cannot check', which is correct.")
 
     # --- neo4j -----------------------------------------------------------
     print(
         f"{OK} Neo4j configured" if s.neo4j_enabled
-        else f"{WARN} Neo4j unset — using the curated seed graph"
+        else f"{WARN} Neo4j unset - using the curated seed graph"
     )
 
     # --- llm -------------------------------------------------------------
     llm = LLMClient(s)
     if not llm.configured:
-        print(f"{BAD} LLM NOT CONFIGURED — set LLM_BASE_URL and LLM_MODEL in .env")
+        print(f"{BAD} LLM NOT CONFIGURED - set LLM_BASE_URL and LLM_MODEL in .env")
         print("   The oracle will fall back to keyword matching and label itself")
         print("   'heuristic'. This is the single biggest gap for the Agentic track.")
         await llm.aclose()
@@ -62,7 +62,7 @@ async def main() -> int:
 
     print(f"{OK} LLM configured: {s.llm_model} @ {s.llm_base_url}")
     if not s.llm_api_key:
-        print(f"{WARN} LLM_API_KEY is empty — fine if your endpoint is unauthenticated")
+        print(f"{WARN} LLM_API_KEY is empty - fine if your endpoint is unauthenticated")
 
     print(f"\n── Live probe ─────────────────────────────────────────────\n")
     print(f'Headline: "{PROBE}"\n')
@@ -81,7 +81,7 @@ async def main() -> int:
         print()
         return 1
 
-    print(f"{OK} LLM responded — engine=llm, model={verdict.model}")
+    print(f"{OK} LLM responded - engine=llm, model={verdict.model}")
     print(f"   entities   : {verdict.entities}")
     print(f"   shock      : {verdict.shock:.2f}  ({verdict.severity})")
     print(f"   confidence : {verdict.confidence:.2f}")
@@ -94,7 +94,7 @@ async def main() -> int:
         return 1
     if verdict.shock < 0.5:
         print(f"\n{WARN} Shock {verdict.shock:.2f} looks low for 'guidance withdrawn'.")
-        print("   Expect ~0.8+. A weaker model may under-read severity — that is")
+        print("   Expect ~0.8+. A weaker model may under-read severity - that is")
         print("   worth knowing before it sizes positions.")
 
     print(f"\n{OK} Oracle is live. Restart the backend to use it.\n")

@@ -1,7 +1,7 @@
 """Portfolio-level risk.
 
 Per-position stops answer "is this trade wrong?". Nothing in them answers
-"is the book too big?" — and for a contagion strategy that gap is dangerous in
+"is the book too big?" - and for a contagion strategy that gap is dangerous in
 a specific way:
 
     Five shorts opened from one TSMC outage are not five positions.
@@ -93,7 +93,7 @@ class RiskManager:
                 allowed=False,
                 reason=(
                     f"HALTED: drawdown {dd:.1f}% >= {L.max_drawdown_pct:.1f}% "
-                    "of starting equity — no new risk"
+                    "of starting equity - no new risk"
                 ),
             )
 
@@ -110,7 +110,7 @@ class RiskManager:
             return RiskDecision(
                 allowed=False,
                 reason=(
-                    f"already short {symbol} (cluster '{held}') — a second "
+                    f"already short {symbol} (cluster '{held}') - a second "
                     "cluster pointing at the same ticker is one exposure, not two"
                 ),
             )
@@ -121,7 +121,7 @@ class RiskManager:
                 allowed=False,
                 reason=(
                     f"cluster '{cluster}' full: {len(in_cluster)}/"
-                    f"{L.max_positions_per_cluster} positions — these names share "
+                    f"{L.max_positions_per_cluster} positions - these names share "
                     "one root cause and are not independent bets"
                 ),
             )

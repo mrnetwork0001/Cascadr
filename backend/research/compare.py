@@ -2,12 +2,12 @@
 
 Runs the same event study against two benchmarks:
 
-  SPY  — broad market. Drift here could still be "semis sold off that week".
-  SMH  — semiconductor ETF. Drift that SURVIVES this is idiosyncratic to the
+  SPY  - broad market. Drift here could still be "semis sold off that week".
+  SMH  - semiconductor ETF. Drift that SURVIVES this is idiosyncratic to the
          individual name, which is what the strategy actually claims.
 
 If CAR collapses toward zero under SMH, the signal is sector rotation, and
-"short the exposed name" is really just "short semis" — a far more crowded and
+"short the exposed name" is really just "short semis" - a far more crowded and
 less interesting trade.
 """
 

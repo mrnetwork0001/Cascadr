@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     sec_user_agent: str = "Cascadr Research contact@example.com"
 
-    # LLM gateway. OpenAI-compatible /chat/completions — works with 0G Compute,
+    # LLM gateway. OpenAI-compatible /chat/completions - works with 0G Compute,
     # OpenRouter, Together, vLLM, LiteLLM. Unset: the oracle falls back to
     # deterministic matching and says so in the trace.
     llm_base_url: str | None = None

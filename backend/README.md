@@ -8,7 +8,7 @@ contagion scoring, and order submission.
 ```bash
 cd backend
 python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
-cp .env.example .env          # optional — it runs with an empty environment
+cp .env.example .env          # optional - it runs with an empty environment
 ./.venv/bin/uvicorn app.main:app --reload --port 8010
 ```
 
@@ -48,19 +48,19 @@ configured those endpoints answer 503, with a wrong one 401. CORS allows
 With `CASCADR_AUTONOMOUS=true` a background loop runs every
 `CASCADR_POLL_SECONDS`:
 
-1. **Sense** — Google News RSS, one query per graph company. Seen and stale
+1. **Sense** - Google News RSS, one query per graph company. Seen and stale
    (older than `CASCADR_NEWS_MAX_AGE_HOURS`) headlines are skipped, and a free
    keyword filter drops any that name no graph company. Feed errors are counted
    and shown in `/health`, not swallowed.
-2. **Reason** — the LLM names the directly disrupted companies (checked against
+2. **Reason** - the LLM names the directly disrupted companies (checked against
    the graph), scores the shock 0–1, and states its reasoning and what would
    change its mind. Below `CASCADR_SHOCK_FLOOR` (0.40) the headline is
    declined. If the LLM fails, the headline waits for the next cycle; a
    keyword match is never traded.
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.
-3. **Propagate** — each disrupted company's downstream cone is scored; where
+3. **Propagate** - each disrupted company's downstream cone is scored; where
    several paths reach one company, the strongest wins.
-4. **Act** — exposures at or above the trade threshold (0.18) go through the
+4. **Act** - exposures at or above the trade threshold (0.18) go through the
    risk engine to the paper book. Both thresholds are calibrated against the
    verified historical events: see [research/README.md](research/README.md#calibrating-the-agent).
 
@@ -92,27 +92,27 @@ Precedence matters: an old, losing position stops out rather than lingering to
 its time stop. `evaluate_exit` is a pure function with no I/O, so the boundaries
 are tested directly.
 
-**Persistence** — SQLite (`cascadr.db`, stdlib, WAL). Kill the process and the
+**Persistence** - SQLite (`cascadr.db`, stdlib, WAL). Kill the process and the
 book is still there. Every transition also appends to `position_events`. The
 store, journal, feed reader and agent share one connection, and every call to
 it is serialised (`app/db.py`); concurrent reads of one query otherwise reset
 each other's cursor.
 
-**Idempotency** — one *open* position per `client_oid` (`cascadr-{origin}-{ticker}`),
+**Idempotency** - one *open* position per `client_oid` (`cascadr-{origin}-{ticker}`),
 enforced by a partial unique index over open rows. A replayed signal cannot
 double the risk, and a closed position does not block a later re-entry.
 
-**P&L** — `pnl_usdt = notional × move`, where notional already includes
+**P&L** - `pnl_usdt = notional × move`, where notional already includes
 leverage; `roe_pct` is the return on margin. Partial closes book their slice's
 realised P&L and keep the rest open; the closed row shows the size as opened
 and the size-weighted average exit, so realized = (entry − exit) × size holds.
 An open position with no live mark makes unrealized P&L and equity unknown,
-and they are reported as unknown — never as a partial sum. For risk decisions
+and they are reported as unknown - never as a partial sum. For risk decisions
 only, it is valued at its stop-loss, so one suspended contract cannot freeze
 the book; an operator can close it at a stated price
 (`POST /positions/{id}/close?price=`), which is recorded as an override.
 
-**Reconciliation** — `/positions/reconcile` compares our open positions against
+**Reconciliation** - `/positions/reconcile` compares our open positions against
 Bitget's. Without credentials it reports `exchange_available: false` rather than
 an empty exchange: "cannot check" and "nothing open" look identical in the data
 and mean opposite things.
@@ -123,7 +123,7 @@ happen is how a book silently diverges from reality.
 ## Paper-trading venue: Bitget Demo Trading
 
 With `BITGET_DEMO_*` set, every paper trade is placed on Bitget's demo
-exchange through the v3 API — the environment Agent Hub's `--paper-trading`
+exchange through the v3 API - the environment Agent Hub's `--paper-trading`
 mode uses: the same host, a Demo API key and the `paptrading: 1` header.
 Bitget fills the orders and keeps the order, position and P&L record; Cascadr
 books exactly what Bitget reports (average price, filled quantity, fees) and
@@ -145,12 +145,12 @@ Without a demo key, fills are simulated locally at Bitget's live prices.
 2. all three Bitget credentials are present
 3. the order notional is under `CASCADR_MAX_ORDER_USDT`
 
-Failing any gate is not an error — the order comes back with `paper: true` and a
+Failing any gate is not an error - the order comes back with `paper: true` and a
 `detail` saying which gate stopped it. The flag is parsed as a string on purpose:
 as a bool, pydantic would read `0`, `no` or an empty value as False and silently
 arm live trading.
 
-## The LLM — 0G Private Computer
+## The LLM - 0G Private Computer
 
 The News Oracle is where the model makes the decision. It reads a raw headline,
 resolves it to graph entities, and sets the **shock magnitude** the graph
@@ -161,8 +161,8 @@ Measured difference on the same headline
 
 | Engine | shock | Outcome |
 | --- | --- | --- |
-| keyword fallback | 0.45 | never traded — recorded only when no LLM is configured |
-| `claude-opus-5` | 0.60-0.87 | `STRESSED` — **orders fire** |
+| keyword fallback | 0.45 | never traded - recorded only when no LLM is configured |
+| `claude-opus-5` | 0.60-0.87 | `STRESSED` - **orders fire** |
 
 The LLM is the difference between trading and not trading.
 
@@ -193,7 +193,7 @@ PROOF  provider=0xd3f02c1a04160389d98D2192AE2034159f731011
 A trading decision you cannot attribute is a trading decision you cannot audit.
 
 `LLM_TRUST_MODE=verified` restricts execution to attestable providers. It is
-opt-in because it also restricts availability — measured, `claude-opus-5`
+opt-in because it also restricts availability - measured, `claude-opus-5`
 returns 503 "no provider available" under verified while `deepseek-v4-pro`
 succeeds.
 
@@ -209,7 +209,7 @@ genuine risk, not a rounding detail.
 ## Portfolio risk
 
 Per-position stops answer "is this trade wrong?". They do not answer "is the
-book too big?" — and for a contagion strategy that gap is specific and
+book too big?" - and for a contagion strategy that gap is specific and
 dangerous:
 
 > Five shorts opened from one TSMC outage are not five positions.
@@ -225,7 +225,7 @@ correlated when the thesis is wrong. `app/risk.py` vets every proposed open
 | `max_cluster_notional_usdt` | 1× equity | caps the correlated exposure |
 | `max_positions_per_symbol` | 1 | two clusters naming NVDA is one exposure |
 | `max_gross_notional_usdt` | 2.5× equity | whole-book ceiling |
-| `max_drawdown_pct` | 15% | kill switch — halts all new risk |
+| `max_drawdown_pct` | 15% | kill switch - halts all new risk |
 
 Notional caps and position sizes (18–60% of equity, by exposure) scale with
 `CASCADR_PAPER_EQUITY`, so they fit the paper account; at 100,000 USDT they are
@@ -238,7 +238,7 @@ Notional caps and position sizes (18–60% of equity, by exposure) scale with
 A paper mode that always fills at the mark teaches you nothing: every close
 succeeds and the first real slippage arrives with real money. `app/market/paper.py`
 models slippage (worse for larger orders, always against you), partial fills,
-and rejects — deterministic per `client_oid`, so runs reproduce.
+and rejects - deterministic per `client_oid`, so runs reproduce.
 
 A partial close **shrinks the position and leaves it open**; a rejected close
 leaves it open too. Recording a close that did not happen is how a book
@@ -248,7 +248,7 @@ silently diverges from the exchange.
 
 Exits run every 60s in a supervised loop that:
 
-- runs **immediately on boot**, not after one interval — while the process was
+- runs **immediately on boot**, not after one interval - while the process was
   down, positions kept ageing and prices kept moving, so a stop may already be
   overdue;
 - backs off exponentially on failure instead of hot-looping, and never dies;
@@ -274,7 +274,7 @@ company's revenue is; they are not supply links.
 Filings do give supply links when the filer states them: the graph's two
 `DISCLOSED` edges come straight from AMD's and Broadcom's 10-Ks.
 
-## Instruments — read this before touching symbols
+## Instruments - read this before touching symbols
 
 Shorting a US equity on Bitget means the **stock perpetual future**:
 symbol `{TICKER}USDT`, `productType: "USDT-FUTURES"`.
@@ -291,12 +291,12 @@ Every edge in [app/graph/data/edges.json](app/graph/data/edges.json) carries a
 the page), a `basis` explaining how the number follows from them, an `as_of`,
 a `confidence`, caveats in `notes`, and any `counter_evidence`:
 
-- `DISCLOSED` — the share is stated in a filing or official statement
-- `REPORTED` — a specific share published by a named analyst or outlet
-- `QUALITATIVE` — sourced relationship, described only in words; the number
+- `DISCLOSED` - the share is stated in a filing or official statement
+- `REPORTED` - a specific share published by a named analyst or outlet
+- `QUALITATIVE` - sourced relationship, described only in words; the number
   comes from one fixed mapping: sole 0.95, primary 0.70, one of two 0.50,
   one of several 0.25
-- `INFERRED` — derived from customs / shipment records (none yet)
+- `INFERRED` - derived from customs / shipment records (none yet)
 
 Links that could not be sourced were removed rather than kept with a guessed
 weight; the file lists them under `removed`, with the reason.

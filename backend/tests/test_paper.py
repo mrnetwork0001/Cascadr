@@ -1,4 +1,4 @@
-"""Paper broker tests — friction must be real enough to exercise exit logic."""
+"""Paper broker tests - friction must be real enough to exercise exit logic."""
 
 from app.market.paper import PaperBroker
 

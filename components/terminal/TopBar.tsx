@@ -64,7 +64,7 @@ export function TopBar({
   }, []);
 
   const a = health?.autonomous;
-  let agent: AgentView = { label: "Agent", state: "—", detail: null, tone: "idle" };
+  let agent: AgentView = { label: "Agent", state: "-", detail: null, tone: "idle" };
   if (healthError) {
     // A failed poll means the last good state may no longer be true.
     agent = health
@@ -174,9 +174,9 @@ function PriceTape({ quotes, quotesError }: { quotes: Quote[]; quotesError: stri
         title={`${q.symbol} · Bitget last trade · 24h change${stale ? " · stale: last successful read" : ""}`}
       >
         <span className="text-[11px] font-[600] tracking-[0.03em] text-ink-soft">{q.ticker}</span>
-        <span className="num text-[12.5px] font-[460] text-ink">{q.last != null ? usd(q.last) : "—"}</span>
+        <span className="num text-[12.5px] font-[460] text-ink">{q.last != null ? usd(q.last) : "-"}</span>
         <span className={`num text-[11.5px] font-[520] ${tone}`}>
-          <span style={chg ? DEEP : undefined}>{chg != null ? signedPct(chg) : "—"}</span>
+          <span style={chg ? DEEP : undefined}>{chg != null ? signedPct(chg) : "-"}</span>
         </span>
       </span>
     );

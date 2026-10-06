@@ -9,7 +9,7 @@ is hurt. Contagion therefore flows X -> filer, which is the reverse of a supply
 edge. We emit it accordingly.
 
 Sentences that name no counterparty ("one direct customer") still carry real
-information — the filer is concentrated — but they cannot become an edge
+information - the filer is concentrated - but they cannot become an edge
 without a second node, so they are recorded as node-level facts instead of
 being guessed into a relationship.
 """
@@ -57,7 +57,7 @@ class IngestReport(BaseModel):
     facts_found: int = 0
     edges_written: int = 0
     edges: list[GraphEdge] = []
-    # Concentration disclosed but counterparty unnamed — real, but not an edge.
+    # Concentration disclosed but counterparty unnamed - real, but not an edge.
     unnamed_facts: list[dict] = []
     errors: list[str] = []
 

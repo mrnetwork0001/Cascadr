@@ -1,4 +1,4 @@
-# Cascadr — full stack for the VPS.
+# Cascadr - full stack for the VPS.
 #
 #   cp backend/.env.example backend/.env   # then paste your keys
 #   docker compose up -d --build

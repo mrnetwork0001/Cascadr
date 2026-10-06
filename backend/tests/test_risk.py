@@ -31,7 +31,7 @@ def test_allows_a_first_position():
 
 
 def test_cluster_position_count_is_capped():
-    """Five names from one shock is one bet — the cap must bite at three."""
+    """Five names from one shock is one bet - the cap must bite at three."""
     book = [pos("TSMC", 10_000, s) for s in ("NVDAUSDT", "AAPLUSDT", "AMDUSDT")]
     d = rm(max_positions_per_cluster=3).vet(
         cluster="TSMC", requested_notional=10_000, open_positions=book

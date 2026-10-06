@@ -23,7 +23,7 @@ only falsify the *multi-day* version of the thesis, not the intraday one.
 What daily bars CAN settle is the 24/7 argument: day 0 is decomposed into the
 overnight gap (previous close -> open) and the intraday move (open -> close).
 Return that lands in the gap is unreachable for a cash-equity trader but fully
-tradeable on a 24/7 perpetual — which is the structural case for doing this on
+tradeable on a 24/7 perpetual - which is the structural case for doing this on
 Bitget at all.
 """
 
@@ -38,7 +38,7 @@ from research.events import EVENTS, Event
 warnings.filterwarnings("ignore")
 
 MARKET = "SPY"
-SECTOR = "SMH"  # semiconductor ETF — the control that matters for chip names
+SECTOR = "SMH"  # semiconductor ETF - the control that matters for chip names
 EST_WINDOW = 120  # trading days used to fit alpha/beta
 EST_GAP = 11  # sessions left between estimation window and the event
 

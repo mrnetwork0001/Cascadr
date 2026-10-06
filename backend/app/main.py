@@ -126,7 +126,7 @@ async def lifespan(app: FastAPI):
         a time stop or a stop loss may already be overdue. Waiting a full
         interval would leave known-bad risk open for no reason.
 
-        Failures back off instead of hot-looping, and never kill the loop —
+        Failures back off instead of hot-looping, and never kill the loop -
         a dead sweeper is silent, and silence looks exactly like "nothing to
         do".
         """
@@ -172,9 +172,9 @@ async def lifespan(app: FastAPI):
     async def sensor():
         """The autonomous loop. Off unless CASCADR_AUTONOMOUS is 'true'."""
         if not s.autonomous:
-            print("[agent] autonomy OFF — set CASCADR_AUTONOMOUS=true to arm", flush=True)
+            print("[agent] autonomy OFF - set CASCADR_AUTONOMOUS=true to arm", flush=True)
             return
-        print(f"[agent] autonomy ON — polling every {s.cascadr_poll_seconds}s", flush=True)
+        print(f"[agent] autonomy ON - polling every {s.cascadr_poll_seconds}s", flush=True)
         # Let the app finish starting before the first poll.
         await asyncio.sleep(10)
         backoff = s.cascadr_poll_seconds
@@ -691,7 +691,7 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
             or headline_notional + notional > limits.max_cluster_notional_usdt
         ):
             skipped.append({"symbol": symbol, "kind": "risk", "reason": (
-                "RISK: one headline is one bet — its cluster allowance "
+                "RISK: one headline is one bet - its cluster allowance "
                 f"({limits.max_positions_per_cluster} positions / "
                 f"{limits.max_cluster_notional_usdt:,.0f} USDT) is used")})
             continue
@@ -701,7 +701,7 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
                 notional_usdt=notional,
                 leverage=3 if e["score"] >= 0.55 else 2,
                 mark=mark,
-                thesis=f"{e.get('rationale', '')} — on: {headline[:160]}",
+                thesis=f"{e.get('rationale', '')} - on: {headline[:160]}",
                 origin=e["origin"],
                 # The model's own implied drawdown becomes the profit target.
                 target_pct=e["implied_drawdown_pct"],
@@ -741,7 +741,7 @@ async def oracle_act(req: HeadlineRequest):
     exposures = await state["agent"].exposures_for(verdict.entities, verdict.shock)
     if not req.execute:
         return {"verdict": verdict, "acted": False,
-                "reason": "execute=false — analysis only", "exposures": exposures}
+                "reason": "execute=false - analysis only", "exposures": exposures}
     result = await _execute(exposures, req.headline, "manual")
     return {"verdict": verdict, "acted": True, "exposures": exposures, "execution": result}
 

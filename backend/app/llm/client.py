@@ -13,7 +13,7 @@ format", and the reverse for Claude. `LLM_API_FORMAT=auto` picks by model name;
 set it explicitly to override.
 
 Raw HTTP rather than the Anthropic SDK: this is a third-party router whose
-responses carry fields the typed SDK would discard — `x_0g_trace` (provider
+responses carry fields the typed SDK would discard - `x_0g_trace` (provider
 address, on-chain billing) and the `x-provider` header. Those are the
 verifiable provenance of a trading decision, so they are worth more here than
 the SDK's typed models.
@@ -21,7 +21,7 @@ the SDK's typed models.
 Trust mode
 ----------
 `X-0G-Provider-Trust-Mode: verified` restricts execution to attestable
-providers. It is opt-in because it also restricts availability — measured:
+providers. It is opt-in because it also restricts availability - measured:
 claude-opus-5 returns 503 "no provider available" under verified, while
 deepseek-v4-pro succeeds.
 """

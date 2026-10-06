@@ -86,7 +86,7 @@ export function ExposureRanking({
           </p>
         ) : rows.length === 0 ? (
           <p className="px-4 py-8 text-center text-[10.5px] font-[520] uppercase tracking-[0.12em] text-muted">
-            this headline names no graph company — no contagion
+            this headline names no graph company - no contagion
           </p>
         ) : (
           <ul className="divide-y divide-term-line/70">

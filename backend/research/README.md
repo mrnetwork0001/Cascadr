@@ -22,8 +22,8 @@ Standard event study. For each (disruption, downstream name):
 
 Two benchmarks, because the distinction decides whether the strategy is real:
 
-- **SPY** — broad market. Drift here might still be "semis sold off that week".
-- **SMH** — semiconductor ETF. Drift that *survives* this is idiosyncratic to
+- **SPY** - broad market. Drift here might still be "semis sold off that week".
+- **SMH** - semiconductor ETF. Drift that *survives* this is idiosyncratic to
   the name, which is what the strategy actually claims.
 
 3 events, 7 event-name pairs.
@@ -59,7 +59,7 @@ CAR_d1_5   -3.00  85.71 -2.59    CAR_d1_5   -3.29 100.00 -2.03
 
 **Day 0 is a coin flip.** Downstream names fell in 43% of cases, mean +0.05%
 against SPY. The market does not price the contagion on the day the news
-breaks — the necessary condition for the thesis.
+breaks - the necessary condition for the thesis.
 
 **The drift lands afterwards.** Days +1..+5 average −3.00% against SPY and
 −3.29% against the semiconductor ETF, negative in every case against SMH.
@@ -76,7 +76,7 @@ five-day drift intact, so this is not merely "semis sold off that week".
 - **Selection bias.** The events are ones memorable enough to recall, which
   biases toward large, real impacts.
 - **Confounders.** Beta adjustment does not remove name-specific news in the
-  same week — AMD's −6% after the Hualien quake is the largest single number
+  same week - AMD's −6% after the Hualien quake is the largest single number
   and may have other causes.
 - **Daily bars cannot see intraday lag.** If the market absorbs news in 90
   minutes, that is invisible here and lands on day 0. This can falsify the
@@ -86,7 +86,7 @@ five-day drift intact, so this is not merely "semis sold off that week".
 
 `backtest.py` splits day 0 into the overnight gap (prev close → open) and the
 regular session (open → close). **A mean 42% of the day-0 move happened in the
-gap** (median 26%) — unreachable for a cash-equity trader, fully tradeable on a 24/7
+gap** (median 26%) - unreachable for a cash-equity trader, fully tradeable on a 24/7
 perpetual. That is a structural reason to run this on Bitget stock perps
 specifically, and it does not depend on the drift result at all.
 

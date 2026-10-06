@@ -85,17 +85,17 @@ export function NodeInspector({
           <Field label="Tier" value={node.tier} />
           <Field label="Country" value={node.country} />
           <Field label="Revenue" value={`$${node.revenue_b.toFixed(1)}B`} />
-          <Field label="Period" value={node.revenue_period ?? "—"} />
+          <Field label="Period" value={node.revenue_period ?? "-"} />
           {quote && (
             <>
               <Field
                 label={quoteStale ? "Mark (stale)" : "Mark"}
-                value={quote.mark != null ? usd(quote.mark) : "—"}
+                value={quote.mark != null ? usd(quote.mark) : "-"}
                 className={quoteStale ? "text-muted" : undefined}
               />
               <Field
                 label="24h"
-                value={quote.change24h_pct != null ? signedPct(quote.change24h_pct) : "—"}
+                value={quote.change24h_pct != null ? signedPct(quote.change24h_pct) : "-"}
                 className={
                   quoteStale || quote.change24h_pct == null
                     ? "text-muted"

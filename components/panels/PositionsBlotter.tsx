@@ -76,7 +76,7 @@ export function PositionsBlotter({
 }) {
   const open = book?.positions.filter((p) => p.status === "OPEN") ?? [];
   const closed = book?.positions.filter((p) => p.status === "CLOSED").slice(0, 8) ?? [];
-  // Only figures the API returned are shown: unknown is "—", never $0.00.
+  // Only figures the API returned are shown: unknown is "-", never $0.00.
   const upl = book?.unrealized_usdt ?? null;
   const rpl = book?.realized_usdt ?? null;
   // Which edges have more of the book hidden past them on a narrow screen.
@@ -113,13 +113,13 @@ export function PositionsBlotter({
             <span className="whitespace-nowrap" title={book?.market_error ?? undefined}>
               <span className="text-muted">UPL </span>
               <Tone tone={pnlTone(upl)} className="num font-[560]">
-                {upl != null ? pnlUsd(upl) : "—"}
+                {upl != null ? pnlUsd(upl) : "-"}
               </Tone>
             </span>
             <span className="whitespace-nowrap">
               <span className="text-muted">RPL </span>
               <Tone tone={pnlTone(rpl)} className="num font-[560]">
-                {rpl != null ? pnlUsd(rpl) : "—"}
+                {rpl != null ? pnlUsd(rpl) : "-"}
               </Tone>
             </span>
             {book?.market_error && (
@@ -172,15 +172,15 @@ export function PositionsBlotter({
                       <td className={`${CELL} text-[10px] font-[520] uppercase tracking-[0.12em] text-muted`}>{p.source}</td>
                       <td className={`${CELL} num text-right text-ink-soft`}>{usd(p.notional_usdt, 0)}</td>
                       <td className={`${CELL} num text-right text-muted-2`}>{usd(p.entry_price)}</td>
-                      <td className={`${CELL} num text-right text-ink-soft`}>{p.mark != null ? usd(p.mark) : "—"}</td>
+                      <td className={`${CELL} num text-right text-ink-soft`}>{p.mark != null ? usd(p.mark) : "-"}</td>
                       <td className={`${CELL} num text-right font-[560]`}>
-                        <Tone tone={pnlTone(p.pnl_usdt)}>{p.pnl_usdt != null ? pnlUsd(p.pnl_usdt) : "—"}</Tone>
+                        <Tone tone={pnlTone(p.pnl_usdt)}>{p.pnl_usdt != null ? pnlUsd(p.pnl_usdt) : "-"}</Tone>
                       </td>
                       <td className={`${CELL} num text-right`}>
-                        <Tone tone={pnlTone(p.pnl_pct)}>{p.pnl_pct != null ? pnlPct(p.pnl_pct) : "—"}</Tone>
+                        <Tone tone={pnlTone(p.pnl_pct)}>{p.pnl_pct != null ? pnlPct(p.pnl_pct) : "-"}</Tone>
                       </td>
                       <td className={`${CELL} num text-right`}>
-                        <Tone tone={pnlTone(p.roe_pct)}>{p.roe_pct != null ? pnlPct(p.roe_pct) : "—"}</Tone>
+                        <Tone tone={pnlTone(p.roe_pct)}>{p.roe_pct != null ? pnlPct(p.roe_pct) : "-"}</Tone>
                       </td>
                       <td className={`${CELL} num text-right text-muted`}>{p.age_hours.toFixed(1)}h</td>
                       <td className={CELL}>
@@ -221,12 +221,12 @@ export function PositionsBlotter({
                       <td className={`${CELL} text-[10px] font-[520] uppercase tracking-[0.12em]`}>{p.source}</td>
                       <td className={`${CELL} num text-right`}>{usd(p.notional_usdt, 0)}</td>
                       <td className={`${CELL} num text-right`}>{usd(p.entry_price)}</td>
-                      <td className={`${CELL} num text-right`}>{p.exit_price != null ? usd(p.exit_price) : "—"}</td>
+                      <td className={`${CELL} num text-right`}>{p.exit_price != null ? usd(p.exit_price) : "-"}</td>
                       <td className={`${CELL} num text-right`}>
                         {p.realized_pnl_usdt != null ? (
                           <Tone tone={pnlTone(p.realized_pnl_usdt)}>{pnlUsd(p.realized_pnl_usdt)}</Tone>
                         ) : (
-                          "—"
+                          "-"
                         )}
                       </td>
                       <td className={CELL} />

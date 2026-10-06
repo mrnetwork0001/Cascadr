@@ -5,7 +5,7 @@ Two halves with very different risk profiles:
 * Market data is public, unauthenticated and read-only.
 * Trading is authenticated and gated. `place_order` simulates unless paper
   trading is explicitly disarmed AND credentials are present AND the notional
-  is under the configured cap. Failing any of those is not an error — it
+  is under the configured cap. Failing any of those is not an error - it
   returns a simulated fill and says why.
 
 Instrument note: shorting requires the stock PERPETUAL FUTURES product
@@ -205,12 +205,12 @@ class BitgetClient:
     async def exchange_positions(self) -> tuple[list[dict], str]:
         """Open positions as the exchange sees them.
 
-        Returns ([], reason) rather than raising when credentials are absent —
+        Returns ([], reason) rather than raising when credentials are absent -
         reconciliation must degrade to "cannot check" instead of "nothing open",
         because those two look identical and mean opposite things.
         """
         if not self._s.has_trading_credentials:
-            return [], "no trading credentials — cannot query exchange positions"
+            return [], "no trading credentials - cannot query exchange positions"
         try:
             data = await self._signed_get(
                 "/api/v2/mix/position/all-position",
@@ -244,7 +244,7 @@ class BitgetClient:
     async def close_position(
         self, symbol: str, size: str, side: str
     ) -> tuple[bool, bool, str, dict]:
-        """(accepted, paper, detail, request_body) — same gates as opening."""
+        """(accepted, paper, detail, request_body) - same gates as opening."""
         body = self.build_close_body(symbol, size, side)
 
         if self._s.paper_trading:

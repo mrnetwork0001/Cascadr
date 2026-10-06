@@ -1,5 +1,5 @@
 /**
- * Formatting helpers. Every one of these is deterministic given its input —
+ * Formatting helpers. Every one of these is deterministic given its input -
  * anything reading the wall clock is called from effects only, so the server
  * and first client render agree and hydration stays quiet.
  */
@@ -27,7 +27,7 @@ export function compactUsd(n: number): string {
   return n.toFixed(0);
 }
 
-/** Always signed — a P&L cell with no sign is a bug report waiting to happen. */
+/** Always signed - a P&L cell with no sign is a bug report waiting to happen. */
 export function signedPct(n: number, dp = 2): string {
   return `${n >= 0 ? "+" : ""}${n.toFixed(dp)}%`;
 }
@@ -42,7 +42,7 @@ export function pct(n: number, dp = 0): string {
 
 /** "3m ago" / "2h ago" / "4d ago" from an ISO timestamp, relative to now. */
 export function ago(iso: string | null | undefined, now: number = Date.now()): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const s = Math.max(0, Math.round((now - new Date(iso).getTime()) / 1000));
   if (s < 60) return `${s}s ago`;
   if (s < 3600) return `${Math.floor(s / 60)}m ago`;

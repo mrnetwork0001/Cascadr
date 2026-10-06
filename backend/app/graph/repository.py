@@ -41,7 +41,7 @@ class MemoryGraphRepository:
 
 
 def index(nodes: list[GraphNode], edges: list[GraphEdge]):
-    """(node_by_id, downstream_adjacency) — the shape traversal expects."""
+    """(node_by_id, downstream_adjacency) - the shape traversal expects."""
     by_id = {n.id: n for n in nodes}
     downstream: dict[str, list[GraphEdge]] = {}
     for e in edges:

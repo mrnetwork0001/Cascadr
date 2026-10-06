@@ -1,4 +1,4 @@
-"""The autonomous loop — sense, reason, act.
+"""The autonomous loop - sense, reason, act.
 
 This is what makes Cascadr an agent rather than a dashboard with a button.
 Every cycle:
@@ -324,7 +324,7 @@ class AutonomousAgent:
         acted: list[dict] = []
 
         for h in fresh:
-            # Free filter first — irrelevant chatter must not cost a token.
+            # Free filter first - irrelevant chatter must not cost a token.
             if not mentions_graph_entity(h.title, nodes):
                 await self._feeds.mark_seen(h, acted=False)
                 continue
@@ -403,4 +403,4 @@ def outcome(opened: list, skipped: list[dict]) -> tuple[str, str]:
         return NO_TRADABLE_EXPOSURE, "no exposure reached the trade threshold"
     action = next(a for k, a in SKIP_OUTCOMES if k in kinds)
     first = next(x for x in skipped if x.get("kind", "risk") == next(k for k, _ in SKIP_OUTCOMES if k in kinds))
-    return action, f"{detail} — {first.get('reason', '')[:120]}"
+    return action, f"{detail} - {first.get('reason', '')[:120]}"

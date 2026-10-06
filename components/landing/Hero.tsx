@@ -32,7 +32,7 @@ function every(seconds: number): string {
 /** Big figures. At this size and weight Inter's comma carries wide spacing,
  *  so the thousands separator is set in its own tightened span. */
 const count = (n: number | undefined) => {
-  if (n == null) return "—";
+  if (n == null) return "-";
   const parts = n.toLocaleString("en-US").split(",");
   return parts.map((p, i) => (
     <span key={i}>
@@ -195,7 +195,7 @@ export function Hero({
                 </b>
               ) : (
                 <b>
-                  <span aria-hidden="true">—</span>
+                  <span aria-hidden="true">-</span>
                   <span className="sr-only">could not be read</span>
                 </b>
               )}
@@ -216,7 +216,7 @@ export function Hero({
                 <b>{shockText}</b>
               ) : (
                 <b>
-                  <span aria-hidden="true">—</span>
+                  <span aria-hidden="true">-</span>
                   <span className="sr-only">not available</span>
                 </b>
               )}

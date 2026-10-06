@@ -1,4 +1,4 @@
-"""SEC EDGAR ingestion — the source of DISCLOSED graph edges.
+"""SEC EDGAR ingestion - the source of DISCLOSED graph edges.
 
 What filings actually give you
 ------------------------------
@@ -12,7 +12,7 @@ directions:
 
 Supplier percentages are rarely disclosed at all, which is why the seed graph's
 supply weights are ESTIMATED. Revenue concentration is legally required, so it
-is the one dependency number that can be cited — and this module extracts it.
+is the one dependency number that can be cited - and this module extracts it.
 
 SEC requires a descriptive User-Agent with contact details on every request.
 """
@@ -136,7 +136,7 @@ class EdgarClient:
     async def concentrations_for(
         self, tickers: list[str], limit: int = 6
     ) -> dict[str, list[Concentration]]:
-        """Sequential on purpose — SEC asks for <=10 req/s and throttles bursts."""
+        """Sequential on purpose - SEC asks for <=10 req/s and throttles bursts."""
         out: dict[str, list[Concentration]] = {}
         for t in tickers:
             try:

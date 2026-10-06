@@ -1,10 +1,10 @@
-"""The News Oracle — where the LLM actually makes a decision.
+"""The News Oracle - where the LLM actually makes a decision.
 
 Given a raw headline, the model must do three things a lookup table cannot:
 
   1. resolve messy real-world language to graph entities ("Hon Hai", "鴻海",
      "the Zhengzhou plant" all mean FOXCONN);
-  2. judge *severity* — "evacuated as a precaution" and "fab offline for
+  2. judge *severity* - "evacuated as a precaution" and "fab offline for
      weeks" name the same company and mean very different things;
   3. say what it is uncertain about, so the risk layer can size accordingly.
 
@@ -39,7 +39,7 @@ Return ONLY a JSON object:
   "uncertainty": "what would change your estimate"
 }
 
-Calibrating shock — this drives real position size, so be conservative:
+Calibrating shock - this drives real position size, so be conservative:
   0.0-0.2  rumour, routine news, already-priced, or precautionary action
   0.2-0.5  confirmed disruption, limited or short duration
   0.5-0.8  confirmed material disruption, days to weeks of lost output
@@ -48,7 +48,7 @@ Calibrating shock — this drives real position size, so be conservative:
 Rules:
 - Only list ids that appear in the provided graph list. Never invent ids.
 - Only the DIRECTLY disrupted company. Downstream effects are computed by the
-  graph, not by you — do not list customers or suppliers.
+  graph, not by you - do not list customers or suppliers.
 - If the headline names no company in the graph, return "entities": [].
 - A headline that is positive or neutral for the company gets a low shock."""
 
@@ -60,7 +60,7 @@ class OracleVerdict(BaseModel):
     confidence: float = 0.0
     reasoning: str = ""
     uncertainty: str = ""
-    # "llm" or "heuristic" — always visible in the decision trace.
+    # "llm" or "heuristic" - always visible in the decision trace.
     engine: str = "heuristic"
     model: str | None = None
     detail: str = ""
@@ -95,7 +95,7 @@ class NewsOracle:
         parsed, detail = result.parsed, result.detail
         if parsed is None:
             v = self._heuristic(headline, nodes)
-            v.detail = f"LLM unavailable, used keyword fallback — {detail}"
+            v.detail = f"LLM unavailable, used keyword fallback - {detail}"
             v.provenance = result.meta
             return v
 
@@ -141,7 +141,7 @@ class NewsOracle:
             shock=0.45 if (hits and severe) else (0.2 if hits else 0.0),
             severity="MEDIUM" if severe else "LOW",
             confidence=0.4 if hits else 0.0,
-            reasoning="Keyword match only — no severity judgement available.",
+            reasoning="Keyword match only - no severity judgement available.",
             uncertainty="No LLM configured; magnitude is a fixed guess, not a reading.",
             engine="heuristic",
         )

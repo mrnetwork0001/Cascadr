@@ -175,7 +175,7 @@ export function GraphCanvas(props: Props) {
   /**
    * Rebuilt only when the graph itself changes (a new node or edge set from
    * the API). force-graph mutates these objects in place with x/y and swaps
-   * link endpoints for node references — handing it a fresh array on every
+   * link endpoints for node references - handing it a fresh array on every
    * state change would reheat the simulation and make the graph jump. Live
    * state reaches the painter through the ref below instead.
    */

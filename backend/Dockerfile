@@ -1,4 +1,4 @@
-# Cascadr backend — FastAPI + the autonomous agent loop.
+# Cascadr backend - FastAPI + the autonomous agent loop.
 FROM python:3.12-slim
 
 # curl is used by the container healthcheck below.

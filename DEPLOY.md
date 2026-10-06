@@ -34,7 +34,7 @@ rsync -av --exclude node_modules --exclude .next --exclude backend/.venv \
 ```
 
 Note `backend/.env` is excluded by `.dockerignore` from the image, but rsync
-will copy it. That is what you want — the container reads it via `env_file`.
+will copy it. That is what you want - the container reads it via `env_file`.
 Check it landed with the right permissions:
 
 ```bash
@@ -66,7 +66,7 @@ echo "PUBLIC_SITE_URL=http://YOUR_VPS_IP:4010" > .env
 In `backend/.env`:
 
 ```bash
-CASCADR_AUTONOMOUS=true      # exactly "true" — nothing else arms it
+CASCADR_AUTONOMOUS=true      # exactly "true" - nothing else arms it
 CASCADR_POLL_SECONDS=600     # sense every 10 minutes
 CASCADR_SHOCK_FLOOR=0.40     # below this, no trade is even considered (calibrated)
 CASCADR_MAX_LLM_PER_HOUR=60  # bounds spend if a feed floods
@@ -88,11 +88,11 @@ docker compose logs -f backend
 You should see:
 
 ```
-[agent] autonomy ON — polling every 600s
+[agent] autonomy ON - polling every 600s
 [agent] 15 fresh headlines, acted on 0
 ```
 
-Acting on 0 is normal and correct — most headlines are not disruptions.
+Acting on 0 is normal and correct - most headlines are not disruptions.
 
 ## 6. Verify
 
@@ -112,19 +112,19 @@ Check four things:
 
 Then open `http://YOUR_VPS_IP:4010/terminal` and check the status bar: `API`,
 `AGENT`, `LLM`, `NEWS` and `BITGET` should all be green. There is no local
-fallback — if the API is unreachable, the panels say so.
+fallback - if the API is unreachable, the panels say so.
 
 Confirm the write endpoints are locked:
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' -X POST http://YOUR_VPS_IP:4010/api/agent/cycle
-# 401 (or 503 if no token is configured) — never 200
+# 401 (or 503 if no token is configured) - never 200
 ```
 
 ## 7. Watch it work
 
 ```bash
-# Decisions, including the refusals — the refusals are the interesting part
+# Decisions, including the refusals - the refusals are the interesting part
 curl -s http://YOUR_VPS_IP:4010/api/agent/decisions | python3 -m json.tool | head -50
 
 # Paper performance, which is half the Agentic Trading score

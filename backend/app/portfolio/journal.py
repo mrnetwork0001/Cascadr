@@ -2,11 +2,11 @@
 
 Agentic Trading is judged 50% on quantitative paper-trading results: Sharpe,
 max drawdown, win rate. Those cannot be computed from a list of open positions
-— they need an equity *time series*. This records one every sweep.
+- they need an equity *time series*. This records one every sweep.
 
 Everything here is real: real Bitget marks, real positions, real exits. Only
 the fills are simulated, and they carry modelled slippage. Nothing is
-backfilled — the series starts when the agent starts.
+backfilled - the series starts when the agent starts.
 """
 
 import asyncio
@@ -68,7 +68,7 @@ class Journal:
 
         Sharpe is annualised from the observed sampling interval. With only
         hours of history it is not a meaningful estimate, so `samples` and
-        `hours_tracked` are reported alongside — a Sharpe from 40 minutes of
+        `hours_tracked` are reported alongside - a Sharpe from 40 minutes of
         data should be read as diagnostic, not as performance.
         """
         s = await self.series()
@@ -76,7 +76,7 @@ class Journal:
             return {
                 "samples": len(s),
                 "hours_tracked": 0.0,
-                "note": "insufficient history — the series starts when the agent starts",
+                "note": "insufficient history - the series starts when the agent starts",
             }
 
         eq = [r["equity_usdt"] for r in s]

@@ -76,7 +76,7 @@ def test_default_hold_is_five_trading_days():
 
 
 def test_stop_loss_outranks_time_stop():
-    """An old, losing position must stop out — not linger to its time stop."""
+    """An old, losing position must stop out - not linger to its time stop."""
     assert ev(make(hours_old=999, stop=6.0), 220.0) is CloseReason.STOP_LOSS
 
 

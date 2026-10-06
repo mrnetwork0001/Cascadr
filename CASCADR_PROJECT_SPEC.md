@@ -1,4 +1,4 @@
-# 🌐 CASCADR — Supply Chain Knowledge Graph Arbitrage Agent
+# 🌐 CASCADR - Supply Chain Knowledge Graph Arbitrage Agent
 
 > **Bitget AI Hackathon: Build What Trades Next**  
 > **Track:** Arbitrage (Cross-market correlation strategies)  

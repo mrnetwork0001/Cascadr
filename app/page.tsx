@@ -104,9 +104,9 @@ export default async function LandingPage() {
   const architecture: [string, string, string][] = [
     ["News sensing", "Google News RSS, per company, every few minutes", agentStatus],
     ["News oracle", `${overview?.agent.llm_model ?? "LLM"} via 0G Private Computer`, agentStatus],
-    ["Knowledge graph", `${overview?.graph.nodes ?? "—"} companies, ${overview?.graph.edges ?? "—"} links, each with cited sources`, graph ? "LIVE" : "UNKNOWN"],
+    ["Knowledge graph", `${overview?.graph.nodes ?? "-"} companies, ${overview?.graph.edges ?? "-"} links, each with cited sources`, graph ? "LIVE" : "UNKNOWN"],
     ["Contagion engine", "Python, server-side, 3-hop traversal", overview ? "LIVE" : "UNKNOWN"],
-    ["Market data", "Bitget public API — live quotes and mark prices", marketStatus],
+    ["Market data", "Bitget public API - live quotes and mark prices", marketStatus],
     ["Portfolio risk & exits", "cluster and symbol caps, drawdown halt, stop / take-profit / time", overview ? "LIVE" : "UNKNOWN"],
     [
       "Order execution",
@@ -147,7 +147,7 @@ export default async function LandingPage() {
           index="01"
           eyebrow="The edge"
           title="Everyone trades the first order. The second order is buried in supply chains."
-          lede="A headline names the company that was hit. It rarely names that company's customers. Working out who depends on whom — and how much — takes a map of the supply chain, and that dependency is what Cascadr trades."
+          lede="A headline names the company that was hit. It rarely names that company's customers. Working out who depends on whom - and how much - takes a map of the supply chain, and that dependency is what Cascadr trades."
         >
           {/* Side by side only once each card is wide enough for its diagram. */}
           <div className="grid gap-5 lg:grid-cols-2">
@@ -159,7 +159,7 @@ export default async function LandingPage() {
               )}
               <p className="max-w-[46rem] text-[15px] leading-[1.65] text-term-text">
                 On 3 April 2024 the M7.4 Hualien earthquake led TSMC to evacuate fabs. The headlines
-                named TSMC. They did not name NVIDIA —{" "}
+                named TSMC. They did not name NVIDIA -{" "}
                 {tsmcNvda ? (
                   <>
                     yet the graph gives NVIDIA a{" "}
@@ -243,7 +243,7 @@ export default async function LandingPage() {
               n="03"
               name="Propagate"
               stack="source-cited graph"
-              body="A breadth-first walk of the supply chain, up to three hops. Each hop multiplies by that link's dependency — a figure taken from a filing, an analyst report, or a sourced statement mapped by a published rule — and decays, so direct customers are hit hardest."
+              body="A breadth-first walk of the supply chain, up to three hops. Each hop multiplies by that link's dependency - a figure taken from a filing, an analyst report, or a sourced statement mapped by a published rule - and decays, so direct customers are hit hardest."
               code={`score = shock × ∏ dependency × ${overview?.graph.hop_decay ?? "decay"}^hops`}
             />
             <Stage
@@ -304,7 +304,7 @@ export default async function LandingPage() {
               <div>
                 <Label>So far</Label>
                 <p className="sr-only">
-                  {`${decisions.total ?? 0} decisions — ${decisions.DECLINED ?? 0} declined, ${decisions.TRADED ?? 0} traded.`}
+                  {`${decisions.total ?? 0} decisions - ${decisions.DECLINED ?? 0} declined, ${decisions.TRADED ?? 0} traded.`}
                 </p>
                 {/* Phones: the total on its own row, then declined | traded. */}
                 <div aria-hidden="true" className="mt-4 grid grid-cols-2 gap-x-5 gap-y-6 sm:flex sm:items-stretch sm:gap-x-7">
@@ -364,8 +364,8 @@ export default async function LandingPage() {
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <Card label="Evidence behind every number" accent="green">
               <p className="max-w-[46rem] text-[15px] leading-[1.65] text-term-text">
-                Each graph link carries its evidence class — disclosed in a filing, reported by an
-                analyst or outlet, or a sourced qualitative statement mapped by a published rule — and
+                Each graph link carries its evidence class - disclosed in a filing, reported by an
+                analyst or outlet, or a sourced qualitative statement mapped by a published rule - and
                 links to its sources. Links nobody could source were removed. Company sizes are latest
                 annual revenue from financial statements. Prices are Bitget&apos;s.
               </p>

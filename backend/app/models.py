@@ -1,7 +1,7 @@
 """Domain model shared by the API, the graph store and the execution layer.
 
 Mirrors lib/types.ts on the frontend. When you change a field here, change it
-there — the SSE payloads are consumed directly by the terminal.
+there - the SSE payloads are consumed directly by the terminal.
 """
 
 from datetime import UTC, datetime
@@ -29,7 +29,7 @@ class Provenance(StrEnum):
     """Where an edge weight came from. This is not decoration.
 
     A dependency the filer actually disclosed is worth far more than one a
-    model guessed, and the UI must be able to tell them apart — otherwise the
+    model guessed, and the UI must be able to tell them apart - otherwise the
     graph launders estimates into facts.
     """
 

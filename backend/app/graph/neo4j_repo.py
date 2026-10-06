@@ -1,7 +1,7 @@
 """Neo4j-backed graph.
 
 Imported lazily by app.main so the `neo4j` package stays an optional
-dependency — the service runs on the in-memory repository without it.
+dependency - the service runs on the in-memory repository without it.
 """
 
 from app.models import GraphEdge, GraphNode, Provenance, Tier

@@ -1,4 +1,4 @@
-# 🛡️ CLAUDE Context Directives — CASCADR
+# 🛡️ CLAUDE Context Directives - CASCADR
 
 Please read `CASCADR_PROJECT_SPEC.md` to fully understand the system architecture and the Bitget Hackathon goals.
 

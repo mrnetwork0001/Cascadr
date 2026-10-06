@@ -1,7 +1,7 @@
 """Durable position storage.
 
 SQLite via the standard library: no service to run, no extra dependency, and
-the book survives a restart — which is the whole point. Writes are tiny and
+the book survives a restart - which is the whole point. Writes are tiny and
 infrequent, but they still run in a worker thread (app.db.run) so a disk stall can
 never block the event loop.
 

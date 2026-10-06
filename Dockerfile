@@ -1,4 +1,4 @@
-# Cascadr frontend — Next.js 14, standalone output.
+# Cascadr frontend - Next.js 14, standalone output.
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
