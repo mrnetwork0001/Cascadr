@@ -408,7 +408,11 @@ export default async function LandingPage() {
                 ["Portfolio risk & exits", "cluster and symbol caps, drawdown halt, stop / take-profit / time", overview ? "LIVE" : "UNKNOWN"],
                 [
                   "Order execution",
-                  overview?.paper_trading === false ? "orders sent to Bitget" : "paper book, fills simulated at live prices",
+                  overview?.paper_trading === false
+                    ? "orders sent to Bitget"
+                    : overview?.paper_venue === "bitget-demo"
+                      ? "paper orders on Bitget's demo exchange, filled and recorded by Bitget"
+                      : "paper book, fills simulated at live prices",
                   !overview ? "UNKNOWN" : overview.paper_trading ? "PAPER" : "LIVE",
                 ],
                 ["Filing facts", "customer concentration read by hand from each company's latest SEC annual report", graph ? "LIVE" : "UNKNOWN"],
@@ -449,9 +453,11 @@ export default async function LandingPage() {
               {!overview
                 ? "Trading mode could not be read from the API right now. "
                 : overview.paper_trading
-                  ? `Paper trading only: ${
-                      overview.trading_credentials ? "the order gate is closed" : "no exchange keys are configured"
-                    }, so no order is ever sent. Fills are simulated at live prices with modelled slippage. `
+                  ? overview.paper_venue === "bitget-demo"
+                    ? "Paper trading only: orders go to Bitget's demo exchange, which fills and records them with no real funds. Bitget's demo lists only some of the graph's stocks, so exposures to the rest are recorded but not traded. "
+                    : `Paper trading only: ${
+                        overview.trading_credentials ? "the order gate is closed" : "no exchange keys are configured"
+                      }, so no order is ever sent. Fills are simulated at live prices with modelled slippage. `
                   : "Live trading is switched on: orders are sent to Bitget. "}
               The LLM judges headlines, not full
               articles. The graph covers {overview?.graph.nodes ?? "a handful of"} companies. The research sample is small. Nothing here is

@@ -106,6 +106,7 @@ export type DecisionAction =
   | "REJECTED_BY_VENUE"
   | "NO_MARKET_PRICE"
   | "ALREADY_HOLDING"
+  | "NOT_ON_VENUE"
   | "NO_TRADABLE_EXPOSURE"
   | "EXECUTION_FAILED"
   | "ANALYSED"
@@ -162,6 +163,9 @@ export interface Position {
   source: "agent" | "manual" | string;
   close_attempts: number;
   status: "OPEN" | "CLOSED";
+  /** "bitget-demo" (Bitget's demo exchange) or "cascadr-sim" (local simulator). */
+  venue: string;
+  fees_usdt: number;
   policy: { max_hold_hours: number; stop_loss_pct: number; take_profit_pct: number | null };
   closed_at: string | null;
   exit_price: number | null;
@@ -182,6 +186,7 @@ export interface PositionsResponse {
   unrealized_usdt: number | null;
   realized_usdt: number;
   paper: boolean;
+  venue: string;
   market_error: string | null;
 }
 
@@ -203,6 +208,7 @@ export interface Health {
   status: "ok" | "degraded";
   graph_backend: string;
   paper_trading: boolean;
+  paper_venue: string;
   trading_credentials: boolean;
   admin_endpoints: boolean;
   llm: {
@@ -274,6 +280,7 @@ export interface Overview {
     unpriced: boolean;
   };
   paper_trading: boolean;
+  paper_venue: string;
   trading_credentials: boolean;
   /** Set when Bitget could not be reached; price-derived fields are null. */
   market_error: string | null;

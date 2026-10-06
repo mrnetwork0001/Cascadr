@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS positions (
     source            TEXT NOT NULL DEFAULT 'unknown',
     close_attempts    INTEGER NOT NULL DEFAULT 0,
     original_size          REAL,
-    original_notional_usdt REAL
+    original_notional_usdt REAL,
+    venue             TEXT NOT NULL DEFAULT 'cascadr-sim',
+    fees_usdt         REAL NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS store_meta (
@@ -74,6 +76,8 @@ MIGRATIONS = [
     "DROP INDEX IF EXISTS ux_positions_client_oid",
     """CREATE UNIQUE INDEX IF NOT EXISTS ux_positions_open_client_oid
          ON positions(client_oid) WHERE client_oid != '' AND status = 'OPEN'""",
+    "ALTER TABLE positions ADD COLUMN venue TEXT NOT NULL DEFAULT 'cascadr-sim'",
+    "ALTER TABLE positions ADD COLUMN fees_usdt REAL NOT NULL DEFAULT 0",
     "ALTER TABLE positions ADD COLUMN original_size REAL",
     "ALTER TABLE positions ADD COLUMN original_notional_usdt REAL",
     # Rows from before these columns. Where no slice was ever booked the
@@ -109,6 +113,8 @@ def _row_to_position(r: sqlite3.Row) -> Position:
         close_attempts=r["close_attempts"],
         original_size=r["original_size"],
         original_notional_usdt=r["original_notional_usdt"],
+        venue=r["venue"],
+        fees_usdt=r["fees_usdt"],
     )
 
 
@@ -179,18 +185,19 @@ class PositionStore:
         self._conn.execute(
             """INSERT INTO positions (id, symbol, side, size, notional_usdt, leverage,
                    entry_price, opened_at, thesis, origin, client_oid, paper, status,
-                   policy, source, original_size, original_notional_usdt)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                   policy, source, original_size, original_notional_usdt, venue, fees_usdt)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 p.id, p.symbol, p.side, p.size, p.notional_usdt, p.leverage,
                 p.entry_price, p.opened_at.isoformat(), p.thesis, p.origin,
                 p.client_oid, int(p.paper), p.status.value, p.policy.model_dump_json(),
-                p.source, p.size, p.notional_usdt,
+                p.source, p.size, p.notional_usdt, p.venue, p.fees_usdt,
             ),
         )
         self._event(
             p.id, "OPENED",
-            f"{p.side} {p.symbol} {p.notional_usdt:.0f} USDT @ {p.entry_price:.4f} ({p.source})",
+            f"{p.side} {p.symbol} {p.notional_usdt:.0f} USDT @ {p.entry_price:.4f} "
+            f"({p.source}, {p.venue})",
         )
         self._conn.commit()
 

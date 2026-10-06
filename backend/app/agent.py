@@ -80,6 +80,7 @@ BLOCKED_BY_RISK = "BLOCKED_BY_RISK"  # tradable exposure existed; the risk engin
 REJECTED_BY_VENUE = "REJECTED_BY_VENUE"  # risk approved; the (paper) venue rejected the fill
 NO_MARKET_PRICE = "NO_MARKET_PRICE"  # no Bitget mark to trade at
 ALREADY_HOLDING = "ALREADY_HOLDING"  # the same thesis is already open
+NOT_ON_VENUE = "NOT_ON_VENUE"  # the venue (Bitget demo) does not list the instrument
 NO_TRADABLE_EXPOSURE = "NO_TRADABLE_EXPOSURE"  # nothing crossed the trade threshold
 EXECUTION_FAILED = "EXECUTION_FAILED"  # the executor raised; see detail
 ANALYSED = "ANALYSED"  # execution disabled for this cycle
@@ -90,6 +91,7 @@ SKIP_OUTCOMES = [
     ("error", EXECUTION_FAILED),
     ("risk", BLOCKED_BY_RISK),
     ("venue", REJECTED_BY_VENUE),
+    ("unlisted", NOT_ON_VENUE),
     ("no_mark", NO_MARKET_PRICE),
     ("duplicate", ALREADY_HOLDING),
 ]

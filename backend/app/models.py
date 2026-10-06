@@ -190,6 +190,10 @@ class Position(BaseModel):
     # keep the whole trade checkable once it is closed.
     original_size: float | None = None
     original_notional_usdt: float | None = None
+    # Where the paper fill happened: Bitget's demo exchange, or Cascadr's own
+    # simulator. Fees are Bitget's, as reported on the fills.
+    venue: str = "cascadr-sim"
+    fees_usdt: float = 0.0
 
     status: PositionStatus = PositionStatus.OPEN
     policy: ExitPolicy = Field(default_factory=ExitPolicy)

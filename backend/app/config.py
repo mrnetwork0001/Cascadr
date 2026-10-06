@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     bitget_api_secret: str | None = None
     bitget_passphrase: str | None = None
 
+    # Bitget Demo Trading key (created in Bitget's demo mode). When set, paper
+    # trades are placed on Bitget's demo exchange instead of being simulated
+    # here, so Bitget keeps the paper-trading record. No real funds.
+    bitget_demo_api_key: str | None = None
+    bitget_demo_api_secret: str | None = None
+    bitget_demo_passphrase: str | None = None
+
     # Deliberately a string, not a bool: pydantic would coerce "0"/"no"/"" into
     # False and silently arm live trading. Only the exact word "false" disarms.
     cascadr_paper_trading: str = "true"
@@ -82,6 +89,18 @@ class Settings(BaseSettings):
     @property
     def autonomous(self) -> bool:
         return self.cascadr_autonomous.strip().lower() == "true"
+
+    @property
+    def demo_configured(self) -> bool:
+        return all(
+            (self.bitget_demo_api_key, self.bitget_demo_api_secret, self.bitget_demo_passphrase)
+        )
+
+    @property
+    def paper_venue(self) -> str:
+        """Where paper trades are filled: Bitget's demo exchange when its key
+        is configured, otherwise Cascadr's own simulator."""
+        return "bitget-demo" if self.demo_configured else "cascadr-sim"
 
     @property
     def has_trading_credentials(self) -> bool:

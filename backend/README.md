@@ -68,7 +68,7 @@ Every headline that reaches the LLM becomes a decision row, with the
 exposures it implies (each with the edges and constants its score was
 multiplied from), the article link and the 0G provider. The outcome names what
 happened: `DECLINED`, `TRADED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`,
-`NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NO_TRADABLE_EXPOSURE`, `ANALYSED` or
+`NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NOT_ON_VENUE`, `NO_TRADABLE_EXPOSURE`, `ANALYSED` or
 `EXECUTION_FAILED`.
 
 Execution acts on exactly the exposures the decision recorded. Each position's
@@ -119,6 +119,23 @@ and mean opposite things.
 
 A failed close leaves the position **open**. Recording a close that did not
 happen is how a book silently diverges from reality.
+
+## Paper-trading venue: Bitget Demo Trading
+
+With `BITGET_DEMO_*` set, every paper trade is placed on Bitget's demo
+exchange through the v3 API — the environment Agent Hub's `--paper-trading`
+mode uses: the same host, a Demo API key and the `paptrading: 1` header.
+Bitget fills the orders and keeps the order, position and P&L record; Cascadr
+books exactly what Bitget reports (average price, filled quantity, fees) and
+marks demo positions at Bitget's demo mark price. Market orders are split at
+the instrument's `maxMarketOrderQty`. `GET /venue` returns Bitget's own view
+of the demo account.
+
+Bitget's demo exchange lists only some stock perps (NVDA, AAPL and TSLA of
+the graph's ten when this was written). Exposures to the others are recorded
+in the decision and skipped with the outcome `NOT_ON_VENUE`.
+
+Without a demo key, fills are simulated locally at Bitget's live prices.
 
 ## Safety
 

@@ -28,7 +28,7 @@ no scripted feed and no fallback data: if the API is unreachable, the UI says so
 | Contagion | server-side, 3-hop traversal: `shock × ∏ dependency × 0.62^hops` |
 | Market data | Bitget public API — live quotes and mark prices for stock perps |
 | Portfolio | paper book in SQLite, marked to Bitget's mark price every minute, cluster/symbol caps, drawdown halt, stop-loss / take-profit / time stop |
-| Execution | paper fills; order signing for Bitget exists but is gated off |
+| Execution | paper orders on Bitget's demo exchange (Demo Trading, no real funds), which fills and records them; without a demo key, fills are simulated at Bitget's live prices. Real-money order signing exists but is gated off |
 
 ### Where the numbers come from
 

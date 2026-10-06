@@ -35,6 +35,7 @@ from app.ingest.oracle import NewsOracle, OracleVerdict
 from app.ingest.promote import ingest_disclosed_edges
 from app.llm.client import LLMClient
 from app.market.bitget import BitgetClient, perp_symbol
+from app.market.bitget_demo import BitgetDemo
 from app.market.paper import PaperBroker
 from app.models import CloseReason, ExitPolicy
 from app.portfolio.journal import Journal
@@ -61,6 +62,7 @@ async def lifespan(app: FastAPI):
     s = get_settings()
     state["settings"] = s
     state["bitget"] = BitgetClient(s)
+    state["demo"] = BitgetDemo(s)
     state["edgar"] = EdgarClient(s.sec_user_agent)
     state["llm"] = LLMClient(s)
     state["oracle"] = NewsOracle(state["llm"])
@@ -94,6 +96,7 @@ async def lifespan(app: FastAPI):
         state["bitget"],
         RiskManager(RiskLimits(starting_equity_usdt=s.cascadr_paper_equity)),
         PaperBroker(),
+        demo=state["demo"],
     )
     state["journal"] = Journal(store.conn, starting_equity=s.cascadr_paper_equity)
     state["feeds"] = FeedReader(
@@ -208,6 +211,7 @@ async def lifespan(app: FastAPI):
     store.close()
 
     await state["bitget"].aclose()
+    await state["demo"].aclose()
     await state["edgar"].aclose()
     await state["llm"].aclose()
     if hasattr(state["repo"], "aclose"):
@@ -350,6 +354,7 @@ async def health():
         "status": "degraded" if stalled else "ok",
         "graph_backend": getattr(state["repo"], "backend", "unknown"),
         "paper_trading": s.paper_trading,
+        "paper_venue": state["portfolio"].venue,
         "trading_credentials": s.has_trading_credentials,
         "admin_endpoints": bool(s.cascadr_admin_token),
         "llm": state["llm"].describe(),
@@ -440,6 +445,7 @@ async def overview():
             "unpriced": unrealized is None and market_error is None,
         },
         "paper_trading": s.paper_trading,
+        "paper_venue": state["portfolio"].venue,
         "trading_credentials": s.has_trading_credentials,
         "market_error": market_error,
     }
@@ -756,16 +762,21 @@ async def agent_cycle(execute: bool = False):
 
 @app.get("/positions")
 async def positions():
-    """The paper book, marked to Bitget's live mark price."""
+    """The paper book, each position marked on its own venue: Bitget's demo
+    mark for positions on Bitget's demo exchange, Bitget's live mark
+    otherwise."""
     rows = await state["store"].all_positions(limit=500)
     open_rows = [p for p in rows if p.status == "OPEN"]
-    marks, market_error = await _marks([p.symbol.removesuffix("USDT") for p in open_rows])
+    try:
+        marks, market_error = await state["portfolio"].position_marks(open_rows), None
+    except Exception as exc:
+        marks, market_error = {}, _market_error(exc)
 
     out, unrealized = [], 0.0
     for p in rows:
         item = p.model_dump()
         if p.status == "OPEN":
-            mark = marks.get(p.symbol.removesuffix("USDT"))
+            mark = marks.get(p.id)
             item["mark"] = mark
             if mark:
                 item["pnl_pct"] = round(p.pnl_pct(mark), 3)
@@ -777,7 +788,7 @@ async def positions():
         out.append(item)
 
     realized = sum(p.realized_pnl_usdt or 0.0 for p in rows)
-    unpriced = sum(1 for p in open_rows if not marks.get(p.symbol.removesuffix("USDT")))
+    unpriced = sum(1 for p in open_rows if not marks.get(p.id))
     return {
         "positions": out,
         "open": len(open_rows),
@@ -785,6 +796,7 @@ async def positions():
         "unrealized_usdt": round(unrealized, 2) if not unpriced else None,
         "realized_usdt": round(realized, 2),
         "paper": state["settings"].paper_trading,
+        "venue": state["portfolio"].venue,
         "market_error": market_error,
     }
 
@@ -840,6 +852,38 @@ async def paper_report():
 @app.get("/paper/equity")
 async def paper_equity():
     return {"series": await state["journal"].series()}
+
+
+@app.get("/venue")
+async def venue():
+    """Where paper trades are filled, and what that venue itself reports.
+
+    On Bitget's demo exchange this reads Bitget's own view of the demo account
+    (balances and open positions) so the record can be checked against the
+    venue rather than taken from Cascadr's word."""
+    pm: PortfolioManager = state["portfolio"]
+    demo: BitgetDemo = state["demo"]
+    nodes = await state["repo"].nodes()
+    out: dict = {"venue": pm.venue}
+    if pm.venue != "bitget-demo":
+        out["detail"] = "simulated fills at Bitget's live prices (no Bitget demo key configured)"
+        return out
+    try:
+        listed = await demo.instruments()
+        out["graph_symbols_listed"] = sorted(
+            perp_symbol(n.ticker) for n in nodes if n.ticker and perp_symbol(n.ticker) in listed
+        )
+        out["bitget_positions"] = [
+            {k: r.get(k) for k in ("symbol", "posSide", "total", "size", "qty", "avgPrice",
+                                   "openPriceAvg", "markPrice", "unrealisedPnl", "unrealizedPL",
+                                   "leverage", "createdTime", "updatedTime") if k in r}
+            for r in await demo.positions()
+        ]
+        assets = await demo.assets()
+        out["bitget_account"] = assets
+    except Exception as exc:
+        out["error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
+    return out
 
 
 @app.get("/risk")

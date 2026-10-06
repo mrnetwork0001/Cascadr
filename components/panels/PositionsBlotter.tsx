@@ -45,7 +45,11 @@ export function PositionsBlotter({
             <span className={pnlTone(rpl)}>RPL {rpl != null ? signedUsd(rpl) : "—"}</span>
             {book?.market_error && <span className="text-signal-red">no marks</span>}
             {error && <span className="text-signal-red" title={error}>stale</span>}
-            {book && <span className={book.paper ? "text-amber" : "text-signal-red"}>{book.paper ? "PAPER" : "LIVE"}</span>}
+            {book && (
+              <span className={book.paper ? "text-amber" : "text-signal-red"}>
+                {!book.paper ? "LIVE" : book.venue === "bitget-demo" ? "PAPER · BITGET DEMO" : "PAPER · SIMULATED"}
+              </span>
+            )}
           </span>
         )
       }

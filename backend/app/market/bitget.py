@@ -225,16 +225,17 @@ class BitgetClient:
     def build_close_body(self, position_symbol: str, size: str, side: str) -> dict[str, str]:
         """Flatten an open position.
 
-        Bitget closes with the OPPOSITE side and tradeSide 'close': a short is
-        covered by a buy. Getting this backwards doubles the position instead
-        of closing it, which is why it lives in one place.
+        In v2 hedge mode `side` names the POSITION being closed, with
+        tradeSide 'close': a short is closed with side=sell & tradeSide=close
+        (Bitget v2 place-order docs). Sending buy would act on a long instead,
+        which is why this lives in one place.
         """
         return {
             "symbol": position_symbol,
             "productType": PRODUCT_TYPE,
             "marginMode": "isolated",
             "marginCoin": "USDT",
-            "side": "buy" if side.upper() == "SHORT" else "sell",
+            "side": "sell" if side.upper() == "SHORT" else "buy",
             "tradeSide": "close",
             "orderType": "market",
             "size": size,

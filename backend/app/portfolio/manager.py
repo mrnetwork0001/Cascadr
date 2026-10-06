@@ -19,6 +19,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.market.bitget import BitgetClient, perp_symbol
+from app.market.bitget_demo import BitgetDemo
 from app.market.paper import PaperBroker
 from app.risk import RiskDecision, RiskManager
 from app.models import (
@@ -37,9 +38,14 @@ class PortfolioManager:
         bitget: BitgetClient,
         risk: RiskManager | None = None,
         paper: PaperBroker | None = None,
+        demo: BitgetDemo | None = None,
     ):
         self._store = store
         self._bitget = bitget
+        # Bitget's demo exchange, when its key is configured: paper trades are
+        # then placed there and Bitget keeps the record. Otherwise the local
+        # simulator fills them.
+        self._demo = demo if demo is not None and demo.configured else None
         self._risk = risk or RiskManager()
         self._paper = paper or PaperBroker()
         # One close at a time per position: the sweeper and an operator close
@@ -53,6 +59,31 @@ class PortfolioManager:
     @property
     def risk(self) -> RiskManager:
         return self._risk
+
+    @property
+    def venue(self) -> str:
+        return "bitget-demo" if self._demo else "cascadr-sim"
+
+    async def position_marks(self, positions: list[Position]) -> dict[str, float]:
+        """Mark per position id, from the venue the position lives on: Bitget's
+        demo mark for demo positions, Bitget's live mark otherwise. A position
+        with no mark is omitted. Raises if the market cannot be reached."""
+        demo_rows = [p for p in positions if p.venue == "bitget-demo"]
+        live_rows = [p for p in positions if p.venue != "bitget-demo"]
+        out: dict[str, float] = {}
+        if live_rows:
+            marks = await self._bitget.marks([p.symbol.removesuffix("USDT") for p in live_rows])
+            for p in live_rows:
+                if m := marks.get(p.symbol.removesuffix("USDT")):
+                    out[p.id] = m
+        if demo_rows:
+            if self._demo is None:
+                return out  # cannot price demo positions without the demo client
+            marks = await self._demo.marks([p.symbol for p in demo_rows])
+            for p in demo_rows:
+                if m := marks.get(p.symbol):
+                    out[p.id] = m
+        return out
 
     async def realized_pnl(self) -> float:
         """Realized P&L alone - needs no market data."""
@@ -71,11 +102,9 @@ class PortfolioManager:
         open_rows = [p for p in rows if p.status == "OPEN"]
         unrealized = 0.0
         if open_rows:
-            marks = await self._bitget.marks(
-                [p.symbol.removesuffix("USDT") for p in open_rows]
-            )
+            marks = await self.position_marks(open_rows)
             for p in open_rows:
-                m = marks.get(p.symbol.removesuffix("USDT"))
+                m = marks.get(p.id)
                 if not m:
                     return realized, None
                 unrealized += p.pnl_usdt(m)
@@ -94,11 +123,9 @@ class PortfolioManager:
         open_rows = [p for p in rows if p.status == "OPEN"]
         unrealized, unpriced = 0.0, []
         if open_rows:
-            marks = await self._bitget.marks(
-                [p.symbol.removesuffix("USDT") for p in open_rows]
-            )
+            marks = await self.position_marks(open_rows)
             for p in open_rows:
-                m = marks.get(p.symbol.removesuffix("USDT"))
+                m = marks.get(p.id)
                 if m:
                     unrealized += p.pnl_usdt(m)
                 else:
@@ -168,6 +195,16 @@ class PortfolioManager:
                 "duplicate",
             )
 
+        # --- the venue must list the instrument -------------------------
+        instrument = None
+        if self._demo:
+            try:
+                instrument = (await self._demo.instruments()).get(symbol)
+            except Exception as exc:
+                return None, f"VENUE: Bitget demo unreachable ({type(exc).__name__})", "venue"
+            if instrument is None:
+                return None, f"UNLISTED: {symbol} is not listed on Bitget's demo exchange", "unlisted"
+
         # --- portfolio risk, before anything reaches the venue -----------
         try:
             realized, unrealized, unpriced = await self.book_pnl_for_risk()
@@ -209,6 +246,9 @@ class PortfolioManager:
             policy=pol,
             source=source,
         )
+
+        if self._demo:
+            return await self._open_on_demo(position, instrument, risk_note)
 
         from app.models import OrderIntent
 
@@ -254,6 +294,80 @@ class PortfolioManager:
             )
         return position, f"{risk_note}{result.detail}", ""
 
+    async def _open_on_demo(
+        self, position: Position, instrument: dict, risk_note: str
+    ) -> tuple[Position | None, str, str]:
+        """Sell on Bitget's demo exchange and book exactly what Bitget filled."""
+        demo = self._demo
+        qty = demo.round_qty(position.notional_usdt / position.entry_price, instrument)
+        if qty < float(instrument.get("minOrderQty") or 0) or (
+            qty * position.entry_price < float(instrument.get("minOrderAmount") or 0)
+        ):
+            return None, f"VENUE: size {qty:g} below Bitget demo minimum", "venue"
+        oid = "cx" + position.id.replace("-", "")[:26]
+        try:
+            ex, note = await demo.open_short(position.symbol, qty, position.leverage, oid)
+        except Exception as exc:
+            return None, f"VENUE: Bitget demo order failed ({type(exc).__name__}: {exc})"[:300], "venue"
+        if ex.qty <= 0:
+            return None, "VENUE: " + ex.detail("SELL", position.symbol), "venue"
+
+        position.entry_price = ex.avg_price
+        position.size = round(ex.qty, 8)
+        position.notional_usdt = round(ex.value, 2)
+        position.fees_usdt = round(ex.fees, 6)
+        position.venue = "bitget-demo"
+        position.paper = True
+        if not await self._store.add(position):
+            # Bitget filled but the book refused it: unwind on Bitget so the
+            # two records cannot disagree.
+            back = await demo.close_short(position.symbol, ex.qty, oid[:24] + "undo")
+            return (
+                None,
+                f"DUPLICATE: already holding this thesis; unwound {back.qty:g} on Bitget demo",
+                "duplicate",
+            )
+        detail = f"{risk_note}{ex.detail('SELL', position.symbol)}"
+        return position, detail + (f"; {note}" if note else ""), ""
+
+    async def _close_on_demo(self, p: Position, reason: CloseReason) -> str:
+        """Buy back on Bitget's demo exchange; book Bitget's fills and fees."""
+        if self._demo is None:
+            detail = "Bitget demo key not configured"
+            await self._store.close_rejected(p.id, detail)
+            return f"close REJECTED, position left OPEN — {detail}"
+        oid = "cz" + p.id.replace("-", "")[:22] + f"{p.close_attempts % 100:02d}"
+        try:
+            ex = await self._demo.close_short(p.symbol, p.size, oid)
+        except Exception as exc:
+            ex = None
+            detail = f"Bitget demo close failed ({type(exc).__name__}: {exc})"[:300]
+        if ex is None or ex.qty <= 0:
+            detail = detail if ex is None else ex.detail("BUY", p.symbol)
+            await self._store.close_rejected(p.id, detail)
+            return f"close REJECTED, position left OPEN — {detail}"
+
+        fill_detail = ex.detail("BUY", p.symbol)
+        price_pnl = self._slice_pnl(p, ex.qty, ex.avg_price)
+        if ex.qty < p.size - 1e-9:
+            remaining = round(p.size - ex.qty, 8)
+            slice_pnl = price_pnl - ex.fees
+            if not await self._store.partial_close(
+                p.id, p.size, remaining, round(remaining * p.entry_price, 2), slice_pnl, fill_detail,
+            ):
+                return "position changed while closing; nothing booked"
+            return f"PARTIAL close {ex.qty:g}/{p.size:g}; {remaining:g} still open — {fill_detail}"
+
+        # Realized P&L is net of Bitget's fees: this close's, and the open's.
+        final_pnl = price_pnl - ex.fees - p.fees_usdt
+        await self._store.note(p.id, "BITGET_FILL", fill_detail)
+        if not await self._store.mark_closed(
+            p.id, self._average_exit(p, price_pnl, ex.avg_price), reason, final_pnl, p.size,
+            last_fill=ex.avg_price,
+        ):
+            return "position changed while closing; nothing booked"
+        return fill_detail
+
     # ---------------------------------------------------------------- exits
 
     @staticmethod
@@ -277,12 +391,11 @@ class PortfolioManager:
         if not open_positions:
             return []
 
-        tickers = [p.symbol.removesuffix("USDT") for p in open_positions]
-        marks = await self._bitget.marks(tickers)
+        marks = await self.position_marks(open_positions)
         actions: list[dict] = []
 
         for p in open_positions:
-            mark = marks.get(p.symbol.removesuffix("USDT"))
+            mark = marks.get(p.id)
             if mark is None:
                 # No price means no decision. Never close on a missing mark.
                 actions.append({"id": p.id, "symbol": p.symbol, "action": "NO_MARK"})
@@ -323,6 +436,8 @@ class PortfolioManager:
     async def _close(
         self, p: Position, mark: float, reason: CloseReason
     ) -> str:
+        if p.venue == "bitget-demo":
+            return await self._close_on_demo(p, reason)
         accepted, paper, detail, _ = await self._bitget.close_position(
             p.symbol, f"{p.size:.2f}", p.side
         )
@@ -401,8 +516,7 @@ class PortfolioManager:
             return None, "unknown position"
         if p.status != "OPEN":
             return p, "already closed"
-        marks = await self._bitget.marks([p.symbol.removesuffix("USDT")])
-        mark = marks.get(p.symbol.removesuffix("USDT"))
+        mark = (await self.position_marks([p])).get(p.id)
         if mark is None and price is None:
             return p, "no mark available; refusing to close blind (supply ?price= to override)"
         if mark is None:
@@ -420,7 +534,16 @@ class PortfolioManager:
         the data and mean opposite things.
         """
         ours = await self._store.open_positions()
-        rows, detail = await self._bitget.exchange_positions()
+        if self._demo:
+            ours = [p for p in ours if p.venue == "bitget-demo"]
+            try:
+                rows, detail = await self._demo.positions(), "ok"
+            except Exception as exc:
+                rows, detail = [], f"Bitget demo: {type(exc).__name__}: {exc}"
+            for r in rows:
+                r.setdefault("total", r.get("size") or r.get("qty") or r.get("total") or 0)
+        else:
+            rows, detail = await self._bitget.exchange_positions()
 
         if detail != "ok":
             return ReconcileReport(
