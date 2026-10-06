@@ -20,6 +20,15 @@ import type {
 
 export class ApiError extends Error {}
 
+/**
+ * Parse an API response for display. Headlines, LLM reasoning and stored
+ * decision details can carry em dashes; the interface uses plain hyphens
+ * throughout, so they are normalised here, once, for every response.
+ */
+function parse<T>(text: string): T {
+  return JSON.parse(text.replace(/\u2014/g, "-")) as T;
+}
+
 async function get<T>(path: string, timeoutMs = 10_000): Promise<T> {
   let res: Response;
   try {
@@ -31,7 +40,7 @@ async function get<T>(path: string, timeoutMs = 10_000): Promise<T> {
     throw new ApiError(`network: ${(e as Error).message}`);
   }
   if (!res.ok) throw new ApiError(`${path} -> HTTP ${res.status}`);
-  return (await res.json()) as T;
+  return parse<T>(await res.text());
 }
 
 export const api = {
@@ -65,7 +74,7 @@ export async function serverGet<T>(path: string): Promise<T | null> {
       signal: AbortSignal.timeout(8_000),
     });
     if (!res.ok) return null;
-    return (await res.json()) as T;
+    return parse<T>(await res.text());
   } catch {
     return null;
   }
