@@ -1,48 +1,64 @@
 import type { Config } from "tailwindcss";
 
 /**
- * CASCADR terminal theme.
- * Palette is deliberately narrow: black chassis, amber chrome, and
- * red/green reserved exclusively for risk + P&L signalling.
+ * CASCADR - light glass theme: a pale studio frame, frosted-glass surfaces,
+ * ink type in Inter, one blue accent, and red/green reserved for risk + P&L.
  */
 const config: Config = {
   content: [
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    // Class maps live in lib/theme.ts (decision, provenance, contagion badges);
+    // without this they are never generated.
+    "./lib/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
+        /*
+         * Light glass theme. The token NAMES are kept from the original dark
+         * terminal so every existing class re-themes in one place; the values
+         * are now the light studio palette.
+         */
         term: {
-          void: "#05070a",
-          bg: "#0a0d12",
-          panel: "#0d1117",
-          raised: "#121821",
-          line: "#1e2732",
-          edge: "#2b3644",
-          dim: "#5c6b7f",
-          text: "#b9c6d4",
-          bright: "#e6eef7",
+          void: "#E6EDF6", // the frame behind everything
+          bg: "#EDF2F8",
+          panel: "#F8FAFD",
+          raised: "#EEF3F9",
+          line: "#D7DFEA",
+          edge: "#C4CEDC",
+          dim: "#59627E",
+          text: "#1F2A44",
+          bright: "#020C21",
         },
+        // Caution / warm emphasis, dark enough to read on the light frame.
         amber: {
-          DEFAULT: "#ffa726",
-          dim: "#8a5a12",
+          DEFAULT: "#A86512",
+          dim: "#E8D2B0",
         },
         signal: {
-          green: "#00e08a",
-          red: "#ff3b52",
-          cyan: "#22d3ee",
-          violet: "#a78bfa",
+          green: "#0E8A5F",
+          red: "#C8323F",
+          cyan: "#2D74A8",
+          violet: "#5D52C8",
         },
         tier: {
-          material: "#a78bfa",
-          supplier: "#22d3ee",
-          manufacturer: "#ffa726",
-          logistics: "#94a3b8",
-          brand: "#00e08a",
+          material: "#5D52C8",
+          supplier: "#2D74A8",
+          manufacturer: "#B26A12",
+          logistics: "#7A889C",
+          brand: "#0E8A5F",
         },
+        // The glass design system.
+        frame: "#E6EDF6",
+        ink: { DEFAULT: "#020C21", soft: "#0F182F" },
+        muted: { DEFAULT: "#59627E", 2: "#4D5B77" },
+        accent: { DEFAULT: "#4A78B0", deep: "#2F5F9E", fill: "#5F88B4" },
+        cta: { DEFAULT: "#0F1B31", knob: "#384B64" },
+        track: "#DDE4EE",
       },
       fontFamily: {
+        sans: ["var(--font-sans)", "Inter", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       fontSize: {
@@ -56,11 +72,11 @@ const config: Config = {
           "50%": { opacity: "0.35" },
         },
         "flash-green": {
-          "0%": { backgroundColor: "rgba(0,224,138,0.28)" },
+          "0%": { backgroundColor: "rgba(14,138,95,0.18)" },
           "100%": { backgroundColor: "transparent" },
         },
         "flash-red": {
-          "0%": { backgroundColor: "rgba(255,59,82,0.28)" },
+          "0%": { backgroundColor: "rgba(200,50,63,0.18)" },
           "100%": { backgroundColor: "transparent" },
         },
         "sweep": {

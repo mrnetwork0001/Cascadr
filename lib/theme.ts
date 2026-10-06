@@ -5,19 +5,20 @@ import type { Contagion, Tier } from "@/lib/types";
  * agree. These constants are the single source; tailwind.config.ts mirrors them.
  */
 export const COLORS = {
-  void: "#05070a",
-  panel: "#0d1117",
-  line: "#1e2732",
-  edge: "#2b3644",
-  dim: "#5c6b7f",
-  text: "#b9c6d4",
-  bright: "#e6eef7",
-  amber: "#ffa726",
-  green: "#00e08a",
-  red: "#ff3b52",
-  cyan: "#22d3ee",
-  violet: "#a78bfa",
-  slate: "#94a3b8",
+  void: "#E6EDF6",
+  panel: "#F8FAFD",
+  line: "#D7DFEA",
+  edge: "#C4CEDC",
+  dim: "#59627E",
+  text: "#1F2A44",
+  bright: "#020C21",
+  amber: "#B26A12",
+  green: "#0E8A5F",
+  red: "#C8323F",
+  cyan: "#2D74A8",
+  violet: "#5D52C8",
+  slate: "#7A889C",
+  accent: "#4A78B0",
 } as const;
 
 export const TIER_COLOR: Record<Tier, string> = {
@@ -31,7 +32,7 @@ export const TIER_COLOR: Record<Tier, string> = {
 export const CONTAGION_COLOR: Record<Contagion, string> = {
   NOMINAL: COLORS.dim,
   WATCH: COLORS.amber,
-  STRESSED: "#ff8c42",
+  STRESSED: "#D9622B",
   CRITICAL: COLORS.red,
 };
 
@@ -39,7 +40,7 @@ export const CONTAGION_COLOR: Record<Contagion, string> = {
 export const CONTAGION_CLASS: Record<Contagion, string> = {
   NOMINAL: "text-term-dim",
   WATCH: "text-amber",
-  STRESSED: "text-[#ff8c42]",
+  STRESSED: "text-[#D9622B]",
   CRITICAL: "text-signal-red",
 };
 
