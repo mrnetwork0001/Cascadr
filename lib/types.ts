@@ -224,6 +224,8 @@ export interface Health {
     poll_seconds: number;
     shock_floor: number;
     trade_threshold: number;
+    /** First-order trades: the directly hit company is shorted too. */
+    trade_origin?: boolean;
     max_llm_per_hour: number;
     cycles: number;
     headlines_seen: number;
@@ -271,6 +273,8 @@ export interface Overview {
     poll_seconds: number;
     shock_floor: number;
     trade_threshold: number;
+    /** First-order trades: the directly hit company is shorted too. */
+    trade_origin?: boolean;
     llm_model: string | null;
     cycles_since_restart: number;
     last_cycle: string | null;

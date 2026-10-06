@@ -63,7 +63,7 @@ One loop runs on the server every 10 minutes, whether or not anyone is watching.
 | **Sense** | Pulls headlines for each of the 16 companies. Already-seen and stale (> 6 h) stories are skipped, and a free keyword filter drops stories that name no graph company before any model is called. |
 | **Reason** | The LLM names the directly disrupted company (checked against the graph, never trusted), scores the shock from 0 to 1, and states its reasoning and what would change its mind. Below a shock of **0.40** the headline is declined. |
 | **Propagate** | A breadth-first walk of the graph, up to 3 hops. Each hop multiplies by that link's sourced dependency and decays by 0.62, so direct customers are hit hardest. The strongest path per company wins. |
-| **Act** | Exposures of at least **0.18** on a company Bitget lists become short orders on Bitget's demo exchange, sized to the account and vetted by the risk engine first. |
+| **Act** | Downstream exposures of at least **0.18**, and the directly hit company itself when its shock is at least **0.40** (first-order), become short orders on Bitget's demo exchange - if Bitget lists the company - sized to the account and vetted by the risk engine first. |
 | **Exit** | Every open position is marked at Bitget's mark price each minute and closed by stop-loss, take-profit (the model's own implied move) or a 7-day time stop. |
 
 ## Verify it yourself
@@ -236,7 +236,8 @@ Deployment is described in [DEPLOY.md](DEPLOY.md); the backend in detail in [bac
 
 - **Paper trading only.** No real funds are at risk.
 - **Few tradable names on the demo venue.** Bitget's demo lists 3 of the graph's 10 stocks.
-- **Trades are rare by design.** The agent acts only on genuine supply-chain disruptions; most news is not one, and it declines it.
+- **Trades are rare by design.** The agent acts only on headlines the LLM rates as genuine disruptions; most news is not one, and it declines it.
+- **First-order trades are not backtested.** The event study supports the downstream (second-order) drift. Shorting the directly hit company rests on the LLM's severity judgement and the calibrated shock floor; it was added on 2026-10-07 so the agent acts on disruptions to the companies Bitget's demo lists.
 - **Small research sample.** Three verified events support the premise directionally; they do not prove it.
 - **Headlines, not articles.** The LLM judges each headline, not the full article.
 - **A small graph.** 16 companies in the electronics supply chain.

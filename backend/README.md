@@ -60,7 +60,9 @@ With `CASCADR_AUTONOMOUS=true` a background loop runs every
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.
 3. **Propagate** - each disrupted company's downstream cone is scored; where
    several paths reach one company, the strongest wins.
-4. **Act** - exposures at or above the trade threshold (0.18) go through the
+4. **Act** - downstream exposures at or above the trade threshold (0.18), and
+   the directly hit company itself when its shock clears the floor
+   (first-order, `CASCADR_TRADE_ORIGIN`), go through the
    risk engine to the paper book. Both thresholds are calibrated against the
    verified historical events: see [research/README.md](research/README.md#calibrating-the-agent).
 

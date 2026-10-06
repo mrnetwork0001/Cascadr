@@ -252,10 +252,10 @@ export default async function LandingPage() {
               stack="paper book · Bitget prices"
               body={
                 onDemo
-                  ? "Exposures above the trade threshold become short orders on Bitget's demo exchange, which fills them and keeps the record. Positions are sized to the paper account, capped per root cause, per headline, per symbol and by a drawdown halt, marked at Bitget's demo price, and closed by stop-loss, take-profit or time stop."
-                  : "Exposures above the trade threshold become short positions on the paper book, marked to Bitget's live mark price, capped per root cause, per headline, per symbol and by a drawdown halt, and closed by stop-loss, take-profit or time stop."
+                  ? "Downstream exposures above the trade threshold, and the hit company itself when its shock clears the floor, become short orders on Bitget's demo exchange, which fills them and keeps the record. Positions are sized to the paper account, capped per root cause, per headline, per symbol and by a drawdown halt, marked at Bitget's demo price, and closed by stop-loss, take-profit or time stop."
+                  : "Downstream exposures above the trade threshold, and the hit company itself when its shock clears the floor, become short positions on the paper book, marked to Bitget's live mark price, capped per root cause, per headline, per symbol and by a drawdown halt, and closed by stop-loss, take-profit or time stop."
               }
-              code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} → size by exposure → risk → ${onDemo ? "Bitget demo order" : "paper fill"}`}
+              code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} (hit company: shock ≥ ${overview?.agent.shock_floor ?? "floor"}) → size → risk → ${onDemo ? "Bitget demo order" : "paper fill"}`}
             />
           </div>
         </Section>
