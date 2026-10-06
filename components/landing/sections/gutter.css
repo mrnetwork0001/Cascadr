@@ -1,0 +1,46 @@
+/*
+ * The side gutter shared by every landing section and the footer.
+ *
+ * It mirrors the hero's own edge (components/landing/hero.css) tier for tier,
+ * so the column runs straight from the hero into the sections at every size:
+ * the desktop hero sets its content 77 comp pixels in from each side, and the
+ * compact tiers pad their stack by --pad comp pixels. Each tier's comp pixel
+ * is the same min(width, height) unit the hero uses.
+ *
+ * Heights use vh, not dvh: these sections scroll, and a gutter that followed a
+ * mobile browser's collapsing toolbar would shift the text sideways mid-scroll.
+ */
+.cx-gutter {
+  padding-left: calc(77 * min(100vw / 1280, 100vh / 960));
+  padding-right: calc(77 * min(100vw / 1280, 100vh / 960));
+}
+
+/* Compact: portrait-ish frames, narrow windows and short windows. */
+@media (max-aspect-ratio: 87/80), (max-width: 899px), (max-height: 639px) {
+  .cx-gutter {
+    padding-left: calc(52 * min(100vw / 880, 100vh / 1220));
+    padding-right: calc(52 * min(100vw / 880, 100vh / 1220));
+  }
+
+  @media (min-aspect-ratio: 1/1) {
+    .cx-gutter {
+      padding-left: calc(46 * min(100vw / 1240, 100vh / 820));
+      padding-right: calc(46 * min(100vw / 1240, 100vh / 820));
+    }
+
+    @media (max-height: 520px) {
+      .cx-gutter {
+        padding-left: calc(30 * min(100vw / 900, 100vh / 560));
+        padding-right: calc(30 * min(100vw / 900, 100vh / 560));
+      }
+    }
+  }
+
+  /* Phones held upright. */
+  @media (max-width: 640px) and (max-aspect-ratio: 1/1) {
+    .cx-gutter {
+      padding-left: calc(40 * min(100vw / 600, 100vh / 940));
+      padding-right: calc(40 * min(100vw / 600, 100vh / 940));
+    }
+  }
+}
