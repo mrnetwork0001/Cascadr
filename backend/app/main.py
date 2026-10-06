@@ -396,6 +396,16 @@ async def overview():
         listed_count: int | None = sum(1 for t in tickers if perp_symbol(t) in listed)
     except Exception as exc:
         listed_count, market_error = None, _market_error(exc)
+    # How many of the graph's stocks the paper venue itself can trade (Bitget's
+    # demo exchange lists fewer than the live market).
+    venue = state["portfolio"].venue
+    on_venue: int | None = listed_count
+    if venue == "bitget-demo":
+        try:
+            demo_listed = await asyncio.wait_for(state["demo"].instruments(), OVERVIEW_MARKET_TIMEOUT)
+            on_venue = sum(1 for t in tickers if perp_symbol(t) in demo_listed)
+        except Exception:
+            on_venue = None
     try:
         realized, unrealized = await asyncio.wait_for(
             state["portfolio"].book_pnl(), OVERVIEW_MARKET_TIMEOUT
@@ -419,6 +429,8 @@ async def overview():
         "instruments": {
             "graph_tickers": len(tickers),
             "listed_on_bitget": listed_count,
+            "venue": venue,
+            "tradable_on_venue": on_venue,
         },
         "agent": {
             "armed": s.autonomous,
