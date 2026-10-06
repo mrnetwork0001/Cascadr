@@ -168,7 +168,8 @@ class AutonomousAgent:
                 "contagion": str(score_to_contagion(shock)),
                 "implied_drawdown_pct": round(implied_drawdown_pct(shock), 2),
                 "provenance": "", "is_origin": True,
-                "rationale": "directly disrupted", "links": [], "hop_decay": HOP_DECAY,
+                "rationale": f"{o.name} directly disrupted (first-order), shock {shock:.2f}",
+                "links": [], "hop_decay": HOP_DECAY,
             }
         for origin in entities:
             if origin not in by_id:

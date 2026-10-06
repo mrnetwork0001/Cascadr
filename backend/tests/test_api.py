@@ -137,3 +137,37 @@ def test_one_headline_opens_at_most_one_cluster_allowance(tmp_path, monkeypatch)
         for p in opened:
             assert p.origin == by_target[p.symbol.removesuffix("USDT")]
         assert any(s["kind"] == "risk" and "one headline" in s["reason"] for s in result["skipped"])
+
+
+def _first_order_run(tmp_path, monkeypatch, shock, trade_origin="true"):
+    import asyncio
+    from app.market.bitget import BitgetClient
+    from app.market.paper import PaperBroker
+
+    async def marks(self, tickers):
+        return {t: 100.0 for t in tickers}
+
+    monkeypatch.setattr(BitgetClient, "marks", marks)
+    monkeypatch.setenv("CASCADR_TRADE_ORIGIN", trade_origin)
+    with client(tmp_path, monkeypatch) as c:
+        from app import main
+        main.state["portfolio"]._paper = PaperBroker(reject_rate=0.0, partial_rate=0.0)
+        exps = asyncio.run(main.state["agent"].exposures_for(["AAPL"], shock))
+        return asyncio.run(main._execute(exps, "Apple recalls iPhone units", "agent"))
+
+
+def test_a_shock_to_a_tradable_company_shorts_it_directly(tmp_path, monkeypatch):
+    """First-order: a 0.42 shock naming Apple (like the 2026-10-05 recall
+    headline) shorts AAPL itself; Apple has nothing downstream in the graph."""
+    result = _first_order_run(tmp_path, monkeypatch, 0.42)
+    opened = [o["position"] for o in result["opened"]]
+    assert [p.symbol for p in opened] == ["AAPLUSDT"]
+    assert opened[0].origin == "AAPL" and "first-order" in opened[0].thesis
+
+
+def test_first_order_needs_the_shock_floor(tmp_path, monkeypatch):
+    assert _first_order_run(tmp_path, monkeypatch, 0.30)["opened"] == []
+
+
+def test_first_order_can_be_switched_off(tmp_path, monkeypatch):
+    assert _first_order_run(tmp_path, monkeypatch, 0.42, trade_origin="false")["opened"] == []

@@ -58,6 +58,9 @@ class Settings(BaseSettings):
     # Shock below this never reaches the risk layer.
     # Calibrated: research/README.md "Calibrating the agent".
     cascadr_shock_floor: float = 0.40
+    # First-order trades: also short the company a headline names as directly
+    # disrupted (shock at or above the floor), not only its downstream.
+    cascadr_trade_origin: str = "true"
     cascadr_max_llm_per_hour: int = 60
     cascadr_news_max_age_hours: float = 6.0
 
@@ -89,6 +92,10 @@ class Settings(BaseSettings):
     @property
     def autonomous(self) -> bool:
         return self.cascadr_autonomous.strip().lower() == "true"
+
+    @property
+    def trade_origin(self) -> bool:
+        return self.cascadr_trade_origin.strip().lower() == "true"
 
     @property
     def demo_configured(self) -> bool:

@@ -363,6 +363,7 @@ async def health():
             "poll_seconds": s.cascadr_poll_seconds,
             "shock_floor": s.cascadr_shock_floor,
             "trade_threshold": TRADE_THRESHOLD,
+            "trade_origin": s.trade_origin,
             "max_llm_per_hour": s.cascadr_max_llm_per_hour,
             **state["agent"].stats,
         },
@@ -437,6 +438,7 @@ async def overview():
             "poll_seconds": s.cascadr_poll_seconds,
             "shock_floor": s.cascadr_shock_floor,
             "trade_threshold": TRADE_THRESHOLD,
+            "trade_origin": s.trade_origin,
             "llm_model": s.llm_model,
             "cycles_since_restart": state["agent"].stats["cycles"],
             "last_cycle": state["agent"].stats["last_cycle"],
@@ -660,15 +662,27 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
     its source ("agent" or "manual"). Each skip says why: risk, venue,
     no_mark, duplicate or error.
 
+    Two kinds of exposure trade: downstream companies whose score reaches the
+    trade threshold, and (first-order, CASCADR_TRADE_ORIGIN) the company the
+    headline itself names as disrupted, when its shock clears the floor.
+
     Each position keeps its real root cause (the exposure's origin) as its
     risk cluster. Separately, one headline is one bet: however many suppliers
     it names, it opens at most one cluster's allowance of positions and
     notional in total.
     """
-    tradable = [
-        e for e in exposures
-        if not e.get("is_origin") and e.get("ticker") and e["score"] >= TRADE_THRESHOLD
-    ]
+    s = state["settings"]
+
+    def tradable_exposure(e: dict) -> bool:
+        if not e.get("ticker") or e["score"] < TRADE_THRESHOLD:
+            return False
+        if e.get("is_origin"):
+            # First-order: the company the headline itself hits, when its
+            # shock clears the calibrated floor.
+            return s.trade_origin and e["score"] >= s.cascadr_shock_floor
+        return True
+
+    tradable = [e for e in exposures if tradable_exposure(e)]
     opened, skipped = [], []
     if not tradable:
         return {"opened": opened, "skipped": skipped}
