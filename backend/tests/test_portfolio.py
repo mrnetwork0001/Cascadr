@@ -399,3 +399,11 @@ async def test_an_unpriced_position_does_not_freeze_the_book(tmp_path):
     assert done.status is PositionStatus.CLOSED and 480.0 < done.realized_pnl_usdt <= 500.0
     assert any(e["kind"] == "PRICE_OVERRIDE" for e in await store.events())
     store.close()
+
+
+def test_caps_scale_with_the_paper_account():
+    from app.risk import RiskLimits
+    full, half = RiskLimits.for_equity(100_000), RiskLimits.for_equity(50_000)
+    assert full == RiskLimits()  # 100k reproduces the defaults exactly
+    assert half.max_cluster_notional_usdt == 50_000 and half.max_gross_notional_usdt == 125_000
+    assert half.max_positions_per_cluster == full.max_positions_per_cluster

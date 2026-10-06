@@ -126,3 +126,9 @@ def test_without_a_demo_key_the_simulator_is_used(tmp_path):
     pm = PortfolioManager(store, BitgetClient(Settings()), demo=BitgetDemo(Settings()))
     assert pm.venue == "cascadr-sim"
     store.close()
+
+
+def test_the_test_suite_cannot_reach_a_real_account():
+    """Whatever keys backend/.env holds, tests run without them."""
+    s = Settings()
+    assert not s.demo_configured and not s.has_trading_credentials

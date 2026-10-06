@@ -94,7 +94,7 @@ async def lifespan(app: FastAPI):
     state["portfolio"] = PortfolioManager(
         store,
         state["bitget"],
-        RiskManager(RiskLimits(starting_equity_usdt=s.cascadr_paper_equity)),
+        RiskManager(RiskLimits.for_equity(s.cascadr_paper_equity)),
         PaperBroker(),
         demo=state["demo"],
     )
@@ -671,7 +671,9 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
             skipped.append({"symbol": symbol, "kind": "no_mark",
                             "reason": market_error or f"no Bitget mark for {symbol}"})
             continue
-        notional = round((18_000 + e["score"] * 42_000) / 500) * 500
+        # 18% to 60% of the paper account, by exposure; caps scale the same way.
+        equity = limits.starting_equity_usdt
+        notional = round(equity * (0.18 + 0.42 * e["score"]) / 50) * 50
         if (
             len(opened) >= limits.max_positions_per_cluster
             or headline_notional + notional > limits.max_cluster_notional_usdt

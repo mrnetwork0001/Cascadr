@@ -23,6 +23,19 @@ from app.models import Position
 class RiskLimits(BaseModel):
     """Caps applied to every new position. Deliberately conservative."""
 
+    @classmethod
+    def for_equity(cls, equity: float) -> "RiskLimits":
+        """The default caps, scaled to the account: at 100,000 USDT they are
+        the defaults below; at 50,000 they are half. Position counts and the
+        drawdown percentage do not depend on size."""
+        k = equity / 100_000.0
+        return cls(
+            starting_equity_usdt=equity,
+            max_gross_notional_usdt=250_000.0 * k,
+            max_cluster_notional_usdt=100_000.0 * k,
+            min_notional_usdt=2_000.0 * k,
+        )
+
     starting_equity_usdt: float = Field(default=100_000.0, gt=0)
 
     # Total notional across the book, all clusters.

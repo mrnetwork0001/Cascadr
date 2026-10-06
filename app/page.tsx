@@ -111,7 +111,7 @@ export default async function LandingPage() {
     <div className="min-h-screen bg-term-void">
       {/* ---------------------------------------------------------------- nav */}
       <nav className="sticky top-0 z-30 border-b border-term-line bg-term-void/90 backdrop-blur">
-        <div className="mx-auto flex max-w-[84rem] items-center gap-4 px-5 py-2.5 md:px-6">
+        <div className="mx-auto flex max-w-[calc(50%_+_43.5rem)] items-center gap-4 px-5 py-2.5 md:px-6">
           <Link href="/" aria-label="Cascadr home" className="flex items-center">
             <Logo height={26} priority />
           </Link>
@@ -139,7 +139,7 @@ export default async function LandingPage() {
           }}
         />
 
-        <div className="relative mx-auto grid max-w-[81rem] gap-10 px-5 py-14 md:px-6 md:py-20 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+        <div className="relative mx-auto grid max-w-[calc(50%_+_42rem)] gap-10 px-5 py-14 md:px-6 md:py-20 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div className="min-w-0">
             <div className="inline-flex items-center gap-2 border border-term-edge px-2 py-1">
               {/* The dot reflects the agent's real state, not decoration. */}
@@ -470,7 +470,7 @@ export default async function LandingPage() {
       {/* ------------------------------------------------------------- footer */}
       <footer className="border-t border-term-line">
         <div className="px-5 py-14 md:px-6">
-          <div className="mx-auto flex max-w-[81rem] flex-col items-start gap-6 md:flex-row md:items-center">
+          <div className="mx-auto flex max-w-[calc(50%_+_42rem)] flex-col items-start gap-6 md:flex-row md:items-center">
             <div>
               <h2 className="text-xl font-semibold text-term-bright md:text-2xl">Watch the agent read the news.</h2>
               <p className="mt-2 max-w-md text-xs text-term-dim">The terminal shows its actual decisions as they happen.</p>
@@ -482,7 +482,7 @@ export default async function LandingPage() {
         </div>
 
         <div className="border-t border-term-line px-5 pb-16 pt-12 md:px-6">
-          <div className="mx-auto grid max-w-[81rem] gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          <div className="mx-auto grid max-w-[calc(50%_+_42rem)] gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
             <div>
               <Logo height={30} />
               <p className="mt-4 max-w-xs text-xs leading-relaxed text-term-dim">
