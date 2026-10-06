@@ -95,6 +95,7 @@ export default async function LandingPage() {
   // with none, the page says so rather than showing a lesser stand-in.
   const featured = latest?.latest_with_exposure ?? null;
   const armed = overview?.agent.armed ?? false;
+  const onDemo = overview?.paper_venue === "bitget-demo";
   // Statuses are only asserted when /overview answered.
   const agentStatus = !overview ? "UNKNOWN" : armed ? "LIVE" : "PAUSED";
   const marketStatus = !overview ? "UNKNOWN" : overview.market_error ? "DOWN" : "LIVE";
@@ -168,8 +169,8 @@ export default async function LandingPage() {
               An autonomous agent that reads live news about{" "}
               {overview ? overview.graph.nodes : "the"} companies in the electronics supply chain. When a headline signals a disruption, an LLM judges how severe it is, a
               source-cited supply-chain graph works out which downstream companies are exposed, and
-              the agent paper-trades Bitget stock perpetuals against them — with every decision,
-              including every refusal, on the record.
+              the agent shorts them with paper trades on {onDemo ? "Bitget's demo exchange" : "Bitget stock perpetuals"}
+              {" "}— with every decision, including every refusal, on the record.
             </p>
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -187,11 +188,11 @@ export default async function LandingPage() {
               <Stat k={overview?.graph.edges} v="source-cited links" />
               <Stat
                 k={
-                  overview && overview.instruments.listed_on_bitget != null
-                    ? `${overview.instruments.listed_on_bitget}/${overview.instruments.graph_tickers}`
+                  overview && overview.instruments.tradable_on_venue != null
+                    ? `${overview.instruments.tradable_on_venue}/${overview.instruments.graph_tickers}`
                     : undefined
                 }
-                v="listed on Bitget now"
+                v={onDemo ? "tradable on Bitget demo" : "listed on Bitget now"}
               />
               <Stat k={overview?.agent.headlines_seen} v="headlines read" />
             </dl>
@@ -319,8 +320,12 @@ export default async function LandingPage() {
             n="04"
             name="Act"
             stack="paper book · Bitget prices"
-            body="Exposures above the trade threshold become short positions on the paper book, marked to Bitget's live mark price, capped per root cause, per symbol and by a drawdown halt, and closed by stop-loss, take-profit or time stop. Order signing for live trading exists but is switched off."
-            code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} → size by exposure → risk → paper fill`}
+            body={
+              onDemo
+                ? "Exposures above the trade threshold become short orders on Bitget's demo exchange, which fills them and keeps the record. Positions are sized to the paper account, capped per root cause, per headline, per symbol and by a drawdown halt, marked at Bitget's demo price, and closed by stop-loss, take-profit or time stop."
+                : "Exposures above the trade threshold become short positions on the paper book, marked to Bitget's live mark price, capped per root cause, per headline, per symbol and by a drawdown halt, and closed by stop-loss, take-profit or time stop."
+            }
+            code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} → size by exposure → risk → ${onDemo ? "Bitget demo order" : "paper fill"}`}
           />
         </div>
       </Section>
@@ -363,7 +368,12 @@ export default async function LandingPage() {
             ["Live news", "Real headlines the agent read, with the LLM's verdict and a link to each article."],
             ["Knowledge graph", "The source-cited graph, coloured by the selected decision's contagion. Click a company for its sources."],
             ["Agent log", "Every decision with its reasoning, uncertainty and 0G provider, plus every paper position event."],
-            ["Paper positions", "The paper book marked to Bitget's live mark price, with P&L, return on margin and pending exits."],
+            [
+              "Paper positions",
+              onDemo
+                ? "Positions on Bitget's demo exchange at Bitget's mark price, with P&L net of Bitget's fees, return on margin and pending exits."
+                : "The paper book marked to Bitget's live mark price, with P&L, return on margin and pending exits.",
+            ],
           ].map(([h, b]) => (
             <div key={h} className="border border-term-line bg-term-panel p-4">
               <h3 className="text-xs font-semibold text-amber">{h}</h3>
@@ -489,7 +499,7 @@ export default async function LandingPage() {
               <Logo height={30} />
               <p className="mt-4 max-w-xs text-xs leading-relaxed text-term-dim">
                 An autonomous agent that reads supply-chain news and paper-trades downstream
-                contagion on Bitget stock perpetuals. Built by NetLayer Labs for the Bitget AI
+                contagion on Bitget stock perpetuals{onDemo ? ", on Bitget's demo exchange" : ""}. Built by NetLayer Labs for the Bitget AI
                 Hackathon.
               </p>
             </div>

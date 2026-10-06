@@ -258,7 +258,14 @@ export interface Overview {
     max_hops: number;
     hop_decay: number;
   };
-  instruments: { graph_tickers: number; listed_on_bitget: number | null };
+  instruments: {
+    graph_tickers: number;
+    listed_on_bitget: number | null;
+    /** Where paper trades are filled: "bitget-demo" or "cascadr-sim". */
+    venue: string;
+    /** How many of the graph's stocks that venue can trade. */
+    tradable_on_venue: number | null;
+  };
   agent: {
     armed: boolean;
     poll_seconds: number;
