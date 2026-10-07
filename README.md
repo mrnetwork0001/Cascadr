@@ -6,9 +6,9 @@ Built by NetLayer Labs for the **Bitget AI Hackathon** - Agentic Trading track, 
 
 | | |
 | --- | --- |
-| **Live site** | https://cascadr.38.49.216.120.sslip.io |
-| **Live terminal** | https://cascadr.38.49.216.120.sslip.io/terminal |
-| **Public API** | https://cascadr.38.49.216.120.sslip.io/api/health |
+| **Live site** | https://trycascadr.vercel.app |
+| **Live terminal** | https://trycascadr.vercel.app/terminal |
+| **Public API** | https://trycascadr.vercel.app/api/health |
 | **Trading** | Paper only - orders are placed on **Bitget's demo exchange** (Demo Trading, no real funds) |
 
 ---
@@ -72,14 +72,14 @@ Everything the site shows is read from the running system; nothing is mocked. Th
 
 | Endpoint | What it shows |
 | --- | --- |
-| [`/api/health`](https://cascadr.38.49.216.120.sslip.io/api/health) | Agent state, last cycle, LLM, news feed, exit loop, paper venue |
-| [`/api/agent/decisions`](https://cascadr.38.49.216.120.sslip.io/api/agent/decisions) | Every decision - including every refusal - with the headline, article link, LLM reasoning, uncertainty, 0G provider and implied exposures |
-| [`/api/positions`](https://cascadr.38.49.216.120.sslip.io/api/positions) | The paper book, each position with its venue, fills, fees and P&L |
-| [`/api/venue`](https://cascadr.38.49.216.120.sslip.io/api/venue) | **Bitget's own view** of the demo account: balances and open positions |
-| [`/api/paper/report`](https://cascadr.38.49.216.120.sslip.io/api/paper/report) | Paper performance: return, Sharpe, max drawdown, win rate, closed trades |
-| [`/api/paper/equity`](https://cascadr.38.49.216.120.sslip.io/api/paper/equity) | The equity time series, one point per minute |
-| [`/api/graph`](https://cascadr.38.49.216.120.sslip.io/api/graph) | The supply-chain graph with every link's sources and filing facts |
-| [`/api/risk`](https://cascadr.38.49.216.120.sslip.io/api/risk) | Risk limits, cluster utilisation, drawdown |
+| [`/api/health`](https://trycascadr.vercel.app/api/health) | Agent state, last cycle, LLM, news feed, exit loop, paper venue |
+| [`/api/agent/decisions`](https://trycascadr.vercel.app/api/agent/decisions) | Every decision - including every refusal - with the headline, article link, LLM reasoning, uncertainty, 0G provider and implied exposures |
+| [`/api/positions`](https://trycascadr.vercel.app/api/positions) | The paper book, each position with its venue, fills, fees and P&L |
+| [`/api/venue`](https://trycascadr.vercel.app/api/venue) | **Bitget's own view** of the demo account: balances and open positions |
+| [`/api/paper/report`](https://trycascadr.vercel.app/api/paper/report) | Paper performance: return, Sharpe, max drawdown, win rate, closed trades |
+| [`/api/paper/equity`](https://trycascadr.vercel.app/api/paper/equity) | The equity time series, one point per minute |
+| [`/api/graph`](https://trycascadr.vercel.app/api/graph) | The supply-chain graph with every link's sources and filing facts |
+| [`/api/risk`](https://trycascadr.vercel.app/api/risk) | Risk limits, cluster utilisation, drawdown |
 
 ## Paper trading on Bitget
 
