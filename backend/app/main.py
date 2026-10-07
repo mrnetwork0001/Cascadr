@@ -15,12 +15,15 @@ Start with:  uvicorn app.main:app --reload --port 8010
 """
 
 import asyncio
+import csv
+import io
 import json
+import re
 import secrets
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -1099,6 +1102,93 @@ async def paper_report():
             }
             for p in closed
         ],
+    }
+
+
+_FILL = re.compile(r"(BUY|SELL) ([0-9.]+) \S+ @ avg ([0-9.]+), fees ([0-9.]+) USDT")
+_SLICE = re.compile(r"slice pnl=([+-]?[0-9.]+)")
+
+
+def _ledger(positions: list, events: list[dict], starting_equity: float) -> list[dict]:
+    """Every fill in the paper book as one row: time, instrument, direction,
+    price, quantity, fee, and the change to the account balance it caused.
+
+    Balance changes are realized cash: the opening fee when a short opens, and
+    the closed slice's P&L (net of its fee) when it is bought back, so a
+    position's rows sum to its realized P&L. `balance_after` runs from the
+    paper account's starting equity; mark-to-market equity is /paper/equity.
+    """
+    by_pos: dict[str, list[dict]] = {}
+    for e in sorted(events, key=lambda x: x["id"]):
+        by_pos.setdefault(e["position_id"], []).append(e)
+    rows: list[dict] = []
+    for p in positions:
+        evs = by_pos.get(p.id, [])
+        open_fee = float(p.fees_usdt or 0.0)
+        qty0 = p.original_size or p.size
+        rows.append({
+            "time_utc": p.opened_at.isoformat(), "position_id": p.id, "instrument": p.symbol,
+            "direction": "SELL (open short)", "price": round(p.entry_price, 4), "quantity": qty0,
+            "notional_usdt": round(p.original_notional_usdt or p.notional_usdt, 2),
+            "fee_usdt": round(open_fee, 4), "balance_change_usdt": round(-open_fee, 4),
+            "source": p.source, "venue": p.venue,
+        })
+        sliced = 0.0
+        for e in evs:
+            if e["kind"] != "PARTIAL_CLOSE":
+                continue
+            m, sl = _FILL.search(e["detail"]), _SLICE.search(e["detail"])
+            change = float(sl.group(1)) if sl else 0.0
+            sliced += change
+            rows.append({
+                "time_utc": e["at"], "position_id": p.id, "instrument": p.symbol,
+                "direction": "BUY (partial cover)", "price": float(m.group(3)) if m else None,
+                "quantity": float(m.group(2)) if m else None, "notional_usdt": None,
+                "fee_usdt": float(m.group(4)) if m else None, "balance_change_usdt": round(change, 4),
+                "source": p.source, "venue": p.venue,
+            })
+        if p.status == "CLOSED":
+            fills = [e for e in evs if e["kind"] == "BITGET_FILL" and _FILL.search(e["detail"])]
+            m = _FILL.search(fills[-1]["detail"]) if fills else None
+            change = (p.realized_pnl_usdt or 0.0) - sliced + open_fee
+            rows.append({
+                "time_utc": p.closed_at.isoformat() if p.closed_at else None, "position_id": p.id,
+                "instrument": p.symbol,
+                "direction": f"BUY (cover, {p.close_reason.value if p.close_reason else 'closed'})",
+                "price": float(m.group(3)) if m else p.exit_price, "quantity": float(m.group(2)) if m else p.size,
+                "notional_usdt": None, "fee_usdt": float(m.group(4)) if m else None,
+                "balance_change_usdt": round(change, 4), "source": p.source, "venue": p.venue,
+            })
+    rows.sort(key=lambda r: r["time_utc"] or "")
+    bal = starting_equity
+    for r in rows:
+        bal += r["balance_change_usdt"]
+        r["balance_after_usdt"] = round(bal, 2)
+    return rows
+
+
+@app.get("/paper/log")
+async def paper_log(format: str = Query(default="json", pattern="^(json|csv)$")):
+    """The paper-trading log, one row per fill: timestamp, instrument,
+    direction, price, quantity, fee and account-balance change."""
+    s = state["settings"]
+    positions = await state["store"].all_positions(limit=5000)
+    events = await state["store"].events(limit=100000)
+    rows = _ledger(positions, events, s.cascadr_paper_equity)
+    if format == "csv":
+        cols = ["time_utc", "instrument", "direction", "price", "quantity", "notional_usdt", "fee_usdt",
+                "balance_change_usdt", "balance_after_usdt", "source", "venue", "position_id"]
+        buf = io.StringIO()
+        w = csv.DictWriter(buf, fieldnames=cols, extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+        return Response(content=buf.getvalue(), media_type="text/csv; charset=utf-8",
+                        headers={"Content-Disposition": 'inline; filename="cascadr-paper-log.csv"'})
+    return {
+        "venue": state["portfolio"].venue,
+        "starting_equity_usdt": s.cascadr_paper_equity,
+        "note": "balance changes are realized cash (fees and closed P&L); mark-to-market equity is /paper/equity",
+        "fills": rows,
     }
 
 

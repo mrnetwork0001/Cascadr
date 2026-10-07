@@ -30,6 +30,7 @@ const DEMO_VIDEO_URL = "";
 
 const API_LINKS: [string, string][] = [
   ["/api/agent/decisions", "Every decision, refusals included: headline, article link, the LLM's reading, its trade call and the 0G provider"],
+  ["/api/paper/log?format=csv", "The trading log, one row per fill: time, instrument, direction, price, quantity, fee, balance change"],
   ["/api/positions", "The paper book: each position with its venue, fills, fees, exit policy and P&L"],
   ["/api/positions/events", "Every position event: opens, Bitget fills, LLM thesis reviews, closes"],
   ["/api/venue", "Bitget's own view of the demo account: balances and open positions"],

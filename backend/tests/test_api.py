@@ -182,3 +182,31 @@ def test_paper_report_names_the_venue_that_fills(tmp_path, monkeypatch):
         r = c.get("/paper/report").json()
     # No demo key in tests: the simulator fills, and the report says so.
     assert r["venue"] == "cascadr-sim" and r["fills"].startswith("simulated")
+
+
+def test_paper_log_lists_every_fill_and_balances(tmp_path):
+    from datetime import UTC, datetime
+    from app.main import _ledger
+    from app.models import CloseReason, Position, PositionStatus
+
+    opened = datetime(2026, 10, 7, 10, 0, tzinfo=UTC)
+    closed = datetime(2026, 10, 8, 10, 0, tzinfo=UTC)
+    p = Position(id="p1", symbol="AAPLUSDT", side="SHORT", size=10, notional_usdt=3000, leverage=2,
+                 entry_price=300.0, opened_at=opened, source="agent", venue="bitget-demo", fees_usdt=1.8,
+                 status=PositionStatus.CLOSED, closed_at=closed, exit_price=290.0,
+                 close_reason=CloseReason.TAKE_PROFIT, realized_pnl_usdt=100 - 1.74 - 1.8)
+    events = [{"id": 1, "position_id": "p1", "at": closed.isoformat(), "kind": "BITGET_FILL",
+               "detail": "BITGET DEMO via Agent Hub: BUY 10 AAPLUSDT @ avg 290.0000, fees 1.7400 USDT, orders 1"}]
+    rows = _ledger([p], events, 50_000)
+    assert [r["direction"] for r in rows] == ["SELL (open short)", "BUY (cover, TAKE_PROFIT)"]
+    assert rows[0]["balance_change_usdt"] == -1.8 and rows[1]["price"] == 290.0 and rows[1]["fee_usdt"] == 1.74
+    # The rows sum to the realized P&L, and the balance runs from starting equity.
+    assert sum(r["balance_change_usdt"] for r in rows) == pytest.approx(p.realized_pnl_usdt)
+    assert rows[-1]["balance_after_usdt"] == pytest.approx(50_000 + p.realized_pnl_usdt, abs=0.01)
+
+
+def test_paper_log_serves_csv(tmp_path, monkeypatch):
+    with client(tmp_path, monkeypatch) as c:
+        r = c.get("/paper/log?format=csv")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/csv")
+    assert r.text.splitlines()[0].startswith("time_utc,instrument,direction,price,quantity")
