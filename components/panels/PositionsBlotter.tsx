@@ -9,6 +9,7 @@ const EXIT_TONE: Record<string, string> = {
   STOP_LOSS: "text-signal-red",
   TAKE_PROFIT: "text-signal-green",
   TIME_STOP: "text-amber",
+  AGENT_EXIT: "text-accent-deep",
 };
 
 /*

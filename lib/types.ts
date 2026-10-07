@@ -110,7 +110,28 @@ export type DecisionAction =
   | "NO_TRADABLE_EXPOSURE"
   | "EXECUTION_FAILED"
   | "ANALYSED"
+  | "PASSED"
   | "BLOCKED"; // legacy label from before the outcomes were split
+
+/** The LLM's call on one candidate short the graph proposed. */
+export interface TradeCall {
+  symbol: string;
+  short: boolean;
+  conviction: number;
+  take_profit_pct: number;
+  hold_hours: number;
+  reason: string;
+}
+
+/** The LLM's trading decision on a headline's candidate shorts. */
+export interface TradePlan {
+  engine: "llm" | "none" | "unavailable" | string;
+  model: string | null;
+  summary: string;
+  calls: TradeCall[];
+  excluded: Record<string, [string, string]>;
+  detail: string;
+}
 
 /** A real headline the agent read, and what the LLM decided about it. */
 export interface Decision {
@@ -132,6 +153,8 @@ export interface Decision {
   detail: string;
   provider: string | null;
   exposures: Exposure[];
+  /** Null for decisions recorded before the LLM made the trade call. */
+  trade_plan?: TradePlan | null;
 }
 
 export type FeedItem =

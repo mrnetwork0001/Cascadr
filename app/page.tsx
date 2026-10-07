@@ -248,14 +248,10 @@ export default async function LandingPage() {
             />
             <Stage
               n="04"
-              name="Act"
-              stack="paper book · Bitget prices"
-              body={
-                onDemo
-                  ? "Downstream exposures above the trade threshold, and the hit company itself when its shock clears the floor, become short orders on Bitget's demo exchange, which fills them and keeps the record. Positions are sized to the paper account, capped per root cause, per headline, per symbol and by a drawdown halt, marked at Bitget's demo price, and closed by stop-loss, take-profit or time stop."
-                  : "Downstream exposures above the trade threshold, and the hit company itself when its shock clears the floor, become short positions on the paper book, marked to Bitget's live mark price, capped per root cause, per headline, per symbol and by a drawdown halt, and closed by stop-loss, take-profit or time stop."
-              }
-              code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} (hit company: shock ≥ ${overview?.agent.shock_floor ?? "floor"}) → size → risk → ${onDemo ? "Bitget demo order" : "paper fill"}`}
+              name="Decide & act"
+              stack={onDemo ? "LLM trade call · Bitget demo" : "LLM trade call · paper book"}
+              body={`The graph's candidates - the hit company and the downstream customers ${onDemo ? "Bitget's demo exchange lists" : "Bitget lists"} - go back to the LLM with live prices and the current book. It decides which to short, its conviction (which sets the size), the profit target and how long to hold, or it passes. Orders are capped per root cause, per headline, per symbol and by a drawdown halt, and every position keeps a hard 6% stop. The LLM reviews each open thesis every few hours and closes it when it no longer holds.`}
+              code={`score ≥ ${overview?.agent.trade_threshold ?? "threshold"} → LLM: short or pass, conviction, target, hold → risk → ${onDemo ? "Bitget demo order" : "paper fill"}`}
             />
           </div>
         </Section>

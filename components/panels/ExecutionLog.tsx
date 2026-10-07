@@ -38,6 +38,7 @@ function Pill({ tone, children, title }: { tone: string; children: ReactNode; ti
 /** Book events: a rejected close is the only one that needs a caution tone. */
 const EVENT_TONE: Record<string, string> = {
   CLOSE_REJECTED: "text-amber",
+  AGENT_REVIEW: "text-accent-deep",
 };
 
 /** A label / value pair in the decision's metadata line. */
@@ -201,6 +202,23 @@ function DecisionRow({
             <dl className="space-y-2.5">
               {d.reasoning && <WhyItem label="reasoning">{d.reasoning}</WhyItem>}
               {d.uncertainty && <WhyItem label="uncertainty">{d.uncertainty}</WhyItem>}
+              {d.trade_plan?.engine === "llm" && (
+                <WhyItem label="trade decision">
+                  {d.trade_plan.summary && <span className="block">{d.trade_plan.summary}</span>}
+                  <ul className="mt-1 space-y-1">
+                    {d.trade_plan.calls.map((c) => (
+                      <li key={c.symbol}>
+                        <span className="num font-[560] text-ink">
+                          {c.short
+                            ? `SHORT ${c.symbol} · conviction ${c.conviction.toFixed(2)} · TP ${c.take_profit_pct.toFixed(1)}% · hold ${c.hold_hours.toFixed(0)}h`
+                            : `PASS ${c.symbol}`}
+                        </span>
+                        {c.reason && <span className="block text-muted-2">{c.reason}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </WhyItem>
+              )}
               <WhyItem label="outcome">{d.detail}</WhyItem>
               {downstream.length > 0 && (
                 <WhyItem label="implies">

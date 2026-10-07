@@ -65,6 +65,7 @@ export const ACTION_CLASS: Record<string, string> = {
   NO_TRADABLE_EXPOSURE: "text-signal-cyan border-signal-cyan/40",
   EXECUTION_FAILED: "text-signal-red border-signal-red/50",
   ANALYSED: "text-signal-violet border-signal-violet/40",
+  PASSED: "text-accent-deep border-accent/40",
   BLOCKED: "text-amber border-amber/50",
 };
 
@@ -79,6 +80,7 @@ export const ACTION_LABEL: Record<string, string> = {
   NO_TRADABLE_EXPOSURE: "NO TRADE",
   EXECUTION_FAILED: "EXEC FAILED",
   ANALYSED: "ANALYSED",
+  PASSED: "LLM PASSED",
   BLOCKED: "NO TRADE",
 };
 
