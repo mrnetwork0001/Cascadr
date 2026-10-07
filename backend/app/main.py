@@ -869,14 +869,18 @@ async def paper_report():
     rows = await state["store"].all_positions(limit=5000)
     closed = [p for p in rows if p.status == "CLOSED"]
     stats = await state["journal"].stats(closed)
+    on_demo = state["portfolio"].venue == "bitget-demo"
     return {
         "mode": "paper",
-        "marks": "Bitget stock-perp mark price, live",
-        "fills": "simulated at the live price with modelled slippage, partials and rejects",
+        "venue": state["portfolio"].venue,
+        "marks": "Bitget demo exchange mark price, live" if on_demo
+        else "Bitget stock-perp mark price, live",
+        "fills": "market orders filled by Bitget's demo exchange; price, quantity and fees as Bitget reports them"
+        if on_demo else "simulated at the live price with modelled slippage, partials and rejects",
         "stats": stats,
         "closed_trades": [
             {
-                "symbol": p.symbol, "origin": p.origin, "source": p.source,
+                "symbol": p.symbol, "origin": p.origin, "source": p.source, "venue": p.venue,
                 "entry": p.entry_price, "exit": p.exit_price,
                 "reason": p.close_reason, "pnl_usdt": p.realized_pnl_usdt,
                 "opened_at": p.opened_at, "closed_at": p.closed_at,

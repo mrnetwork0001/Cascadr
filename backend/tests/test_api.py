@@ -175,3 +175,10 @@ def test_first_order_needs_the_shock_floor(tmp_path, monkeypatch):
 
 def test_first_order_can_be_switched_off(tmp_path, monkeypatch):
     assert _first_order_run(tmp_path, monkeypatch, 0.42, trade_origin="false")["opened"] == []
+
+
+def test_paper_report_names_the_venue_that_fills(tmp_path, monkeypatch):
+    with client(tmp_path, monkeypatch) as c:
+        r = c.get("/paper/report").json()
+    # No demo key in tests: the simulator fills, and the report says so.
+    assert r["venue"] == "cascadr-sim" and r["fills"].startswith("simulated")
