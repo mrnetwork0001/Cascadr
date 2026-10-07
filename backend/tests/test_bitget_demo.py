@@ -53,6 +53,12 @@ class FakeDemo:
             }
             return ok({"orderId": oid, "clientOid": body["clientOid"]})
         if path == "/api/v3/trade/order-info":
+            if "clientOid" in req.url.params:
+                cid = req.url.params["clientOid"]
+                row = next((o for o in self.orders.values() if o["body"]["clientOid"] == cid), None)
+                if row is None:
+                    return httpx.Response(200, json={"code": "40109", "msg": "order not found"})
+                return ok(row)
             return ok(self.orders[req.url.params["orderId"]])
         return httpx.Response(404, json={"code": "40404", "msg": "not mocked"})
 

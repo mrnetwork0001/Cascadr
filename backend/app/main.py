@@ -36,6 +36,7 @@ from app.ingest.oracle import NewsOracle, OracleVerdict
 from app.ingest.promote import ingest_disclosed_edges
 from app.llm.client import LLMClient
 from app.market.bitget import BitgetClient, perp_symbol
+from app.market.agent_hub import AgentHub
 from app.market.bitget_demo import BitgetDemo
 from app.market.paper import PaperBroker
 from app.models import CloseReason, ExitPolicy
@@ -71,7 +72,8 @@ async def lifespan(app: FastAPI):
     s = get_settings()
     state["settings"] = s
     state["bitget"] = BitgetClient(s)
-    state["demo"] = BitgetDemo(s)
+    state["hub"] = AgentHub(s)
+    state["demo"] = BitgetDemo(s, hub=state["hub"])
     state["alerts"] = Alerts(s)
     state["edgar"] = EdgarClient(s.sec_user_agent)
     state["llm"] = LLMClient(s)
@@ -244,6 +246,7 @@ async def lifespan(app: FastAPI):
 
     await state["bitget"].aclose()
     await state["demo"].aclose()
+    await state["hub"].aclose()
     await state["alerts"].aclose()
     await state["edgar"].aclose()
     await state["llm"].aclose()
@@ -390,6 +393,7 @@ async def health():
         "paper_venue": state["portfolio"].venue,
         "trading_credentials": s.has_trading_credentials,
         "admin_endpoints": bool(s.cascadr_admin_token),
+        "agent_hub": state["hub"].describe(),
         "position_reviews": {
             "every_hours": REVIEW_EVERY_HOURS,
             "runs": state["reviews"]["runs"],
@@ -580,7 +584,9 @@ async def tradable():
 
 @app.get("/agent/decisions")
 async def agent_decisions(
-    limit: int = 60, before_id: int | None = Query(default=None, ge=1, le=2**63 - 1)
+    limit: int = 60,
+    before_id: int | None = Query(default=None, ge=1, le=2**63 - 1),
+    action: str | None = Query(default=None, max_length=40),
 ):
     """Every decision, including the refusals, newest first.
 
@@ -588,7 +594,7 @@ async def agent_decisions(
     are valuation chatter, and an agent that passes on them is working.
     """
     limit = max(1, min(limit, 200))
-    rows = await state["agent"].decisions(limit, before_id)
+    rows = await state["agent"].decisions(limit, before_id, action)
     return {"decisions": rows, "counts": await state["agent"].counts()}
 
 

@@ -68,6 +68,14 @@ class Settings(BaseSettings):
     cascadr_alert_ntfy_server: str = "https://ntfy.sh"
     # Public site address, used as the alert's tap-through link.
     cascadr_public_url: str | None = None
+
+    # Bitget Agent Hub (`@bitget-ai/bitget-agent-mcp`, run with
+    # --paper-trading) as the order path to the demo exchange. Path to the
+    # package's lib/index.js; unset: orders go through the native v3 client.
+    cascadr_agent_hub_entry: str | None = None
+    cascadr_agent_hub_node: str = "node"
+    # HOME for the Agent Hub process (it may keep a config dir there).
+    cascadr_agent_hub_home: str | None = None
     cascadr_max_llm_per_hour: int = 60
     cascadr_news_max_age_hours: float = 6.0
 

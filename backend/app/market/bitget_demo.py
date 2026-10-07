@@ -6,13 +6,16 @@ Orders go to Bitget's own demo environment (the one Agent Hub's
 market and keeps the order, position and P&L record in the demo account, so
 the paper-trading log is Bitget's, not ours.
 
-Uses the v3 (unified account) API, as Agent Hub does. Market orders are split
-into chunks of at most the instrument's maxMarketOrderQty, and every fill is
-read back from Bitget (average price, filled quantity, fees) rather than
-assumed.
+Uses the v3 (unified account) API, as Agent Hub does. When Agent Hub is
+configured (app/market/agent_hub.py), orders are placed through it - Bitget's
+own MCP server for agents, in --paper-trading mode - and this client reads the
+fills back. Market orders are split into chunks of at most the instrument's
+maxMarketOrderQty, and every fill is read back from Bitget (average price,
+filled quantity, fees) rather than assumed.
 
 Only instruments Bitget lists in demo can be traded here; at the time of
-writing that is NVDA, AAPL and TSLA among the graph's stock perps.
+writing that is 8 of the graph's 15 stocks: NVDA, AAPL, TSLA, SAMSUNG, SKHY,
+GOOGL, META and AMZN.
 """
 
 import asyncio
@@ -28,6 +31,7 @@ from typing import Any
 import httpx
 
 from app.config import Settings
+from app.market.agent_hub import AgentHub, AgentHubRejected, AgentHubUnavailable
 from app.market.bitget import BASE_URL, TICKER_TTL_SECONDS, _Cached
 
 CATEGORY = "USDT-FUTURES"
@@ -54,6 +58,8 @@ class Execution:
     fees: float = 0.0
     order_ids: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+    # How each order reached Bitget: "agent-hub" or "v3" (the native client).
+    routes: list[str] = field(default_factory=list)
 
     @property
     def avg_price(self) -> float:
@@ -61,8 +67,12 @@ class Execution:
 
     def detail(self, verb: str, symbol: str) -> str:
         ids = ",".join(self.order_ids) or "-"
+        via = ""
+        if self.routes:
+            names = {"agent-hub": "Agent Hub", "v3": "v3 API"}
+            via = " via " + "+".join(sorted({names.get(r, r) for r in self.routes}))
         s = (
-            f"BITGET DEMO: {verb} {self.qty:g} {symbol} @ avg {self.avg_price:.4f}, "
+            f"BITGET DEMO{via}: {verb} {self.qty:g} {symbol} @ avg {self.avg_price:.4f}, "
             f"fees {self.fees:.4f} USDT, orders {ids}"
         )
         if self.errors:
@@ -71,8 +81,12 @@ class Execution:
 
 
 class BitgetDemo:
-    def __init__(self, settings: Settings, client: httpx.AsyncClient | None = None):
+    def __init__(
+        self, settings: Settings, client: httpx.AsyncClient | None = None,
+        hub: AgentHub | None = None,
+    ):
         self._s = settings
+        self._hub = hub if hub is not None and hub.configured else None
         self._client = client or httpx.AsyncClient(base_url=BASE_URL, timeout=15.0)
         self._instruments = _Cached(INSTRUMENTS_TTL_SECONDS)
         self._tickers = _Cached(TICKER_TTL_SECONDS)
@@ -268,8 +282,8 @@ class BitgetDemo:
             elif close:
                 body["reduceOnly"] = "yes"
             try:
-                placed = await self._post("/api/v3/trade/place-order", body)
-                order_id = str((placed or {}).get("orderId"))
+                order_id, route = await self._place(body)
+                ex.routes.append(route)
                 fill = await self._order_fill(order_id)
             except (DemoError, httpx.HTTPError) as exc:
                 ex.errors.append(str(exc)[:160])
@@ -281,6 +295,30 @@ class BitgetDemo:
             for f in fill.get("feeDetail") or []:
                 ex.fees += abs(float(f.get("fee") or 0))
         return ex
+
+    async def _place(self, body: dict) -> tuple[str, str]:
+        """Place one order: through Agent Hub when configured, else the native
+        v3 client. Returns (orderId, route)."""
+        if self._hub is not None:
+            try:
+                return await self._hub.place_order(body), "agent-hub"
+            except AgentHubRejected as exc:
+                # Bitget refused it: the same order would be refused again.
+                raise DemoError("agent-hub", str(exc)) from exc
+            except AgentHubUnavailable:
+                # Outcome unknown. If the order reached Bitget, it is findable
+                # by its clientOid; only an order that is not there is placed
+                # again, natively, under the same clientOid (which Bitget would
+                # reject as a duplicate anyway), so it can never fill twice.
+                try:
+                    row = await self._get("/api/v3/trade/order-info", {"clientOid": body["clientOid"]})
+                    row = row[0] if isinstance(row, list) and row else (row or {})
+                    if row.get("orderId"):
+                        return str(row["orderId"]), "agent-hub"
+                except DemoError:
+                    pass  # no such order: it never reached Bitget
+        placed = await self._post("/api/v3/trade/place-order", body)
+        return str((placed or {}).get("orderId")), "v3"
 
     async def open_short(self, symbol: str, qty: float, leverage: int, client_oid: str) -> tuple[Execution, str | None]:
         note = await self._ensure_leverage(symbol, leverage)
