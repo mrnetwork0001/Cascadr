@@ -293,4 +293,4 @@ Nothing here is investment advice or a trading signal.
 
 ---
 
-NetLayer Labs · Bitget AI Hackathon
+Bitget AI Hackathon
