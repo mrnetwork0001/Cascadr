@@ -1,0 +1,322 @@
+{
+ "graph": {
+  "file": "footage/graph.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 486,
+  "marks": {
+   "select": 93,
+   "supplies": 209,
+   "expand": 262,
+   "sources": 388
+  },
+  "url": "/terminal",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "node": "TSMC",
+  "relation": "TSMC > NVDA",
+  "points": {
+   "node": {
+    "x": 668.3,
+    "y": 381.9,
+    "k": 1.1543647140762325
+   }
+  },
+  "rects": {
+   "news": {
+    "x": 10,
+    "y": 66,
+    "w": 320,
+    "h": 429
+   },
+   "contagion": {
+    "x": 10,
+    "y": 505,
+    "w": 320,
+    "h": 343
+   },
+   "graph": {
+    "x": 340,
+    "y": 66,
+    "w": 740,
+    "h": 562
+   },
+   "positions": {
+    "x": 340,
+    "y": 638,
+    "w": 740,
+    "h": 210
+   },
+   "log": {
+    "x": 1090,
+    "y": 66,
+    "w": 500,
+    "h": 782
+   },
+   "inspector": {
+    "x": 353,
+    "y": 182,
+    "w": 372,
+    "h": 433
+   }
+  },
+  "rectsAt": {
+   "select": {
+    "inspector": {
+     "x": 353,
+     "y": 182,
+     "w": 372,
+     "h": 433
+    }
+   }
+  },
+  "notes": "Real mouse click on the TSMC disc in the force-graph canvas (screen point from graph2ScreenCoords); the inspector opens, scrolls to \"Supplies\", the TSMC > NVDA link is expanded and the list scrolls to its sources. points.node is the click point in CSS px at mark select (the graph then pans the node clear of the inspector)."
+ },
+ "judges": {
+  "file": "footage/judges.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 491,
+  "marks": {
+   "trace": 156,
+   "log": 387
+  },
+  "url": "/judges",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "scroll": {
+   "trace": 1133,
+   "log": 2615,
+   "max": 2632
+  },
+  "sections": {
+   "demo": {
+    "x": 0,
+    "y": 510,
+    "w": 1600,
+    "h": 623
+   },
+   "trace": {
+    "x": 0,
+    "y": 1133,
+    "w": 1600,
+    "h": 1482
+   },
+   "log": {
+    "x": 0,
+    "y": 2615,
+    "w": 1600,
+    "h": 805
+   }
+  },
+  "notes": "Page scroll positions in CSS px; sections are in document coordinates (y from the top of the page)."
+ },
+ "landing": {
+  "file": "footage/landing.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 317,
+  "marks": {},
+  "url": "/",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "notes": "The hero at rest (after its entrance), animated canvas; no scrolling."
+ },
+ "positions": {
+  "file": "footage/positions.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 260,
+  "marks": {
+   "posScroll": 104
+  },
+  "url": "/terminal",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "rects": {
+   "news": {
+    "x": 10,
+    "y": 66,
+    "w": 320,
+    "h": 429
+   },
+   "contagion": {
+    "x": 10,
+    "y": 505,
+    "w": 320,
+    "h": 343
+   },
+   "graph": {
+    "x": 340,
+    "y": 66,
+    "w": 740,
+    "h": 562
+   },
+   "positions": {
+    "x": 340,
+    "y": 638,
+    "w": 740,
+    "h": 210
+   },
+   "log": {
+    "x": 1090,
+    "y": 66,
+    "w": 500,
+    "h": 782
+   }
+  },
+  "notes": "Paper Positions at rest for 3.5 s, then the table scrolls right (eased, 1.8 s) to show the exit column; the symbol column stays pinned. Crop to rects.positions."
+ },
+ "terminal": {
+  "file": "footage/terminal.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 438,
+  "marks": {},
+  "url": "/terminal",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "rects": {
+   "news": {
+    "x": 10,
+    "y": 66,
+    "w": 320,
+    "h": 429
+   },
+   "contagion": {
+    "x": 10,
+    "y": 505,
+    "w": 320,
+    "h": 343
+   },
+   "graph": {
+    "x": 340,
+    "y": 66,
+    "w": 740,
+    "h": 562
+   },
+   "positions": {
+    "x": 340,
+    "y": 638,
+    "w": 740,
+    "h": 210
+   },
+   "log": {
+    "x": 1090,
+    "y": 66,
+    "w": 500,
+    "h": 782
+   }
+  },
+  "notes": "Whole terminal at rest, live data; nothing clicked."
+ },
+ "why": {
+  "file": "footage/why.mp4",
+  "width": 3200,
+  "height": 1800,
+  "durationFrames": 435,
+  "marks": {
+   "open": 93,
+   "inview": 167,
+   "panelEnd": 319
+  },
+  "url": "/terminal",
+  "deviceScale": 2,
+  "viewport": {
+   "w": 1600,
+   "h": 900
+  },
+  "decision": {
+   "id": 2107,
+   "action": "PASSED",
+   "entities": [
+    "SK_HYNIX"
+   ],
+   "headline": "SK hynix Reportedly Faces Difficulties in HBM Hybrid Bonding, Trailing Samsung"
+  },
+  "rects": {
+   "news": {
+    "x": 10,
+    "y": 66,
+    "w": 320,
+    "h": 429
+   },
+   "contagion": {
+    "x": 10,
+    "y": 505,
+    "w": 320,
+    "h": 343
+   },
+   "graph": {
+    "x": 340,
+    "y": 66,
+    "w": 740,
+    "h": 562
+   },
+   "positions": {
+    "x": 340,
+    "y": 638,
+    "w": 740,
+    "h": 210
+   },
+   "log": {
+    "x": 1090,
+    "y": 66,
+    "w": 500,
+    "h": 782
+   },
+   "why": {
+    "x": 1188,
+    "y": 151,
+    "w": 385,
+    "h": 682
+   },
+   "whyRow": {
+    "x": 1107,
+    "y": 43,
+    "w": 466,
+    "h": 800
+   }
+  },
+  "rectsAt": {
+   "open": {
+    "why": {
+     "x": 1188,
+     "y": 214,
+     "w": 385,
+     "h": 682
+    }
+   },
+   "inview": {
+    "why": {
+     "x": 1188,
+     "y": 216,
+     "w": 385,
+     "h": 682
+    },
+    "whyRow": {
+     "x": 1107,
+     "y": 108,
+     "w": 466,
+     "h": 800
+    }
+   }
+  },
+  "notes": "Clicked the row's \"why\" button (real mouse click) at mark open; the log then scrolls (eased) so the headline sits at the top (mark inview) and, after a hold, on to the panel's last line (mark panelEnd). rects are the final hold; rectsAt.open.why is where the panel first opened (partly below the fold), rectsAt.inview at mark inview."
+ }
+}

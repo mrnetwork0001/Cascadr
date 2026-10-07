@@ -1,0 +1,92 @@
+{
+ "edge": {
+  "source": "TSMC",
+  "target": "NVDA",
+  "component": "4N/4NP (Blackwell) and 3nm (Rubin) GPU dies",
+  "dependency": 0.95,
+  "provenance": "QUALITATIVE",
+  "sources": [
+   {
+    "publisher": "Taipei Times (quoting NVIDIA CEO Jensen Huang)",
+    "date": "2025-08-23",
+    "title": null,
+    "quote": "We have now taped out six brand new chips to TSMC. ... All these new chips are now in TSMC\u2019s fab.",
+    "url": "https://www.taipeitimes.com/News/front/archives/2025/08/23/2003842521"
+   },
+   {
+    "publisher": "NVIDIA (official product page)",
+    "date": "undated, accessed 2026-09-24",
+    "title": null,
+    "quote": "NVIDIA Blackwell-architecture GPUs pack 208 billion transistors and are manufactured using a custom-built TSMC 4NP process.",
+    "url": "https://www.nvidia.com/en-us/data-center/technologies/blackwell-architecture/"
+   }
+  ]
+ },
+ "tsmcDownstream": [
+  {
+   "target": "NVDA",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE"
+  },
+  {
+   "target": "AAPL",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE"
+  },
+  {
+   "target": "AMD",
+   "dependency": 1.0,
+   "provenance": "DISCLOSED"
+  },
+  {
+   "target": "QCOM",
+   "dependency": 0.95,
+   "provenance": "QUALITATIVE"
+  },
+  {
+   "target": "AVGO",
+   "dependency": 0.95,
+   "provenance": "DISCLOSED"
+  }
+ ],
+ "counts": {
+  "headlines": 3143,
+  "declined": 2106,
+  "decisions": 2110,
+  "companies": 19,
+  "links": 24,
+  "tradable": 8,
+  "graphTickers": 15
+ },
+ "tradeCall": {
+  "id": 2107,
+  "at": "2026-10-07 13:02 UTC",
+  "headline": "SK hynix Reportedly Faces Difficulties in HBM Hybrid Bonding, Trailing Samsung",
+  "source": "TechPowerUp",
+  "shock": 0.35,
+  "call": {
+   "symbol": "SKHYUSDT",
+   "short": false,
+   "conviction": 0.15,
+   "take_profit_pct": 3.0,
+   "hold_hours": 24,
+   "reason": "Shock is only medium (0.35) and sourced as 'reportedly' about hybrid bonding yields for future HBM rather than confirmed current production loss, while the price is already -6.88% in 24h, exceeding the graph-implied -3.33% move, so the risk/reward of a fresh short is poor."
+  }
+ },
+ "order": {
+  "symbol": "AAPLUSDT",
+  "side": "SELL",
+  "qty": 54.76,
+  "price": 335.64,
+  "notional": 18380,
+  "stop": 355.78,
+  "venue": "Bitget demo exchange"
+ },
+ "research": {
+  "car5": -3.29,
+  "overnightPct": 42,
+  "pairs": 7,
+  "events": 3,
+  "fromOneEvent": 5
+ }
+}

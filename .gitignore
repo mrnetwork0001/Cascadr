@@ -47,3 +47,10 @@ backend/*.db-shm
 
 # generated at runtime by POST /ingest/edgar/refresh
 backend/disclosed_edges.json
+
+# demo film (sources are tracked; generated media is not)
+video/node_modules/
+video/out/
+video/.cache/
+video/public/footage/
+video/public/stills/

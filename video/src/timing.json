@@ -1,0 +1,2154 @@
+{
+ "fps": 30,
+ "totalFrames": 5099,
+ "bpm": 80,
+ "beats": [
+  2,
+  25,
+  47,
+  70,
+  92,
+  115,
+  137,
+  160,
+  182,
+  205,
+  227,
+  250,
+  272,
+  295,
+  317,
+  340,
+  362,
+  385,
+  407,
+  430,
+  452,
+  475,
+  497,
+  520,
+  542,
+  565,
+  587,
+  610,
+  632,
+  655,
+  677,
+  700,
+  722,
+  745,
+  767,
+  790,
+  812,
+  835,
+  857,
+  880,
+  902,
+  925,
+  947,
+  970,
+  992,
+  1015,
+  1037,
+  1060,
+  1082,
+  1105,
+  1127,
+  1150,
+  1172,
+  1195,
+  1217,
+  1240,
+  1262,
+  1285,
+  1307,
+  1330,
+  1352,
+  1375,
+  1397,
+  1420,
+  1442,
+  1465,
+  1487,
+  1510,
+  1532,
+  1555,
+  1577,
+  1600,
+  1622,
+  1645,
+  1667,
+  1690,
+  1712,
+  1735,
+  1757,
+  1780,
+  1802,
+  1825,
+  1847,
+  1870,
+  1892,
+  1915,
+  1937,
+  1960,
+  1982,
+  2005,
+  2027,
+  2050,
+  2072,
+  2095,
+  2117,
+  2140,
+  2162,
+  2185,
+  2207,
+  2230,
+  2252,
+  2275,
+  2297,
+  2320,
+  2342,
+  2365,
+  2387,
+  2410,
+  2432,
+  2455,
+  2477,
+  2500,
+  2522,
+  2545,
+  2567,
+  2590,
+  2612,
+  2635,
+  2657,
+  2680,
+  2702,
+  2725,
+  2747,
+  2770,
+  2792,
+  2815,
+  2837,
+  2860,
+  2882,
+  2905,
+  2927,
+  2950,
+  2972,
+  2995,
+  3017,
+  3040,
+  3062,
+  3085,
+  3107,
+  3130,
+  3152,
+  3175,
+  3197,
+  3220,
+  3242,
+  3265,
+  3287,
+  3310,
+  3332,
+  3355,
+  3377,
+  3400,
+  3422,
+  3445,
+  3467,
+  3490,
+  3512,
+  3535,
+  3557,
+  3580,
+  3602,
+  3625,
+  3647,
+  3670,
+  3692,
+  3715,
+  3737,
+  3760,
+  3782,
+  3805,
+  3827,
+  3850,
+  3872,
+  3895,
+  3917,
+  3940,
+  3962,
+  3985,
+  4007,
+  4030,
+  4052,
+  4075,
+  4097,
+  4120,
+  4142,
+  4165,
+  4187,
+  4210,
+  4232,
+  4255,
+  4277,
+  4300,
+  4322,
+  4345,
+  4367,
+  4390,
+  4412,
+  4435,
+  4457,
+  4480,
+  4502,
+  4525,
+  4547,
+  4570,
+  4592,
+  4615,
+  4637,
+  4660,
+  4682,
+  4705,
+  4727,
+  4750,
+  4772,
+  4795,
+  4817,
+  4840,
+  4862,
+  4885,
+  4907,
+  4930,
+  4952,
+  4975,
+  4997,
+  5020,
+  5042,
+  5065,
+  5087
+ ],
+ "music": {
+  "file": "audio/music.mp3",
+  "source": "elevenlabs-music"
+ },
+ "scenes": [
+  {
+   "id": "open",
+   "from": 0,
+   "durationInFrames": 501,
+   "lines": [
+    {
+     "voice": "anchor",
+     "text": "Breaking news. A magnitude seven point four earthquake has struck Taiwan. TSMC is evacuating staff from its chip plants.",
+     "file": "audio/vo/open_0.mp3",
+     "startFrame": 12,
+     "durationFrames": 260,
+     "words": [
+      {
+       "word": "Breaking",
+       "start": 12,
+       "end": 27
+      },
+      {
+       "word": "news.",
+       "start": 29,
+       "end": 42
+      },
+      {
+       "word": "A",
+       "start": 52,
+       "end": 54
+      },
+      {
+       "word": "magnitude",
+       "start": 57,
+       "end": 73
+      },
+      {
+       "word": "seven",
+       "start": 75,
+       "end": 83
+      },
+      {
+       "word": "point",
+       "start": 84,
+       "end": 91
+      },
+      {
+       "word": "four",
+       "start": 94,
+       "end": 100
+      },
+      {
+       "word": "earthquake",
+       "start": 103,
+       "end": 118
+      },
+      {
+       "word": "has",
+       "start": 119,
+       "end": 122
+      },
+      {
+       "word": "struck",
+       "start": 124,
+       "end": 134
+      },
+      {
+       "word": "Taiwan.",
+       "start": 136,
+       "end": 154
+      },
+      {
+       "word": "TSMC",
+       "start": 164,
+       "end": 182
+      },
+      {
+       "word": "is",
+       "start": 188,
+       "end": 190
+      },
+      {
+       "word": "evacuating",
+       "start": 192,
+       "end": 212
+      },
+      {
+       "word": "staff",
+       "start": 214,
+       "end": 224
+      },
+      {
+       "word": "from",
+       "start": 226,
+       "end": 230
+      },
+      {
+       "word": "its",
+       "start": 231,
+       "end": 235
+      },
+      {
+       "word": "chip",
+       "start": 238,
+       "end": 245
+      },
+      {
+       "word": "plants.",
+       "start": 247,
+       "end": 271
+      }
+     ]
+    },
+    {
+     "voice": "narrator",
+     "text": "April the third, twenty twenty-four. Within minutes, the market had read the headline.",
+     "file": "audio/vo/open_1.mp3",
+     "startFrame": 287,
+     "durationFrames": 198,
+     "words": [
+      {
+       "word": "April",
+       "start": 287,
+       "end": 298
+      },
+      {
+       "word": "the",
+       "start": 300,
+       "end": 302
+      },
+      {
+       "word": "third,",
+       "start": 304,
+       "end": 320
+      },
+      {
+       "word": "twenty",
+       "start": 330,
+       "end": 341
+      },
+      {
+       "word": "twenty-four.",
+       "start": 342,
+       "end": 369
+      },
+      {
+       "word": "Within",
+       "start": 383,
+       "end": 393
+      },
+      {
+       "word": "minutes,",
+       "start": 395,
+       "end": 413
+      },
+      {
+       "word": "the",
+       "start": 418,
+       "end": 421
+      },
+      {
+       "word": "market",
+       "start": 423,
+       "end": 435
+      },
+      {
+       "word": "had",
+       "start": 441,
+       "end": 445
+      },
+      {
+       "word": "read",
+       "start": 447,
+       "end": 452
+      },
+      {
+       "word": "the",
+       "start": 453,
+       "end": 455
+      },
+      {
+       "word": "headline.",
+       "start": 457,
+       "end": 485
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "problem",
+   "from": 501,
+   "durationInFrames": 510,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "But a headline names one company. The damage doesn't stop there.",
+     "file": "audio/vo/problem_0.mp3",
+     "startFrame": 513,
+     "durationFrames": 133,
+     "words": [
+      {
+       "word": "But",
+       "start": 513,
+       "end": 519
+      },
+      {
+       "word": "a",
+       "start": 520,
+       "end": 520
+      },
+      {
+       "word": "headline",
+       "start": 522,
+       "end": 536
+      },
+      {
+       "word": "names",
+       "start": 537,
+       "end": 544
+      },
+      {
+       "word": "one",
+       "start": 547,
+       "end": 553
+      },
+      {
+       "word": "company.",
+       "start": 554,
+       "end": 575
+      },
+      {
+       "word": "The",
+       "start": 588,
+       "end": 591
+      },
+      {
+       "word": "damage",
+       "start": 593,
+       "end": 604
+      },
+      {
+       "word": "doesn't",
+       "start": 605,
+       "end": 613
+      },
+      {
+       "word": "stop",
+       "start": 614,
+       "end": 622
+      },
+      {
+       "word": "there.",
+       "start": 624,
+       "end": 645
+      }
+     ]
+    },
+    {
+     "voice": "narrator",
+     "text": "TSMC makes the chips inside NVIDIA, AMD, Apple, Qualcomm and Broadcom. None of them were in the headline.",
+     "file": "audio/vo/problem_1.mp3",
+     "startFrame": 661,
+     "durationFrames": 292,
+     "words": [
+      {
+       "word": "TSMC",
+       "start": 661,
+       "end": 682
+      },
+      {
+       "word": "makes",
+       "start": 697,
+       "end": 705
+      },
+      {
+       "word": "the",
+       "start": 706,
+       "end": 708
+      },
+      {
+       "word": "chips",
+       "start": 710,
+       "end": 719
+      },
+      {
+       "word": "inside",
+       "start": 721,
+       "end": 737
+      },
+      {
+       "word": "NVIDIA,",
+       "start": 738,
+       "end": 758
+      },
+      {
+       "word": "AMD,",
+       "start": 766,
+       "end": 792
+      },
+      {
+       "word": "Apple,",
+       "start": 800,
+       "end": 817
+      },
+      {
+       "word": "Qualcomm",
+       "start": 823,
+       "end": 840
+      },
+      {
+       "word": "and",
+       "start": 847,
+       "end": 852
+      },
+      {
+       "word": "Broadcom.",
+       "start": 854,
+       "end": 876
+      },
+      {
+       "word": "None",
+       "start": 891,
+       "end": 897
+      },
+      {
+       "word": "of",
+       "start": 899,
+       "end": 900
+      },
+      {
+       "word": "them",
+       "start": 901,
+       "end": 906
+      },
+      {
+       "word": "were",
+       "start": 911,
+       "end": 917
+      },
+      {
+       "word": "in",
+       "start": 918,
+       "end": 920
+      },
+      {
+       "word": "the",
+       "start": 921,
+       "end": 923
+      },
+      {
+       "word": "headline.",
+       "start": 925,
+       "end": 952
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "evidence",
+   "from": 1011,
+   "durationInFrames": 563,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "Across the disruptions we studied, the companies downstream fell behind the chip index by more than three percent over the next five trading days.",
+     "file": "audio/vo/evidence_0.mp3",
+     "startFrame": 1023,
+     "durationFrames": 317,
+     "words": [
+      {
+       "word": "Across",
+       "start": 1023,
+       "end": 1034
+      },
+      {
+       "word": "the",
+       "start": 1036,
+       "end": 1038
+      },
+      {
+       "word": "disruptions",
+       "start": 1040,
+       "end": 1056
+      },
+      {
+       "word": "we",
+       "start": 1057,
+       "end": 1060
+      },
+      {
+       "word": "studied,",
+       "start": 1062,
+       "end": 1080
+      },
+      {
+       "word": "the",
+       "start": 1092,
+       "end": 1095
+      },
+      {
+       "word": "companies",
+       "start": 1097,
+       "end": 1110
+      },
+      {
+       "word": "downstream",
+       "start": 1113,
+       "end": 1139
+      },
+      {
+       "word": "fell",
+       "start": 1152,
+       "end": 1159
+      },
+      {
+       "word": "behind",
+       "start": 1161,
+       "end": 1172
+      },
+      {
+       "word": "the",
+       "start": 1174,
+       "end": 1176
+      },
+      {
+       "word": "chip",
+       "start": 1178,
+       "end": 1185
+      },
+      {
+       "word": "index",
+       "start": 1187,
+       "end": 1203
+      },
+      {
+       "word": "by",
+       "start": 1212,
+       "end": 1217
+      },
+      {
+       "word": "more",
+       "start": 1219,
+       "end": 1223
+      },
+      {
+       "word": "than",
+       "start": 1224,
+       "end": 1228
+      },
+      {
+       "word": "three",
+       "start": 1230,
+       "end": 1239
+      },
+      {
+       "word": "percent",
+       "start": 1240,
+       "end": 1254
+      },
+      {
+       "word": "over",
+       "start": 1266,
+       "end": 1272
+      },
+      {
+       "word": "the",
+       "start": 1274,
+       "end": 1276
+      },
+      {
+       "word": "next",
+       "start": 1277,
+       "end": 1284
+      },
+      {
+       "word": "five",
+       "start": 1286,
+       "end": 1299
+      },
+      {
+       "word": "trading",
+       "start": 1300,
+       "end": 1312
+      },
+      {
+       "word": "days.",
+       "start": 1315,
+       "end": 1339
+      }
+     ]
+    },
+    {
+     "voice": "narrator",
+     "text": "And about forty percent of the first day's move happened overnight, while American markets were closed.",
+     "file": "audio/vo/evidence_1.mp3",
+     "startFrame": 1355,
+     "durationFrames": 204,
+     "words": [
+      {
+       "word": "And",
+       "start": 1355,
+       "end": 1360
+      },
+      {
+       "word": "about",
+       "start": 1361,
+       "end": 1368
+      },
+      {
+       "word": "forty",
+       "start": 1370,
+       "end": 1379
+      },
+      {
+       "word": "percent",
+       "start": 1380,
+       "end": 1391
+      },
+      {
+       "word": "of",
+       "start": 1392,
+       "end": 1394
+      },
+      {
+       "word": "the",
+       "start": 1395,
+       "end": 1397
+      },
+      {
+       "word": "first",
+       "start": 1399,
+       "end": 1407
+      },
+      {
+       "word": "day's",
+       "start": 1409,
+       "end": 1416
+      },
+      {
+       "word": "move",
+       "start": 1418,
+       "end": 1427
+      },
+      {
+       "word": "happened",
+       "start": 1428,
+       "end": 1439
+      },
+      {
+       "word": "overnight,",
+       "start": 1444,
+       "end": 1470
+      },
+      {
+       "word": "while",
+       "start": 1477,
+       "end": 1484
+      },
+      {
+       "word": "American",
+       "start": 1485,
+       "end": 1499
+      },
+      {
+       "word": "markets",
+       "start": 1501,
+       "end": 1516
+      },
+      {
+       "word": "were",
+       "start": 1524,
+       "end": 1530
+      },
+      {
+       "word": "closed.",
+       "start": 1531,
+       "end": 1558
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "gap",
+   "from": 1574,
+   "durationInFrames": 390,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "To trade that, you need to know who depends on whom, and by how much. You need to be reading the news at three in the morning. And you need to decide fast, without guessing.",
+     "file": "audio/vo/gap_0.mp3",
+     "startFrame": 1586,
+     "durationFrames": 363,
+     "words": [
+      {
+       "word": "To",
+       "start": 1586,
+       "end": 1591
+      },
+      {
+       "word": "trade",
+       "start": 1593,
+       "end": 1602
+      },
+      {
+       "word": "that,",
+       "start": 1603,
+       "end": 1615
+      },
+      {
+       "word": "you",
+       "start": 1622,
+       "end": 1624
+      },
+      {
+       "word": "need",
+       "start": 1626,
+       "end": 1632
+      },
+      {
+       "word": "to",
+       "start": 1633,
+       "end": 1634
+      },
+      {
+       "word": "know",
+       "start": 1636,
+       "end": 1641
+      },
+      {
+       "word": "who",
+       "start": 1642,
+       "end": 1647
+      },
+      {
+       "word": "depends",
+       "start": 1648,
+       "end": 1663
+      },
+      {
+       "word": "on",
+       "start": 1665,
+       "end": 1669
+      },
+      {
+       "word": "whom,",
+       "start": 1671,
+       "end": 1687
+      },
+      {
+       "word": "and",
+       "start": 1695,
+       "end": 1699
+      },
+      {
+       "word": "by",
+       "start": 1701,
+       "end": 1706
+      },
+      {
+       "word": "how",
+       "start": 1709,
+       "end": 1713
+      },
+      {
+       "word": "much.",
+       "start": 1716,
+       "end": 1732
+      },
+      {
+       "word": "You",
+       "start": 1747,
+       "end": 1751
+      },
+      {
+       "word": "need",
+       "start": 1753,
+       "end": 1757
+      },
+      {
+       "word": "to",
+       "start": 1758,
+       "end": 1759
+      },
+      {
+       "word": "be",
+       "start": 1761,
+       "end": 1763
+      },
+      {
+       "word": "reading",
+       "start": 1765,
+       "end": 1773
+      },
+      {
+       "word": "the",
+       "start": 1775,
+       "end": 1777
+      },
+      {
+       "word": "news",
+       "start": 1779,
+       "end": 1792
+      },
+      {
+       "word": "at",
+       "start": 1796,
+       "end": 1802
+      },
+      {
+       "word": "three",
+       "start": 1804,
+       "end": 1812
+      },
+      {
+       "word": "in",
+       "start": 1813,
+       "end": 1814
+      },
+      {
+       "word": "the",
+       "start": 1816,
+       "end": 1818
+      },
+      {
+       "word": "morning.",
+       "start": 1819,
+       "end": 1836
+      },
+      {
+       "word": "And",
+       "start": 1847,
+       "end": 1851
+      },
+      {
+       "word": "you",
+       "start": 1853,
+       "end": 1856
+      },
+      {
+       "word": "need",
+       "start": 1857,
+       "end": 1862
+      },
+      {
+       "word": "to",
+       "start": 1863,
+       "end": 1865
+      },
+      {
+       "word": "decide",
+       "start": 1866,
+       "end": 1879
+      },
+      {
+       "word": "fast,",
+       "start": 1881,
+       "end": 1904
+      },
+      {
+       "word": "without",
+       "start": 1911,
+       "end": 1922
+      },
+      {
+       "word": "guessing.",
+       "start": 1924,
+       "end": 1948
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "turn",
+   "from": 1964,
+   "durationInFrames": 242,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "Meet Cascadr. Markets price the headline. Cascadr prices the cascade.",
+     "file": "audio/vo/turn_0.mp3",
+     "startFrame": 1976,
+     "durationFrames": 207,
+     "words": [
+      {
+       "word": "Meet",
+       "start": 1976,
+       "end": 1985
+      },
+      {
+       "word": "Cascadr.",
+       "start": 1989,
+       "end": 2017
+      },
+      {
+       "word": "Markets",
+       "start": 2028,
+       "end": 2042
+      },
+      {
+       "word": "price",
+       "start": 2043,
+       "end": 2055
+      },
+      {
+       "word": "the",
+       "start": 2057,
+       "end": 2060
+      },
+      {
+       "word": "headline.",
+       "start": 2062,
+       "end": 2083
+      },
+      {
+       "word": "Cascadr",
+       "start": 2098,
+       "end": 2118
+      },
+      {
+       "word": "prices",
+       "start": 2120,
+       "end": 2137
+      },
+      {
+       "word": "the",
+       "start": 2143,
+       "end": 2146
+      },
+      {
+       "word": "cascade.",
+       "start": 2148,
+       "end": 2182
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "sense",
+   "from": 2206,
+   "durationInFrames": 351,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "Cascadr is an autonomous trading agent. Every ten minutes, around the clock, it reads live news on nineteen companies across the chip supply chain.",
+     "file": "audio/vo/sense_0.mp3",
+     "startFrame": 2218,
+     "durationFrames": 324,
+     "words": [
+      {
+       "word": "Cascadr",
+       "start": 2218,
+       "end": 2238
+      },
+      {
+       "word": "is",
+       "start": 2244,
+       "end": 2249
+      },
+      {
+       "word": "an",
+       "start": 2250,
+       "end": 2252
+      },
+      {
+       "word": "autonomous",
+       "start": 2253,
+       "end": 2268
+      },
+      {
+       "word": "trading",
+       "start": 2270,
+       "end": 2280
+      },
+      {
+       "word": "agent.",
+       "start": 2282,
+       "end": 2298
+      },
+      {
+       "word": "Every",
+       "start": 2313,
+       "end": 2322
+      },
+      {
+       "word": "ten",
+       "start": 2324,
+       "end": 2329
+      },
+      {
+       "word": "minutes,",
+       "start": 2331,
+       "end": 2343
+      },
+      {
+       "word": "around",
+       "start": 2344,
+       "end": 2353
+      },
+      {
+       "word": "the",
+       "start": 2355,
+       "end": 2357
+      },
+      {
+       "word": "clock,",
+       "start": 2358,
+       "end": 2372
+      },
+      {
+       "word": "it",
+       "start": 2381,
+       "end": 2385
+      },
+      {
+       "word": "reads",
+       "start": 2387,
+       "end": 2396
+      },
+      {
+       "word": "live",
+       "start": 2398,
+       "end": 2409
+      },
+      {
+       "word": "news",
+       "start": 2410,
+       "end": 2424
+      },
+      {
+       "word": "on",
+       "start": 2431,
+       "end": 2436
+      },
+      {
+       "word": "nineteen",
+       "start": 2440,
+       "end": 2454
+      },
+      {
+       "word": "companies",
+       "start": 2456,
+       "end": 2473
+      },
+      {
+       "word": "across",
+       "start": 2481,
+       "end": 2493
+      },
+      {
+       "word": "the",
+       "start": 2495,
+       "end": 2497
+      },
+      {
+       "word": "chip",
+       "start": 2498,
+       "end": 2505
+      },
+      {
+       "word": "supply",
+       "start": 2507,
+       "end": 2518
+      },
+      {
+       "word": "chain.",
+       "start": 2520,
+       "end": 2541
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "reason",
+   "from": 2557,
+   "durationInFrames": 454,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "A language model reads each headline like an analyst. Which company is actually hit? How badly, from zero to one? And what would change its mind? Most headlines are noise, and it says so.",
+     "file": "audio/vo/reason_0.mp3",
+     "startFrame": 2569,
+     "durationFrames": 427,
+     "words": [
+      {
+       "word": "A",
+       "start": 2569,
+       "end": 2572
+      },
+      {
+       "word": "language",
+       "start": 2574,
+       "end": 2585
+      },
+      {
+       "word": "model",
+       "start": 2586,
+       "end": 2593
+      },
+      {
+       "word": "reads",
+       "start": 2595,
+       "end": 2602
+      },
+      {
+       "word": "each",
+       "start": 2607,
+       "end": 2614
+      },
+      {
+       "word": "headline",
+       "start": 2616,
+       "end": 2631
+      },
+      {
+       "word": "like",
+       "start": 2632,
+       "end": 2637
+      },
+      {
+       "word": "an",
+       "start": 2638,
+       "end": 2640
+      },
+      {
+       "word": "analyst.",
+       "start": 2643,
+       "end": 2663
+      },
+      {
+       "word": "Which",
+       "start": 2676,
+       "end": 2683
+      },
+      {
+       "word": "company",
+       "start": 2685,
+       "end": 2697
+      },
+      {
+       "word": "is",
+       "start": 2703,
+       "end": 2708
+      },
+      {
+       "word": "actually",
+       "start": 2710,
+       "end": 2721
+      },
+      {
+       "word": "hit?",
+       "start": 2724,
+       "end": 2738
+      },
+      {
+       "word": "How",
+       "start": 2748,
+       "end": 2753
+      },
+      {
+       "word": "badly,",
+       "start": 2756,
+       "end": 2775
+      },
+      {
+       "word": "from",
+       "start": 2780,
+       "end": 2785
+      },
+      {
+       "word": "zero",
+       "start": 2787,
+       "end": 2797
+      },
+      {
+       "word": "to",
+       "start": 2799,
+       "end": 2801
+      },
+      {
+       "word": "one?",
+       "start": 2804,
+       "end": 2816
+      },
+      {
+       "word": "And",
+       "start": 2832,
+       "end": 2836
+      },
+      {
+       "word": "what",
+       "start": 2838,
+       "end": 2842
+      },
+      {
+       "word": "would",
+       "start": 2844,
+       "end": 2849
+      },
+      {
+       "word": "change",
+       "start": 2850,
+       "end": 2859
+      },
+      {
+       "word": "its",
+       "start": 2860,
+       "end": 2864
+      },
+      {
+       "word": "mind?",
+       "start": 2865,
+       "end": 2884
+      },
+      {
+       "word": "Most",
+       "start": 2897,
+       "end": 2905
+      },
+      {
+       "word": "headlines",
+       "start": 2907,
+       "end": 2921
+      },
+      {
+       "word": "are",
+       "start": 2924,
+       "end": 2930
+      },
+      {
+       "word": "noise,",
+       "start": 2932,
+       "end": 2951
+      },
+      {
+       "word": "and",
+       "start": 2957,
+       "end": 2962
+      },
+      {
+       "word": "it",
+       "start": 2964,
+       "end": 2966
+      },
+      {
+       "word": "says",
+       "start": 2967,
+       "end": 2974
+      },
+      {
+       "word": "so.",
+       "start": 2976,
+       "end": 2995
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "graph",
+   "from": 3011,
+   "durationInFrames": 442,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "Then the shock travels through a supply-chain graph built from public sources. Every link carries its evidence: filings, quotes, dates, and how much one company depends on another.",
+     "file": "audio/vo/graph_0.mp3",
+     "startFrame": 3023,
+     "durationFrames": 414,
+     "words": [
+      {
+       "word": "Then",
+       "start": 3023,
+       "end": 3030
+      },
+      {
+       "word": "the",
+       "start": 3032,
+       "end": 3034
+      },
+      {
+       "word": "shock",
+       "start": 3036,
+       "end": 3046
+      },
+      {
+       "word": "travels",
+       "start": 3056,
+       "end": 3070
+      },
+      {
+       "word": "through",
+       "start": 3072,
+       "end": 3080
+      },
+      {
+       "word": "a",
+       "start": 3082,
+       "end": 3083
+      },
+      {
+       "word": "supply-chain",
+       "start": 3085,
+       "end": 3106
+      },
+      {
+       "word": "graph",
+       "start": 3108,
+       "end": 3120
+      },
+      {
+       "word": "built",
+       "start": 3130,
+       "end": 3138
+      },
+      {
+       "word": "from",
+       "start": 3139,
+       "end": 3144
+      },
+      {
+       "word": "public",
+       "start": 3146,
+       "end": 3157
+      },
+      {
+       "word": "sources.",
+       "start": 3158,
+       "end": 3179
+      },
+      {
+       "word": "Every",
+       "start": 3193,
+       "end": 3202
+      },
+      {
+       "word": "link",
+       "start": 3204,
+       "end": 3211
+      },
+      {
+       "word": "carries",
+       "start": 3214,
+       "end": 3226
+      },
+      {
+       "word": "its",
+       "start": 3228,
+       "end": 3232
+      },
+      {
+       "word": "evidence:",
+       "start": 3233,
+       "end": 3253
+      },
+      {
+       "word": "filings,",
+       "start": 3263,
+       "end": 3287
+      },
+      {
+       "word": "quotes,",
+       "start": 3296,
+       "end": 3314
+      },
+      {
+       "word": "dates,",
+       "start": 3322,
+       "end": 3339
+      },
+      {
+       "word": "and",
+       "start": 3344,
+       "end": 3349
+      },
+      {
+       "word": "how",
+       "start": 3351,
+       "end": 3355
+      },
+      {
+       "word": "much",
+       "start": 3357,
+       "end": 3363
+      },
+      {
+       "word": "one",
+       "start": 3365,
+       "end": 3372
+      },
+      {
+       "word": "company",
+       "start": 3373,
+       "end": 3385
+      },
+      {
+       "word": "depends",
+       "start": 3387,
+       "end": 3401
+      },
+      {
+       "word": "on",
+       "start": 3409,
+       "end": 3414
+      },
+      {
+       "word": "another.",
+       "start": 3415,
+       "end": 3437
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "decide",
+   "from": 3453,
+   "durationInFrames": 397,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "The model makes the trade call. For each company in the path, short or pass, how confident it is, the profit target, and how long to hold, with a reason anyone can check.",
+     "file": "audio/vo/decide_0.mp3",
+     "startFrame": 3465,
+     "durationFrames": 370,
+     "words": [
+      {
+       "word": "The",
+       "start": 3465,
+       "end": 3469
+      },
+      {
+       "word": "model",
+       "start": 3471,
+       "end": 3478
+      },
+      {
+       "word": "makes",
+       "start": 3480,
+       "end": 3489
+      },
+      {
+       "word": "the",
+       "start": 3490,
+       "end": 3493
+      },
+      {
+       "word": "trade",
+       "start": 3494,
+       "end": 3502
+      },
+      {
+       "word": "call.",
+       "start": 3504,
+       "end": 3519
+      },
+      {
+       "word": "For",
+       "start": 3531,
+       "end": 3535
+      },
+      {
+       "word": "each",
+       "start": 3537,
+       "end": 3543
+      },
+      {
+       "word": "company",
+       "start": 3545,
+       "end": 3556
+      },
+      {
+       "word": "in",
+       "start": 3557,
+       "end": 3559
+      },
+      {
+       "word": "the",
+       "start": 3560,
+       "end": 3563
+      },
+      {
+       "word": "path,",
+       "start": 3564,
+       "end": 3578
+      },
+      {
+       "word": "short",
+       "start": 3584,
+       "end": 3594
+      },
+      {
+       "word": "or",
+       "start": 3595,
+       "end": 3598
+      },
+      {
+       "word": "pass,",
+       "start": 3600,
+       "end": 3617
+      },
+      {
+       "word": "how",
+       "start": 3622,
+       "end": 3627
+      },
+      {
+       "word": "confident",
+       "start": 3630,
+       "end": 3645
+      },
+      {
+       "word": "it",
+       "start": 3647,
+       "end": 3649
+      },
+      {
+       "word": "is,",
+       "start": 3651,
+       "end": 3664
+      },
+      {
+       "word": "the",
+       "start": 3671,
+       "end": 3674
+      },
+      {
+       "word": "profit",
+       "start": 3675,
+       "end": 3684
+      },
+      {
+       "word": "target,",
+       "start": 3685,
+       "end": 3703
+      },
+      {
+       "word": "and",
+       "start": 3710,
+       "end": 3714
+      },
+      {
+       "word": "how",
+       "start": 3716,
+       "end": 3720
+      },
+      {
+       "word": "long",
+       "start": 3721,
+       "end": 3726
+      },
+      {
+       "word": "to",
+       "start": 3728,
+       "end": 3729
+      },
+      {
+       "word": "hold,",
+       "start": 3732,
+       "end": 3747
+      },
+      {
+       "word": "with",
+       "start": 3757,
+       "end": 3763
+      },
+      {
+       "word": "a",
+       "start": 3764,
+       "end": 3765
+      },
+      {
+       "word": "reason",
+       "start": 3767,
+       "end": 3779
+      },
+      {
+       "word": "anyone",
+       "start": 3783,
+       "end": 3803
+      },
+      {
+       "word": "can",
+       "start": 3805,
+       "end": 3811
+      },
+      {
+       "word": "check.",
+       "start": 3813,
+       "end": 3834
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "act",
+   "from": 3850,
+   "durationInFrames": 477,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "A risk engine caps every bet by its root cause, and a hard stop protects each position. Orders go to Bitget's demo exchange through Bitget Agent Hub, and every four hours, the agent reviews its own trades.",
+     "file": "audio/vo/act_0.mp3",
+     "startFrame": 3862,
+     "durationFrames": 449,
+     "words": [
+      {
+       "word": "A",
+       "start": 3862,
+       "end": 3865
+      },
+      {
+       "word": "risk",
+       "start": 3867,
+       "end": 3874
+      },
+      {
+       "word": "engine",
+       "start": 3876,
+       "end": 3885
+      },
+      {
+       "word": "caps",
+       "start": 3887,
+       "end": 3896
+      },
+      {
+       "word": "every",
+       "start": 3898,
+       "end": 3907
+      },
+      {
+       "word": "bet",
+       "start": 3909,
+       "end": 3917
+      },
+      {
+       "word": "by",
+       "start": 3924,
+       "end": 3929
+      },
+      {
+       "word": "its",
+       "start": 3931,
+       "end": 3935
+      },
+      {
+       "word": "root",
+       "start": 3937,
+       "end": 3943
+      },
+      {
+       "word": "cause,",
+       "start": 3945,
+       "end": 3963
+      },
+      {
+       "word": "and",
+       "start": 3969,
+       "end": 3973
+      },
+      {
+       "word": "a",
+       "start": 3975,
+       "end": 3976
+      },
+      {
+       "word": "hard",
+       "start": 3978,
+       "end": 3986
+      },
+      {
+       "word": "stop",
+       "start": 3988,
+       "end": 3996
+      },
+      {
+       "word": "protects",
+       "start": 3999,
+       "end": 4014
+      },
+      {
+       "word": "each",
+       "start": 4017,
+       "end": 4023
+      },
+      {
+       "word": "position.",
+       "start": 4025,
+       "end": 4045
+      },
+      {
+       "word": "Orders",
+       "start": 4063,
+       "end": 4074
+      },
+      {
+       "word": "go",
+       "start": 4076,
+       "end": 4081
+      },
+      {
+       "word": "to",
+       "start": 4084,
+       "end": 4086
+      },
+      {
+       "word": "Bitget's",
+       "start": 4088,
+       "end": 4099
+      },
+      {
+       "word": "demo",
+       "start": 4100,
+       "end": 4108
+      },
+      {
+       "word": "exchange",
+       "start": 4110,
+       "end": 4130
+      },
+      {
+       "word": "through",
+       "start": 4135,
+       "end": 4144
+      },
+      {
+       "word": "Bitget",
+       "start": 4145,
+       "end": 4155
+      },
+      {
+       "word": "Agent",
+       "start": 4157,
+       "end": 4167
+      },
+      {
+       "word": "Hub,",
+       "start": 4169,
+       "end": 4180
+      },
+      {
+       "word": "and",
+       "start": 4186,
+       "end": 4190
+      },
+      {
+       "word": "every",
+       "start": 4193,
+       "end": 4199
+      },
+      {
+       "word": "four",
+       "start": 4201,
+       "end": 4208
+      },
+      {
+       "word": "hours,",
+       "start": 4210,
+       "end": 4224
+      },
+      {
+       "word": "the",
+       "start": 4230,
+       "end": 4234
+      },
+      {
+       "word": "agent",
+       "start": 4236,
+       "end": 4247
+      },
+      {
+       "word": "reviews",
+       "start": 4249,
+       "end": 4265
+      },
+      {
+       "word": "its",
+       "start": 4270,
+       "end": 4276
+      },
+      {
+       "word": "own",
+       "start": 4278,
+       "end": 4283
+      },
+      {
+       "word": "trades.",
+       "start": 4284,
+       "end": 4311
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "unique",
+   "from": 4327,
+   "durationInFrames": 502,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "What makes Cascadr different? It trades the second order, not the headline. Its evidence is sourced, not guessed. And every decision is public, including the two thousand times it chose not to trade.",
+     "file": "audio/vo/unique_0.mp3",
+     "startFrame": 4339,
+     "durationFrames": 474,
+     "words": [
+      {
+       "word": "What",
+       "start": 4339,
+       "end": 4347
+      },
+      {
+       "word": "makes",
+       "start": 4349,
+       "end": 4358
+      },
+      {
+       "word": "Cascadr",
+       "start": 4360,
+       "end": 4377
+      },
+      {
+       "word": "different?",
+       "start": 4379,
+       "end": 4396
+      },
+      {
+       "word": "It",
+       "start": 4410,
+       "end": 4414
+      },
+      {
+       "word": "trades",
+       "start": 4415,
+       "end": 4428
+      },
+      {
+       "word": "the",
+       "start": 4429,
+       "end": 4432
+      },
+      {
+       "word": "second",
+       "start": 4434,
+       "end": 4444
+      },
+      {
+       "word": "order,",
+       "start": 4446,
+       "end": 4460
+      },
+      {
+       "word": "not",
+       "start": 4467,
+       "end": 4473
+      },
+      {
+       "word": "the",
+       "start": 4474,
+       "end": 4476
+      },
+      {
+       "word": "headline.",
+       "start": 4478,
+       "end": 4499
+      },
+      {
+       "word": "Its",
+       "start": 4512,
+       "end": 4518
+      },
+      {
+       "word": "evidence",
+       "start": 4520,
+       "end": 4531
+      },
+      {
+       "word": "is",
+       "start": 4532,
+       "end": 4535
+      },
+      {
+       "word": "sourced,",
+       "start": 4537,
+       "end": 4556
+      },
+      {
+       "word": "not",
+       "start": 4566,
+       "end": 4571
+      },
+      {
+       "word": "guessed.",
+       "start": 4573,
+       "end": 4590
+      },
+      {
+       "word": "And",
+       "start": 4606,
+       "end": 4611
+      },
+      {
+       "word": "every",
+       "start": 4613,
+       "end": 4620
+      },
+      {
+       "word": "decision",
+       "start": 4622,
+       "end": 4638
+      },
+      {
+       "word": "is",
+       "start": 4640,
+       "end": 4645
+      },
+      {
+       "word": "public,",
+       "start": 4647,
+       "end": 4665
+      },
+      {
+       "word": "including",
+       "start": 4675,
+       "end": 4691
+      },
+      {
+       "word": "the",
+       "start": 4693,
+       "end": 4695
+      },
+      {
+       "word": "two",
+       "start": 4696,
+       "end": 4702
+      },
+      {
+       "word": "thousand",
+       "start": 4704,
+       "end": 4716
+      },
+      {
+       "word": "times",
+       "start": 4717,
+       "end": 4731
+      },
+      {
+       "word": "it",
+       "start": 4741,
+       "end": 4746
+      },
+      {
+       "word": "chose",
+       "start": 4748,
+       "end": 4764
+      },
+      {
+       "word": "not",
+       "start": 4770,
+       "end": 4780
+      },
+      {
+       "word": "to",
+       "start": 4782,
+       "end": 4787
+      },
+      {
+       "word": "trade.",
+       "start": 4789,
+       "end": 4813
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "close",
+   "from": 4829,
+   "durationInFrames": 270,
+   "lines": [
+    {
+     "voice": "narrator",
+     "text": "Cascadr. Trade the cascade.",
+     "file": "audio/vo/close_0.mp3",
+     "startFrame": 4841,
+     "durationFrames": 81,
+     "words": [
+      {
+       "word": "Cascadr.",
+       "start": 4841,
+       "end": 4869
+      },
+      {
+       "word": "Trade",
+       "start": 4878,
+       "end": 4888
+      },
+      {
+       "word": "the",
+       "start": 4889,
+       "end": 4891
+      },
+      {
+       "word": "cascade.",
+       "start": 4892,
+       "end": 4922
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

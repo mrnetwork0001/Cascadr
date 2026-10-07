@@ -1,0 +1,105 @@
+{
+  "title": "Cascadr: markets price the headline, Cascadr prices the cascade",
+  "model": "eleven_multilingual_v2",
+  "voices": {
+    "narrator": {
+      "name": "Daniel",
+      "id": "onwK4e9ZLuTAKqWW03F9",
+      "settings": { "stability": 0.52, "similarity_boost": 0.8, "style": 0.22, "use_speaker_boost": true }
+    },
+    "anchor": {
+      "name": "Alice",
+      "id": "Xb7hH8MSUJpSbSDYk0k2",
+      "settings": { "stability": 0.62, "similarity_boost": 0.8, "style": 0.18, "use_speaker_boost": true }
+    }
+  },
+  "scenes": [
+    {
+      "id": "open",
+      "seconds": 13,
+      "lines": [
+        { "voice": "anchor", "text": "Breaking news. A magnitude seven point four earthquake has struck Taiwan. TSMC is evacuating staff from its chip plants." },
+        { "voice": "narrator", "text": "April the third, twenty twenty-four. Within minutes, the market had read the headline." }
+      ]
+    },
+    {
+      "id": "problem",
+      "seconds": 17,
+      "lines": [
+        { "voice": "narrator", "text": "But a headline names one company. The damage doesn't stop there." },
+        { "voice": "narrator", "text": "TSMC makes the chips inside NVIDIA, AMD, Apple, Qualcomm and Broadcom. None of them were in the headline." }
+      ]
+    },
+    {
+      "id": "evidence",
+      "seconds": 14,
+      "lines": [
+        { "voice": "narrator", "text": "Across the disruptions we studied, the companies downstream fell behind the chip index by more than three percent over the next five trading days." },
+        { "voice": "narrator", "text": "And about forty percent of the first day's move happened overnight, while American markets were closed." }
+      ]
+    },
+    {
+      "id": "gap",
+      "seconds": 11,
+      "lines": [
+        { "voice": "narrator", "text": "To trade that, you need to know who depends on whom, and by how much. You need to be reading the news at three in the morning. And you need to decide fast, without guessing." }
+      ]
+    },
+    {
+      "id": "turn",
+      "seconds": 7,
+      "lines": [
+        { "voice": "narrator", "text": "Meet Cascadr. Markets price the headline. Cascadr prices the cascade." }
+      ]
+    },
+    {
+      "id": "sense",
+      "seconds": 10,
+      "lines": [
+        { "voice": "narrator", "text": "Cascadr is an autonomous trading agent. Every ten minutes, around the clock, it reads live news on nineteen companies across the chip supply chain." }
+      ]
+    },
+    {
+      "id": "reason",
+      "seconds": 13,
+      "lines": [
+        { "voice": "narrator", "text": "A language model reads each headline like an analyst. Which company is actually hit? How badly, from zero to one? And what would change its mind? Most headlines are noise, and it says so." }
+      ]
+    },
+    {
+      "id": "graph",
+      "seconds": 12,
+      "lines": [
+        { "voice": "narrator", "text": "Then the shock travels through a supply-chain graph built from public sources. Every link carries its evidence: filings, quotes, dates, and how much one company depends on another." }
+      ]
+    },
+    {
+      "id": "decide",
+      "seconds": 13,
+      "lines": [
+        { "voice": "narrator", "text": "The model makes the trade call. For each company in the path, short or pass, how confident it is, the profit target, and how long to hold, with a reason anyone can check." }
+      ]
+    },
+    {
+      "id": "act",
+      "seconds": 14,
+      "lines": [
+        { "voice": "narrator", "text": "A risk engine caps every bet by its root cause, and a hard stop protects each position. Orders go to Bitget's demo exchange through Bitget Agent Hub, and every four hours, the agent reviews its own trades." }
+      ]
+    },
+    {
+      "id": "unique",
+      "seconds": 16,
+      "lines": [
+        { "voice": "narrator", "text": "What makes Cascadr different? It trades the second order, not the headline. Its evidence is sourced, not guessed. And every decision is public, including the two thousand times it chose not to trade." }
+      ]
+    },
+    {
+      "id": "close",
+      "seconds": 9,
+      "lines": [
+        { "voice": "narrator", "text": "Cascadr. Trade the cascade." }
+      ]
+    }
+  ]
+}
