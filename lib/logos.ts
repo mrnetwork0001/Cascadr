@@ -11,6 +11,7 @@
 const IDS = [
   "ASML", "SHIN_ETSU", "TSMC", "SK_HYNIX", "SAMSUNG", "SONY", "CATL",
   "FOXCONN", "PEGATRON", "NVDA", "AAPL", "AMD", "QCOM", "AVGO", "TSLA", "DELL",
+  "GOOGL", "META", "AMZN",
 ] as const;
 
 const HAS_LOGO = new Set<string>(IDS);
