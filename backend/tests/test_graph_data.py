@@ -5,13 +5,18 @@ no hand-guessed weight slips back in.
 """
 
 import json
+import re
 
+from app.graph.repository import index
 from app.graph.seed import EDGES, EDGES_PATH, NODES
 from app.models import Provenance
+from app.traversal import TRADE_THRESHOLD, traverse_contagion
 
 NODE_IDS = {n.id for n in NODES}
 # The published mapping for sourced-but-unquantified relationships.
 QUALITATIVE_BUCKETS = {0.95, 0.70, 0.50, 0.25}
+# Buy AI accelerators from several named suppliers and design their own.
+HYPERSCALERS = {"GOOGL", "META", "AMZN"}
 
 
 def test_every_edge_connects_two_graph_nodes():
@@ -52,6 +57,26 @@ def test_removed_edges_are_not_shipped():
 def test_every_node_has_a_traceable_revenue():
     for n in NODES:
         assert n.revenue_b > 0 and n.revenue_period and n.revenue_source, n.id
+
+
+def test_tickers_are_unique_bitget_bases():
+    # Prices and positions are keyed by ticker; two nodes sharing one would
+    # silently collapse into a single row.
+    tickers = [n.ticker for n in NODES if n.ticker]
+    assert len(tickers) == len(set(tickers))
+    for t in tickers:
+        assert re.fullmatch(r"[A-Z]+", t), t
+
+
+def test_hyperscalers_trade_first_order_only():
+    """No shock carries a contagion score into a hyperscaler over the trade
+    threshold: they trade only when a headline names them. If this fails, a
+    stronger link was added; update the note in app/graph/seed.py."""
+    by_id, down = index(NODES, EDGES)
+    for origin in by_id:
+        for p in traverse_contagion(origin, 1.0, by_id, down):
+            if p.target in HYPERSCALERS:
+                assert p.score < TRADE_THRESHOLD, (origin, p.target, p.score)
 
 
 def test_every_filing_fact_cites_its_filing():

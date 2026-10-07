@@ -1,5 +1,5 @@
 {
- "_about": "Every supply-chain link in the graph, with the evidence behind its dependency figure. Produced by a sourced research pass on 2026-09-24: one researcher per supplier and an independent verifier per link, both reading primary pages. See app/graph/seed.py for the provenance classes and the mapping rule.",
+ "_about": "Every supply-chain link in the graph, with the evidence behind its dependency figure. Produced by a sourced research pass on 2026-09-24: one researcher per supplier and an independent verifier per link, both reading primary pages. See app/graph/seed.py for the provenance classes and the mapping rule. Links into Alphabet, Meta and Amazon were added by a second sourced pass on 2026-10-07, every quote checked against the raw page text.",
  "researched": "2026-09-24",
  "edges": [
   {
@@ -920,6 +920,225 @@
      "publisher": "Apple Inc., Supplier List (fiscal year 2023)",
      "date": "2024-04",
      "quote": "Pegatron Corporation   Jiangsu, Shanghai   China mainland   Tamil Nadu   India"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "NVDA",
+   "target": "GOOGL",
+   "relation": "SUPPLIES",
+   "component": "AI accelerators: GPU systems for Google Cloud (GB200/GB300 NVL72, Vera Rubin NVL72)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "Alphabet's FY2025 10-K says its infrastructure offers 'a range of AI accelerator options, including specialized Graphics Processing Units (GPUs) and our own custom-built Tensor Processing Units (TPUs)'. Google Cloud's own GTC 2026 post names the NVIDIA systems it runs (A4X on GB200 NVL72, A4X Max on GB300 NVL72) and says it plans to offer Vera Rubin NVL72 in the second half of 2026. The other accelerators are Google's TPUs, which Broadcom (8-K, 2026-04-06) and MediaTek (Tom's Hardware, 2026-04-27) design and supply, and Marvell holds a Google agreement for TPU-ecosystem inference accelerators (8-K, 2026-08-19). No filing or outlet gives NVIDIA's share of Google's accelerators. NVIDIA is one of several named suppliers, which the rule maps to 0.25.",
+   "as_of": "2026 (Alphabet FY2025 10-K filed 2026-02-05; Google Cloud post 2026-03-17)",
+   "confidence": "medium",
+   "notes": "Scope: Google's AI accelerator supply, of which NVIDIA supplies the GPUs. The 10-K names GPUs but not the vendor; NVIDIA is named in Google Cloud's own post. No public figure splits Google's accelerator spend between TPUs and NVIDIA GPUs, so the rule weight cannot be refined in either direction. 'Primary' is not supported by any wording found. Quotes were read from the raw page text (SEC EDGAR, cloud.google.com).",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+     "publisher": "Alphabet Inc., Form 10-K FY2025 (SEC EDGAR)",
+     "date": "2026-02-05",
+     "quote": "Our technical infrastructure allows us to use and offer our customers a range of AI accelerator options, including specialized Graphics Processing Units (GPUs) and our own custom-built Tensor Processing Units (TPUs), such as Ironwood, our seventh-generation TPU."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+     "publisher": "Alphabet Inc., Form 10-K FY2025 (SEC EDGAR), risk factors",
+     "date": "2026-02-05",
+     "quote": "Additionally, manufacturing and supply of servers and network equipment for our technical infrastructure, particularly for specialized AI chips, is limited to a small number of qualified suppliers."
+    },
+    {
+     "url": "https://cloud.google.com/blog/products/compute/google-cloud-ai-infrastructure-at-nvidia-gtc-2026",
+     "publisher": "Google Cloud blog (Mark Lohmeyer, VP and GM, AI and Computing Infrastructure)",
+     "date": "2026-03-17",
+     "quote": "We plan to be among the first cloud providers to offer NVIDIA Vera Rubin NVL72 rack-scale systems in the second half of 2026, integrating them into our AI Hypercomputer architecture to empower the next generation of reasoning and agentic AI."
+    },
+    {
+     "url": "https://cloud.google.com/blog/products/compute/google-cloud-ai-infrastructure-at-nvidia-gtc-2026",
+     "publisher": "Google Cloud blog (Mark Lohmeyer, VP and GM, AI and Computing Infrastructure)",
+     "date": "2026-03-17",
+     "quote": "We are also enhancing resource obtainability through the Dynamic Workload Scheduler, with Calendar Mode and Flex Start for A4X and A4X Max (powered by NVIDIA GB300 NVL72), as well as new Flex Start support for G4 VMs."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526144028/d87999d8k.htm",
+     "publisher": "Broadcom Inc., Form 8-K Item 8.01 (SEC EDGAR)",
+     "date": "2026-04-06",
+     "quote": "Broadcom Inc. (“Broadcom”) and Google LLC (“Google”) have entered into a Long Term Agreement for Broadcom to develop and supply custom Tensor Processing Units (“TPUs”) for Google’s future generations of TPUs"
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "AVGO",
+   "target": "GOOGL",
+   "relation": "SUPPLIES",
+   "component": "AI accelerators: custom TPUs (design and supply; TPU 8t) and networking for Google's AI racks",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "Broadcom's 8-K of 2026-04-06 discloses a Long Term Agreement 'for Broadcom to develop and supply custom Tensor Processing Units' for Google's future TPU generations, and a Supply Assurance Agreement for networking and other components for Google's next-generation AI racks through up to 2031. It gives no share. Broadcom is not Google's only accelerator source: Tom's Hardware reports MediaTek joined Broadcom as a TPU design partner for the eighth generation (Broadcom designs the 8t training chip, MediaTek the 8i inference chip), 'ending Broadcom’s exclusive role in TPU development since 2015'; Marvell's 8-K of 2026-08-19 discloses a Google agreement for custom silicon attached to the TPU ecosystem, including AI inference accelerators; and Google also buys NVIDIA GPUs (Alphabet FY2025 10-K, Google Cloud). Broadcom is one of several named suppliers of Google's AI accelerators, which the rule maps to 0.25.",
+   "as_of": "2026 (Broadcom 8-K 2026-04-06; TPU 8 program as reported 2026-04-27; Marvell 8-K 2026-08-19)",
+   "confidence": "high",
+   "notes": "Scope: Google's AI accelerator supply, of which Broadcom designs and supplies the TPU 8t line and supplies AI-rack networking. Narrowed to TPU silicon design alone, Tom's Hardware's 'Two suppliers instead of one' would map to one of two (0.50); the edge is scoped to all of Google's accelerators, like the NVIDIA -> Google edge, and Marvell's TPU-ecosystem agreement adds a third custom-silicon supplier, so the conservative bucket is used. The Anthropic part of the same 8-K is compute capacity Anthropic accesses through Broadcom, not a supply link to Google, and was not used. HBM for Google's TPUs is reported to ship through Broadcom (TrendForce citing Hankyung, 2025-12-01: Samsung 'provides more than 60% of Google’s HBM shipments in 2025 through Broadcom'), so memory makers are not linked to Google directly. Quotes were read from the raw page text (SEC EDGAR, tomshardware.com).",
+   "sources": [
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526144028/d87999d8k.htm",
+     "publisher": "Broadcom Inc., Form 8-K Item 8.01 (SEC EDGAR)",
+     "date": "2026-04-06",
+     "quote": "Broadcom Inc. (“Broadcom”) and Google LLC (“Google”) have entered into a Long Term Agreement for Broadcom to develop and supply custom Tensor Processing Units (“TPUs”) for Google’s future generations of TPUs and a Supply Assurance Agreement for Broadcom to supply networking and other components to be used in Google’s next-generation AI racks through up to 2031."
+    },
+    {
+     "url": "https://www.tomshardware.com/tech-industry/semiconductors/google-splits-its-tpu-into-two-chips-for-the-first-time-with-training-and-inference-variants",
+     "publisher": "Tom's Hardware (Luke James)",
+     "date": "2026-04-27",
+     "quote": "The split also extends to the supply chain, with MediaTek having joined Broadcom as a silicon design partner for the eighth-gen program back in December, ending Broadcom’s exclusive role in TPU development since 2015."
+    },
+    {
+     "url": "https://www.tomshardware.com/tech-industry/semiconductors/google-splits-its-tpu-into-two-chips-for-the-first-time-with-training-and-inference-variants",
+     "publisher": "Tom's Hardware (Luke James)",
+     "date": "2026-04-27",
+     "quote": "The MediaTek partnership means that there’s a second silicon design house in the TPU program alongside Broadcom, with MediaTek understood to be handling the design of the TPU 8i inference chip while Broadcom handles the design of the 8t training chip."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1835632/000119312526356217/d412696d8k.htm",
+     "publisher": "Marvell Technology, Inc., Form 8-K Item 1.01 (SEC EDGAR)",
+     "date": "2026-08-19",
+     "quote": "The expanded partnership spans a comprehensive range of custom silicon programs that attach to the TPU ecosystem, including AI inference accelerators, storage controllers, network interface controllers, memory interface controllers, and near-memory compute."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+     "publisher": "Alphabet Inc., Form 10-K FY2025 (SEC EDGAR)",
+     "date": "2026-02-05",
+     "quote": "Our technical infrastructure allows us to use and offer our customers a range of AI accelerator options, including specialized Graphics Processing Units (GPUs) and our own custom-built Tensor Processing Units (TPUs), such as Ironwood, our seventh-generation TPU."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "NVDA",
+   "target": "META",
+   "relation": "SUPPLIES",
+   "component": "AI accelerators: Blackwell and Rubin GPUs (GB300 systems), plus Grace/Vera CPUs and Spectrum-X networking",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "NVIDIA's release of 2026-02-17 announces a multiyear, multigenerational partnership that 'will enable the large-scale deployment of NVIDIA CPUs and millions of NVIDIA Blackwell and Rubin GPUs' at Meta. It gives no share. Meta buys accelerators from several named suppliers: on 2026-02-24 AMD and Meta announced a multi-generation agreement for up to 6 gigawatts of AMD Instinct GPUs, which Mark Zuckerberg called a step 'as we diversify our compute', and on 2026-04-14 Meta announced it is co-developing multiple generations of its MTIA accelerator with Broadcom, saying it takes 'a portfolio approach to AI silicon'. NVIDIA is one of several named suppliers, which the rule maps to 0.25.",
+   "as_of": "2026 (NVIDIA release 2026-02-17; AMD release 2026-02-24; Meta release 2026-04-14)",
+   "confidence": "medium",
+   "notes": "Scope: Meta's AI accelerator supply, of which NVIDIA supplies the GPUs. Meta's FY2025 10-K does not name its chip suppliers. No filing or outlet publishes NVIDIA's share of Meta's accelerators, so the rule weight may understate or overstate it; 'primary' is not supported by any wording found, and Meta's own words ('diversify', 'portfolio') point the other way. Quotes were read from the raw page text (nvidianews.nvidia.com, ir.amd.com, about.fb.com).",
+   "sources": [
+    {
+     "url": "https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia",
+     "publisher": "NVIDIA Newsroom (press release)",
+     "date": "2026-02-17",
+     "quote": "This partnership will enable the large-scale deployment of NVIDIA CPUs and millions of NVIDIA Blackwell and Rubin GPUs, as well as the integration of NVIDIA Spectrum-X™ Ethernet switches for Meta’s Facebook Open Switching System platform."
+    },
+    {
+     "url": "https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia",
+     "publisher": "NVIDIA Newsroom (press release)",
+     "date": "2026-02-17",
+     "quote": "Meta will deploy industry-leading NVIDIA GB300-based systems and create a unified architecture that spans on-premises data centers and NVIDIA Cloud Partner deployments"
+    },
+    {
+     "url": "https://ir.amd.com/news-events/press-releases/detail/1279/amd-and-meta-announce-expanded-strategic-partnership-to-deploy-6-gigawatts-of-amd-gpus",
+     "publisher": "AMD Investor Relations (press release)",
+     "date": "2026-02-24",
+     "quote": "AMD (NASDAQ: AMD) and Meta today announced a 6-gigawatt agreement to power Meta’s next generation of AI infrastructure across multiple generations of AMD Instinct GPUs."
+    },
+    {
+     "url": "https://ir.amd.com/news-events/press-releases/detail/1279/amd-and-meta-announce-expanded-strategic-partnership-to-deploy-6-gigawatts-of-amd-gpus",
+     "publisher": "AMD Investor Relations (press release, quoting Mark Zuckerberg)",
+     "date": "2026-02-24",
+     "quote": "This is an important step for Meta as we diversify our compute."
+    },
+    {
+     "url": "https://about.fb.com/news/2026/04/meta-partners-with-broadcom-to-co-develop-custom-ai-silicon/",
+     "publisher": "Meta Newsroom",
+     "date": "2026-04-14",
+     "quote": "At Meta, we take a portfolio approach to AI silicon, matching the right accelerator to each workload to achieve the best mix of performance and total cost of ownership."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "AVGO",
+   "target": "META",
+   "relation": "SUPPLIES",
+   "component": "AI accelerators: MTIA custom silicon (co-design, advanced packaging) and Ethernet networking",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "Meta's release of 2026-04-14 says it is partnering with Broadcom to co-develop multiple generations of MTIA, its custom accelerator, that 'Broadcom will work with us across chip design, advanced packaging, and networking', and that the agreement 'includes a commitment that exceeds 1GW'. It gives no share and does not call Broadcom the sole partner. MTIA is one of several accelerator lines Meta buys: millions of NVIDIA Blackwell and Rubin GPUs (NVIDIA, 2026-02-17) and up to 6 gigawatts of AMD Instinct GPUs (AMD, 2026-02-24), under what Meta calls 'a portfolio approach to AI silicon'. Broadcom is one of several named suppliers of Meta's AI accelerators, which the rule maps to 0.25.",
+   "as_of": "2026 (Meta release 2026-04-14)",
+   "confidence": "high",
+   "notes": "Scope: Meta's AI accelerator supply, of which Broadcom co-develops the MTIA line and supplies networking. Narrowed to MTIA alone, Broadcom is the only partner Meta names, but Meta does not say sole or exclusive, so the sole bucket is not used. Broadcom's own release of the same day (investors.broadcom.com, GlobeNewswire) could not be fetched (HTTP 403 / timeout) and is not relied on. Quotes were read from the raw page text (about.fb.com, nvidianews.nvidia.com, ir.amd.com).",
+   "sources": [
+    {
+     "url": "https://about.fb.com/news/2026/04/meta-partners-with-broadcom-to-co-develop-custom-ai-silicon/",
+     "publisher": "Meta Newsroom",
+     "date": "2026-04-14",
+     "quote": "Broadcom will work with us across chip design, advanced packaging, and networking to help build out the massive computing foundation we need to deliver real-time AI experiences to billions of people."
+    },
+    {
+     "url": "https://about.fb.com/news/2026/04/meta-partners-with-broadcom-to-co-develop-custom-ai-silicon/",
+     "publisher": "Meta Newsroom",
+     "date": "2026-04-14",
+     "quote": "The agreement includes a commitment that exceeds 1GW, which is the first phase of a sustained, multi-gigawatt rollout"
+    },
+    {
+     "url": "https://about.fb.com/news/2026/04/meta-partners-with-broadcom-to-co-develop-custom-ai-silicon/",
+     "publisher": "Meta Newsroom",
+     "date": "2026-04-14",
+     "quote": "At Meta, we take a portfolio approach to AI silicon, matching the right accelerator to each workload to achieve the best mix of performance and total cost of ownership."
+    },
+    {
+     "url": "https://nvidianews.nvidia.com/news/meta-builds-ai-infrastructure-with-nvidia",
+     "publisher": "NVIDIA Newsroom (press release)",
+     "date": "2026-02-17",
+     "quote": "This partnership will enable the large-scale deployment of NVIDIA CPUs and millions of NVIDIA Blackwell and Rubin GPUs"
+    },
+    {
+     "url": "https://ir.amd.com/news-events/press-releases/detail/1279/amd-and-meta-announce-expanded-strategic-partnership-to-deploy-6-gigawatts-of-amd-gpus",
+     "publisher": "AMD Investor Relations (press release)",
+     "date": "2026-02-24",
+     "quote": "AMD (NASDAQ: AMD) and Meta today announced a 6-gigawatt agreement to power Meta’s next generation of AI infrastructure across multiple generations of AMD Instinct GPUs."
+    }
+   ],
+   "counter_evidence": []
+  },
+  {
+   "source": "NVDA",
+   "target": "AMZN",
+   "relation": "SUPPLIES",
+   "component": "AI accelerators: GPUs for AWS (Blackwell Ultra, Rubin, Rubin Ultra)",
+   "dependency": 0.25,
+   "provenance": "QUALITATIVE",
+   "basis": "AWS and NVIDIA announced on 2026-08-26 that AWS will deploy 'an additional 2 million NVIDIA Blackwell Ultra, Rubin and Rubin Ultra GPUs in 2027-2028', on top of the 'more than 1 million NVIDIA GPUs' announced at GTC 2026. Amazon's Q2 2026 10-Q says it relies 'on a limited group of suppliers for semiconductor products, including products related to artificial intelligence infrastructure such as graphics processing units'. AWS also builds its own accelerator, Trainium (Trainium3 generally available 2025-12-02). No filing or outlet gives NVIDIA's share of AWS's accelerators. NVIDIA is one of several sources, which the rule maps to 0.25.",
+   "as_of": "2026 (AWS/NVIDIA release 2026-08-26; Amazon 10-Q filed 2026-07-31)",
+   "confidence": "medium",
+   "notes": "Scope: Amazon's AI accelerator supply, of which NVIDIA supplies the GPUs. The 10-Q names GPUs and 'a limited group of suppliers' but not NVIDIA; NVIDIA is named in the joint release. Trainium is AWS's own chip rather than an outside supplier's, so the alternative reading 'one of two sources' (0.50) was considered and not used: the 10-Q's 'limited group of suppliers' points to more than two, so one of several is used. No public figure refines the weight in either direction. Quotes were read from the raw page text (SEC EDGAR, nvidianews.nvidia.com, press.aboutamazon.com).",
+   "sources": [
+    {
+     "url": "https://nvidianews.nvidia.com/news/aws-and-nvidia-to-deliver-2-million-additional-gpus-and-next-generation-infrastructure-for-agentic-and-physical-ai",
+     "publisher": "NVIDIA Newsroom (joint AWS/NVIDIA press release)",
+     "date": "2026-08-26",
+     "quote": "AWS plans to deploy an additional 2 million NVIDIA Blackwell Ultra, Rubin and Rubin Ultra GPUs in 2027-2028 across AWS Global Infrastructure, including AI factories."
+    },
+    {
+     "url": "https://nvidianews.nvidia.com/news/aws-and-nvidia-to-deliver-2-million-additional-gpus-and-next-generation-infrastructure-for-agentic-and-physical-ai",
+     "publisher": "NVIDIA Newsroom (joint AWS/NVIDIA press release)",
+     "date": "2026-08-26",
+     "quote": "At NVIDIA GTC 2026, AWS announced plans to add more than 1 million NVIDIA GPUs starting in 2026."
+    },
+    {
+     "url": "https://www.sec.gov/Archives/edgar/data/1018724/000101872426000026/amzn-20260630.htm",
+     "publisher": "Amazon.com, Inc., Form 10-Q Q2 2026 (SEC EDGAR), risk factors",
+     "date": "2026-07-31",
+     "quote": "For example, we rely on a limited group of suppliers for semiconductor products, including products related to artificial intelligence infrastructure such as graphics processing units."
+    },
+    {
+     "url": "https://press.aboutamazon.com/2025/12/trainium3-ultraservers-now-available-enabling-customers-to-train-and-deploy-ai-models-faster-at-lower-cost",
+     "publisher": "Amazon Press Center (Business Wire)",
+     "date": "2025-12-02",
+     "quote": "At AWS re:Invent, Amazon Web Services, Inc. (AWS), an Amazon.com, Inc. company (NASDAQ: AMZN), today announced the general availability of Trainium3 UltraServers powered by the new Trainium3 chip."
     }
    ],
    "counter_evidence": []

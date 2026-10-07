@@ -1,6 +1,6 @@
 """The supply-chain graph the agent reasons over.
 
-Nodes are 16 companies in the electronics supply chain. Node size is the
+Nodes are 19 companies in the electronics supply chain. Node size is the
 latest full fiscal year's revenue from the company's income statement, as
 served by Yahoo Finance, converted to USD at the exchange rate on the fiscal
 year-end date.
@@ -10,7 +10,14 @@ figure: the sources (URL, publisher, date and a quote that appears on the
 page), the reasoning from sources to number, the period it describes, a
 confidence grade, caveats and any counter-evidence. They came from a research
 pass on 2026-09-24 in which each supplier's links were researched from primary
-pages and then independently re-checked.
+pages and then independently re-checked. The links into Alphabet, Meta and
+Amazon were added on 2026-10-07 from primary pages, each quote checked
+against the raw page text, without a second independent verifier. Each of
+those three buys AI accelerators from several named suppliers and designs its
+own, so every link into them is scoped to the company's AI accelerator supply
+and weighted "one of several" (0.25). One hop at 0.25 stays below the trade
+threshold, so they are traded when a headline shocks them directly, not
+through contagion.
 
 Provenance classes (weakest wins along a path, see app.traversal):
 
@@ -30,7 +37,12 @@ company, so they are no longer in the graph.
 
 Tickers are underlying equities, which on Bitget trade as stock perpetual
 futures (f"{ticker}USDT") and can therefore be shorted. Tokenized xStocks
-(AAPLx, NVDAx) are spot-only and deliberately not referenced.
+(AAPLx, NVDAx) are spot-only and deliberately not referenced. Two tickers are
+the base Bitget lists rather than a home-market code: SAMSUNG (SAMSUNGUSDT
+tracks one Samsung Electronics common share, 005930.KS, in USD) and SKHY (SK
+hynix's Nasdaq ADS, listed July 2026; one ADS is a tenth of a 000660.KS
+share). Both were checked on 2026-10-07 against Bitget's live contract list
+and its demo exchange's instrument list.
 """
 
 import json
@@ -76,9 +88,9 @@ NODES: list[GraphNode] = [
     _node("TSMC", "Taiwan Semiconductor", Tier.SUPPLIER, "TW", 121.91, "2025-12-31", "2330.TW",
           "TWD 3,809.1B at 0.0320066 USD/TWD on 2025-12-31", ticker="TSM"),
     _node("SK_HYNIX", "SK Hynix", Tier.SUPPLIER, "KR", 67.56, "2025-12-31", "000660.KS",
-          "KRW 97,146.7B at 0.000695454 USD/KRW on 2025-12-31"),
+          "KRW 97,146.7B at 0.000695454 USD/KRW on 2025-12-31", ticker="SKHY"),
     _node("SAMSUNG", "Samsung Electronics", Tier.SUPPLIER, "KR", 232.01, "2025-12-31", "005930.KS",
-          "KRW 333,605.9B at 0.000695454 USD/KRW on 2025-12-31"),
+          "KRW 333,605.9B at 0.000695454 USD/KRW on 2025-12-31", ticker="SAMSUNG"),
     # The whole group: SONY is Sony Group's listing, and the image sensors
     # Apple buys come from its semiconductor segment.
     _node("SONY", "Sony Group", Tier.SUPPLIER, "JP", 78.08, "2026-03-31", "SONY",
@@ -100,6 +112,10 @@ NODES: list[GraphNode] = [
     _node("AVGO", "Broadcom", Tier.BRAND, "US", 63.89, "2025-11-02", "AVGO", ticker="AVGO"),
     _node("TSLA", "Tesla", Tier.BRAND, "US", 94.83, "2025-12-31", "TSLA", ticker="TSLA"),
     _node("DELL", "Dell Technologies", Tier.BRAND, "US", 113.54, "2026-01-30", "DELL", ticker="DELL"),
+    # Hyperscalers: end buyers of AI accelerators.
+    _node("GOOGL", "Alphabet", Tier.BRAND, "US", 402.84, "2025-12-31", "GOOGL", ticker="GOOGL"),
+    _node("META", "Meta Platforms", Tier.BRAND, "US", 200.97, "2025-12-31", "META", ticker="META"),
+    _node("AMZN", "Amazon", Tier.BRAND, "US", 716.92, "2025-12-31", "AMZN", ticker="AMZN"),
 ]
 
 EDGES_PATH = Path(__file__).parent / "data" / "edges.json"

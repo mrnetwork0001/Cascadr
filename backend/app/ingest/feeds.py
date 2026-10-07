@@ -55,6 +55,24 @@ MIGRATIONS = [
 _PUBLISHER = re.compile(r"\s+-\s+[^-]{2,40}$")
 _TAG = re.compile(r"<[^>]+>")
 
+# Names headlines use for a company that its graph name does not cover, by
+# node id, matched as whole words. They replace the default first-word match
+# for that node: "meta" as a substring would let "metals" and "Metaplanet"
+# through, and "SK" is too short to match at all. Each alias widens what
+# reaches the LLM, so only names headlines actually use belong here.
+HEADLINE_ALIASES: dict[str, tuple[str, ...]] = {
+    "SK_HYNIX": ("hynix",),
+    "GOOGL": ("alphabet", "google"),
+    "META": ("meta",),
+    "AMZN": ("amazon", "aws"),
+}
+
+# Google News queries beyond the node's own name, for a company whose news
+# mostly runs under another one. Each costs a request per poll.
+EXTRA_QUERIES: dict[str, tuple[str, ...]] = {
+    "GOOGL": ("Google",),
+}
+
 
 @dataclass
 class Headline:
@@ -207,6 +225,9 @@ class FeedReader:
         """
         # Query by name, not id: "SK_HYNIX" is not a phrase anyone writes.
         queries = {n.name.split(" (")[0]: n for n in nodes}
+        for n in nodes:
+            for q in EXTRA_QUERIES.get(n.id, ()):
+                queries.setdefault(q, n)
         fresh: list[Headline] = []
         seen_this_round: set[str] = set()
         self.stats["last_poll_errors"] = 0
@@ -236,9 +257,14 @@ def mentions_graph_entity(title: str, nodes: list[GraphNode]) -> bool:
     chatter never costs a token."""
     text = title.lower()
     for n in nodes:
-        first = n.name.split()[0].lower()
-        if len(first) >= 4 and first in text:
-            return True
+        aliases = HEADLINE_ALIASES.get(n.id)
+        if aliases:
+            if any(re.search(rf"\b{re.escape(a)}\b", text) for a in aliases):
+                return True
+        else:
+            first = n.name.split()[0].lower()
+            if len(first) >= 4 and first in text:
+                return True
         if n.ticker and re.search(rf"\b{n.ticker.lower()}\b", text):
             return True
     return False
