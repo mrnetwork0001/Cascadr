@@ -140,3 +140,60 @@ async def test_keyword_fallback_is_never_traded(tmp_path, llm_configured):
         assert rows == [] and seen == []  # retried with the LLM next cycle
     else:
         assert rows[0]["action"] == "DECLINED" and seen == [h.title]
+
+
+class _Verdict:
+    engine, model, severity, confidence = "llm", "m", "HIGH", 0.8
+    reasoning, uncertainty, provenance = "r", "u", {}
+
+    def __init__(self, entities, shock):
+        self.entities, self.shock = entities, shock
+
+
+class _Oracle:
+    def __init__(self, verdict):
+        self.verdict, self.calls = verdict, []
+
+    async def analyse(self, title, nodes):
+        self.calls.append(title)
+        return self.verdict
+
+
+def replay_agent(tmp_path, verdict):
+    executed = []
+
+    async def execute(exposures, headline, source):
+        executed.append((headline, source))
+        return {"opened": [{"position": None}], "skipped": []}
+
+    conn = sqlite3.connect(tmp_path / "a.db", check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    a = AutonomousAgent(conn=conn, feeds=_Stub(), oracle=_Oracle(verdict),
+                        repo=MemoryGraphRepository(), execute_fn=execute)
+    conn.execute(
+        "INSERT INTO agent_decisions (at, headline, source, url, published, action, entities, shock) "
+        "VALUES ('2026-10-05T07:32:00+00:00', 'Apple recall', 'Macworld', 'https://x/1', "
+        "'2026-10-05T07:22:00+00:00', 'DECLINED', 'AAPL', 0.42)")
+    conn.commit()
+    return a, executed
+
+
+@pytest.mark.asyncio
+async def test_a_replay_reruns_a_recorded_headline_as_manual(tmp_path):
+    a, executed = replay_agent(tmp_path, _Verdict(["AAPL"], 0.4))
+    r = await a.replay(1)
+    assert r["action"] == "TRADED" and "operator replay of #1" in r["detail"]
+    assert executed == [("Apple recall", "manual")]
+    new = (await a.decisions(1))[0]
+    assert new["source"] == "Operator replay (Macworld)"
+    assert new["url"] == "https://x/1" and new["published"].startswith("2026-10-05T07:22")
+    # A replay of a replay is refused: the record names one original.
+    assert "error" in await a.replay(new["id"])
+    assert "error" in await a.replay(999)
+
+
+@pytest.mark.asyncio
+async def test_a_replay_still_respects_the_floor(tmp_path):
+    a, executed = replay_agent(tmp_path, _Verdict(["AAPL"], 0.1))
+    r = await a.replay(1)
+    assert r["action"] == "DECLINED" and executed == []

@@ -109,7 +109,7 @@ class AutonomousAgent:
         oracle: NewsOracle,
         repo,
         execute_fn: ExecuteFn,
-        shock_floor: float = 0.30,
+        shock_floor: float = 0.25,
         max_llm_calls_per_hour: int = 60,
     ):
         self._conn = conn
@@ -315,6 +315,56 @@ class AutonomousAgent:
         return len(rows)
 
     # -- the loop ----------------------------------------------------------
+
+    async def replay(self, decision_id: int) -> dict:
+        """Re-run one recorded headline through the whole agent, as an
+        operator action: LLM -> graph -> risk -> venue.
+
+        Only a headline the agent itself collected can be replayed, never free
+        text, so nothing invented reaches the record. The new decision is
+        logged with its source marked as an operator replay and the original
+        link and publish time; any position it opens has source="manual".
+        """
+        rows = await self.decisions(limit=1, before_id=decision_id + 1)
+        if not rows or rows[0]["id"] != decision_id:
+            return {"error": f"no decision #{decision_id}"}
+        orig = rows[0]
+        if str(orig.get("source") or "").startswith("Operator replay"):
+            return {"error": "that decision is itself a replay; replay the original"}
+        published = orig.get("published")
+        h = Headline(
+            title=orig["headline"],
+            source=f"Operator replay ({orig.get('source') or 'unknown'})",
+            url=orig.get("url") or "",
+            published=datetime.fromisoformat(published) if published else None,
+        )
+        nodes = await self._repo.nodes()
+        self._llm_calls.append(datetime.now(UTC))
+        verdict = await self._oracle.analyse(h.title, nodes)
+        if verdict.engine != "llm":
+            return {"error": "LLM unavailable; a replay needs its judgement"}
+
+        exposures = await self.exposures_for(verdict.entities, verdict.shock)
+        prefix = f"operator replay of #{decision_id}"
+        result: dict = {"opened": [], "skipped": []}
+        if not verdict.entities:
+            action, detail = DECLINED, f"{prefix}: no graph entity resolved"
+        elif verdict.shock < self.shock_floor:
+            action, detail = DECLINED, (
+                f"{prefix}: shock {verdict.shock:.2f} below floor {self.shock_floor:.2f}")
+        else:
+            try:
+                result = await self._execute(exposures, h.title, "manual")
+            except Exception as exc:
+                result = {"opened": [], "skipped": [], "error": f"{type(exc).__name__}: {exc}"}
+            if result.get("error"):
+                action, detail = EXECUTION_FAILED, f"{prefix}: {result['error'][:300]}"
+            else:
+                action, detail = outcome(result.get("opened", []), result.get("skipped", []))
+                detail = f"{prefix}: {detail}"
+        await self._record(h, verdict, action, detail, exposures)
+        return {"replayed": decision_id, "action": action, "detail": detail,
+                "verdict": verdict, "exposures": exposures, "execution": result}
 
     async def cycle(self, execute: bool = True) -> dict:
         """One sense-reason-act pass."""

@@ -618,6 +618,10 @@ class HeadlineRequest(BaseModel):
     execute: bool = False
 
 
+class ReplayRequest(BaseModel):
+    decision_id: int
+
+
 class ShockRequest(BaseModel):
     origin: str
     shock: float
@@ -784,6 +788,17 @@ async def execute(req: ShockRequest):
     exposures = await state["agent"].exposures_for([req.origin], req.shock)
     result = await _execute(exposures, req.headline, "manual")
     return {"exposures": exposures, **result}
+
+
+@app.post("/agent/replay", dependencies=ADMIN)
+async def agent_replay(req: ReplayRequest):
+    """Re-run one real headline from the decision log through the agent
+    (LLM -> graph -> risk -> venue). Never free text; logged as an operator
+    replay, and positions it opens are source="manual"."""
+    result = await state["agent"].replay(req.decision_id)
+    if "error" in result:
+        raise HTTPException(400, result["error"])
+    return result
 
 
 @app.post("/agent/cycle", dependencies=ADMIN)
