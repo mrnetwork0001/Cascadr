@@ -42,20 +42,21 @@ Bitget's stock perpetuals make this tradeable: they can be shorted, and they tra
 
 ## How the agent works
 
-One loop runs on the server every 10 minutes, whether or not anyone is watching. A second loop checks exits every minute.
+One loop runs on the server every 10 minutes, whether or not anyone is watching. A second loop checks exits every minute, and a third has the LLM review every open position's thesis every 4 hours.
 
 ```
-  SENSE            REASON              PROPAGATE                 ACT                     EXIT
-  Google News  ->  LLM oracle      ->  supply-chain graph    ->  risk engine         ->  every 60 s:
-  RSS, one         (0G Private         3-hop traversal:          sizing, caps,            stop-loss,
-  query per        Computer):          score = shock x           drawdown halt,           take-profit,
-  company;         disrupted           prod(dependency)          then a short order       7-day time stop
-  dedupe,          company, shock      x 0.62^hops               on Bitget's demo
-  freshness,       0-1, reasoning,                               exchange
-  keyword filter   uncertainty
+  SENSE          REASON            PROPAGATE             DECIDE                  ACT              EXIT
+  Google News -> LLM oracle     -> supply-chain graph -> LLM trade call      -> risk engine -> every 60 s: hard
+  RSS, one       (0G Private       3-hop traversal:      per candidate:          caps, drawdown   stop, target,
+  query per      Computer):        score = shock x       short or pass,          halt, then a     time stop;
+  company;       disrupted         prod(dependency)      conviction (= size),    short order on   every 4 h: the
+  dedupe,        company, shock    x 0.62^hops           take-profit, hold       Bitget's demo    LLM reviews the
+  freshness,     0-1, reasoning,   -> candidate shorts   hours, written reason   exchange         thesis, may close
+  keyword filter uncertainty
 
-  shock < 0.25 ............ declined (recorded)
-  exposure < 0.18 ......... not traded (recorded)
+  shock < 0.25 ............ not sent for a trade decision (recorded)
+  exposure < 0.18 ......... not a candidate (recorded)
+  LLM passes .............. not traded (recorded, with its reason)
 ```
 
 | Stage | What happens |
@@ -63,8 +64,9 @@ One loop runs on the server every 10 minutes, whether or not anyone is watching.
 | **Sense** | Pulls headlines for each of the 16 companies. Already-seen and stale (> 6 h) stories are skipped, and a free keyword filter drops stories that name no graph company before any model is called. |
 | **Reason** | The LLM names the directly disrupted company (checked against the graph, never trusted), scores the shock from 0 to 1, and states its reasoning and what would change its mind. Below a shock of **0.25** the headline is declined. |
 | **Propagate** | A breadth-first walk of the graph, up to 3 hops. Each hop multiplies by that link's sourced dependency and decays by 0.62, so direct customers are hit hardest. The strongest path per company wins. |
-| **Act** | Downstream exposures of at least **0.18**, and the directly hit company itself when its shock is at least **0.25** (first-order), become short orders on Bitget's demo exchange - if Bitget lists the company - sized to the account and vetted by the risk engine first. |
-| **Exit** | Every open position is marked at Bitget's mark price each minute and closed by stop-loss, take-profit (the model's own implied move) or a 7-day time stop. |
+| **Decide** | Downstream exposures of at least **0.18**, and the directly hit company itself when its shock is at least **0.25**, become candidate shorts - if Bitget's demo exchange lists the company. The LLM receives them with the evidence path behind each, live prices and 24-hour moves, and the current book, and decides per candidate: short or pass, conviction (which sets the size, 10–50% of the account), take-profit (1–10%) and holding period (24–168 h), with a written reason. If the model cannot be reached, nothing trades. |
+| **Act** | The risk engine vets each order (caps per root cause, per headline and per symbol, plus a drawdown halt) and it is placed on Bitget's demo exchange. |
+| **Exit** | Every open position is marked at Bitget's mark price each minute and closed by its hard 6% stop-loss, the LLM's take-profit or its holding period. Every 4 hours the LLM also reviews each open thesis against the news since entry and closes positions whose thesis no longer holds. |
 
 ## Verify it yourself
 
@@ -124,14 +126,14 @@ Three of the six originally listed events failed verification and were dropped (
 
 [`backend/research/calibrate.py`](backend/research/calibrate.py) scores real headlines from each verified event with the live LLM and replays them through the graph. Over 8 calls per event, real disruptions scored **0.45–0.65**; the 1,466 live headlines the LLM scored from 2026-09-24 to 10-04 peaked at **0.33**.
 
-- **Shock floor 0.25.** Calibration put it at 0.40, between the two. In 13 days of live news only one headline cleared 0.40, so on 2026-10-07 it was lowered to 0.25 for the hackathon window. This is a deliberate trade-off: company-specific bad news (0.25–0.33, such as Apple's iPhone cellular defect or Tesla's falling quarterly sales) now trades too, so some trades are on news that is not a supply-chain disruption. Every one is in the decision log with the LLM's reasoning.
+- **Shock floor 0.25 - which headlines get a trade decision.** When fixed rules turned exposures into orders, the floor alone had to separate disruption from noise, so calibration put it at 0.40, between the two; in 13 days of live news only one headline cleared it. Since 2026-10-07 the LLM makes the trade call itself, so the floor no longer decides trades: it decides which headlines are worth a trade decision. At 0.25 that includes company-specific bad news (0.25–0.33, such as Apple's iPhone cellular defect or Tesla's falling quarterly sales), and the LLM can pass on any of it, with its reason recorded.
 - **Trade threshold 0.18** trades the Hualien-earthquake and Foxconn-lockdown names on every call. The previous 0.32 dated from guessed graph weights and would have traded none of them.
 
 [`tests/test_calibration.py`](backend/tests/test_calibration.py) pins this: if the graph or thresholds change, it says whether the agent would still trade the events its own research supports.
 
 ## Operator replays
 
-On 2026-10-07, with no trade yet in the paper record, the operator replayed three real headlines from the previous week through the agent with `POST /agent/replay`. A replay takes only a headline the agent itself collected (never free text), sends it to the LLM again, and runs the result through the graph, the risk engine and Bitget's demo exchange like any other decision. The LLM still decides:
+On 2026-10-07, with no trade yet in the paper record, the operator replayed three real headlines from the previous week through the agent with `POST /agent/replay`. These replays ran a few hours before the LLM took over the trade call, so their size and exits came from the earlier score-based rules. A replay takes only a headline the agent itself collected (never free text), sends it to the LLM again, and runs the result through the graph, the risk engine and Bitget's demo exchange like any other decision. The LLM still decides:
 
 | Original decision | Headline | LLM shock | Outcome |
 | --- | --- | --- | --- |
@@ -168,9 +170,11 @@ The landing page's *A real decision* section rebuilds one decision's arithmetic 
 | | |
 | --- | --- |
 | **Model** | `claude-opus-5`, served through **0G Private Computer** (`router-api.0g.ai`) |
-| **Function** | News oracle only: for each candidate headline, identify the directly disrupted graph company, score the shock (0–1), severity and confidence, and explain its reasoning and uncertainty |
-| **Not used for** | Position sizing, risk, exits or order execution - those are deterministic code |
-| **Audit** | Each call records the 0G provider that executed it |
+| **1. Reads the news** | For each headline: which graph company it directly disrupts (checked against the graph, never trusted), the shock (0–1), severity, confidence, reasoning and what would change its mind |
+| **2. Makes the trade call** | For the candidate shorts the sourced graph derives: short or pass, conviction (sets the size), take-profit and holding period, each with a written reason |
+| **3. Manages open positions** | Every 4 hours, reviews each open thesis against the news since entry and closes positions whose thesis no longer holds |
+| **Guardrails, not decisions** | Code limits what it can choose: only graph-supported, venue-listed candidates; clamped bounds; the risk engine's caps; a hard 6% stop-loss; no trade if the model cannot be reached |
+| **Audit** | Every call is recorded with its output, and the 0G provider that executed it |
 
 ## Architecture
 
@@ -179,8 +183,9 @@ Browser ──► Caddy (TLS) ──► /api/* ──► FastAPI agent  (127.0.0
                         └──► /*     ──► Next.js site   (127.0.0.1:4010)
 
 FastAPI agent
-├── news loop (10 min) ── Google News RSS ── LLM oracle (0G) ── graph traversal ── risk ── Bitget demo
+├── news loop (10 min) ── Google News RSS ── LLM oracle (0G) ── graph traversal ── LLM trade call ── risk ── Bitget demo
 ├── exit loop (60 s) ──── Bitget marks ───── exit rules ─────── Bitget demo
+├── review loop (4 h) ─── news since entry ── LLM thesis review ── Bitget demo (close)
 └── SQLite (WAL, serialised) - decisions, headlines, positions, events, equity journal
 ```
 

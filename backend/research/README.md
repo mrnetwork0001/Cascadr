@@ -117,16 +117,18 @@ none implied a downstream exposure above 0.13. Not one reached a trade.
   Foxconn names on every call. Texas storm's Qualcomm link stays untraded: Samsung is
   one of three primary foundries for Qualcomm, so its weight is the lowest
   bucket.
-- **Shock floor 0.40 → 0.25 (2026-10-07).** From 2026-09-24 to 10-07 one of
-  1,905 live headlines cleared 0.40 (Apple's iPhone 18 Pro Max recall, 0.42),
-  so the agent had nothing to trade in the hackathon window. 0.25 admits
-  company-specific bad news: over those 13 days, nine headlines naming Apple,
-  Tesla or Nvidia scored 0.25-0.42 (Apple's recall and cellular defect,
-  Tesla's falling sales and credit line, Nvidia's chip-smuggling cases). The
-  0.20 band below is mostly keyword-only matches, which never trade. That is a
-  deliberate step away from the calibration: the floor no longer separates
-  disruption from noise on its own, and trades on such headlines test the
-  agent, not the research.
+- **Shock floor 0.40 → 0.25, and the LLM makes the trade call (2026-10-07).**
+  While fixed rules turned exposures into orders, the floor alone had to keep
+  noise out, and from 2026-09-24 to 10-07 only one of 1,905 live headlines
+  cleared 0.40 (Apple's iPhone 18 Pro Max recall, 0.42). On 2026-10-07 the
+  trade decision moved to the LLM (`app/trader.py`): the graph proposes
+  candidates, the model decides short or pass, conviction, target and hold.
+  The floor's job changed with it - it now decides which headlines are worth
+  a trade decision, not which are traded. At 0.25 that admits company-specific
+  bad news (over those 13 days, nine headlines naming Apple, Tesla or Nvidia
+  scored 0.25-0.42), and the model can pass on any of it, with its reason
+  recorded. The calibration above still measures what the oracle scores real
+  disruptions at; it no longer sets the trading cutoff by itself.
 - **Keyword fallback is never traded.** If the LLM fails, the headline is
   left for the next cycle instead of being decided on keywords.
 

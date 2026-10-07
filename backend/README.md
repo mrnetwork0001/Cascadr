@@ -39,6 +39,7 @@ configured those endpoints answer 503, with a wrong one 401. CORS allows
 | `POST` | `/oracle`, `/oracle/act` | Admin: score one headline; score and act on it |
 | `POST` | `/contagion`, `/execute` | Admin: what-if scoring; open positions for a hypothetical shock (`source="manual"`) |
 | `POST` | `/agent/cycle` | Admin: run one agent pass now |
+| `POST` | `/positions/review` | Admin: run the LLM's thesis review of open positions now |
 | `POST` | `/agent/replay` | Admin: re-run one real headline from the decision log through the agent; logged as an operator replay, positions `source="manual"` |
 | `POST` | `/positions/sweep`, `/positions/{id}/close` | Admin: force an exit pass; flatten one position |
 | `GET` | `/positions/reconcile` | Admin: our book vs the exchange's |
@@ -61,18 +62,32 @@ With `CASCADR_AUTONOMOUS=true` a background loop runs every
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.
 3. **Propagate** - each disrupted company's downstream cone is scored; where
    several paths reach one company, the strongest wins.
-4. **Act** - downstream exposures at or above the trade threshold (0.18), and
-   the directly hit company itself when its shock clears the floor
-   (first-order, `CASCADR_TRADE_ORIGIN`), go through the
-   risk engine to the paper book. Both thresholds are calibrated against the
-   verified historical events: see [research/README.md](research/README.md#calibrating-the-agent).
+4. **Decide** - downstream exposures at or above the trade threshold (0.18),
+   and the directly hit company itself when its shock clears the floor
+   (first-order, `CASCADR_TRADE_ORIGIN`), become candidate shorts if the venue
+   lists them. `app/trader.py` puts them in front of the LLM with each one's
+   evidence path, live price and 24h move, and the current book. Per
+   candidate it returns short or pass, conviction (size: 10-50% of the
+   account), take-profit (1-10%) and hold (24-168 h), with a reason. Its
+   numbers are clamped; only an explicit `"short": true` opens anything; if
+   it cannot be reached the headline waits for the next cycle.
+5. **Act** - the risk engine vets each chosen order before it reaches the
+   venue. Every position gets a hard 6% stop-loss and the LLM's take-profit
+   and hold as its exit policy.
+6. **Review** - every 4 hours the LLM reviews each open position against the
+   news since entry and closes it (`AGENT_EXIT`) when the thesis no longer
+   holds. `POST /positions/review` runs it on demand.
+
+The thresholds are calibrated against the verified historical events: see
+[research/README.md](research/README.md#calibrating-the-agent).
 
 Every headline that reaches the LLM becomes a decision row, with the
 exposures it implies (each with the edges and constants its score was
-multiplied from), the article link and the 0G provider. The outcome names what
-happened: `DECLINED`, `TRADED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`,
-`NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NOT_ON_VENUE`, `NO_TRADABLE_EXPOSURE`, `ANALYSED` or
-`EXECUTION_FAILED`.
+multiplied from), the LLM's trade plan, the article link and the 0G provider.
+The outcome names what happened: `DECLINED`, `TRADED`, `PASSED` (the LLM chose
+none of the candidates), `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`,
+`NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NOT_ON_VENUE`, `NO_TRADABLE_EXPOSURE`,
+`ANALYSED` or `EXECUTION_FAILED`.
 
 Execution acts on exactly the exposures the decision recorded. Each position's
 risk cluster is its real root cause; separately, one headline opens at most
