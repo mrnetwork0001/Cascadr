@@ -255,8 +255,15 @@ class AutonomousAgent:
         d["entities"] = [e for e in (d.get("entities") or "").split(",") if e]
         return d
 
-    async def decisions(self, limit: int = 60, before_id: int | None = None) -> list[dict]:
+    async def decisions(
+        self, limit: int = 60, before_id: int | None = None, action: str | None = None
+    ) -> list[dict]:
         def q():
+            if action:
+                return self._conn.execute(
+                    "SELECT * FROM agent_decisions WHERE action = ? ORDER BY id DESC LIMIT ?",
+                    (action, limit),
+                ).fetchall()
             if before_id:
                 return self._conn.execute(
                     "SELECT * FROM agent_decisions WHERE id < ? ORDER BY id DESC LIMIT ?",

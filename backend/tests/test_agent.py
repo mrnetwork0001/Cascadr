@@ -197,3 +197,14 @@ async def test_a_replay_still_respects_the_floor(tmp_path):
     a, executed = replay_agent(tmp_path, _Verdict(["AAPL"], 0.1))
     r = await a.replay(1)
     assert r["action"] == "DECLINED" and executed == []
+
+
+@pytest.mark.asyncio
+async def test_decisions_can_be_filtered_by_outcome(tmp_path):
+    a = agent(tmp_path)
+    for action in ("DECLINED", "TRADED", "DECLINED"):
+        a._conn.execute(
+            "INSERT INTO agent_decisions (at, headline, action) VALUES ('2026-10-07T00:00:00+00:00', 'h', ?)",
+            (action,))
+    a._conn.commit()
+    assert [r["action"] for r in await a.decisions(10, action="TRADED")] == ["TRADED"]
