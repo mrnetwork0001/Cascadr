@@ -149,8 +149,8 @@ marks demo positions at Bitget's demo mark price. Market orders are split at
 the instrument's `maxMarketOrderQty`. `GET /venue` returns Bitget's own view
 of the demo account.
 
-Bitget's demo exchange lists only some stock perps (NVDA, AAPL and TSLA of
-the graph's ten when this was written). Exposures to the others are recorded
+Bitget's demo exchange lists only some stock perps (8 of the graph's 15 when
+this was written: NVDA, AAPL, TSLA, SAMSUNG, SKHY, GOOGL, META, AMZN). Exposures to the others are recorded
 in the decision and skipped with the outcome `NOT_ON_VENUE`.
 
 Without a demo key, fills are simulated locally at Bitget's live prices.
@@ -308,7 +308,7 @@ Shorting a US equity on Bitget means the **stock perpetual future**:
 symbol `{TICKER}USDT`, `productType: "USDT-FUTURES"`.
 
 It does **not** mean tokenized xStocks (`AAPLx`, `NVDAx`). Those are **spot only**
-and cannot be shorted, which makes them unusable for this strategy. All ten graph
+and cannot be shorted, which makes them unusable for this strategy. All 15 graph
 tickers were reconciled against `GET /api/v2/mix/market/contracts`; hit
 `/market/tradable` to re-check at any time.
 
