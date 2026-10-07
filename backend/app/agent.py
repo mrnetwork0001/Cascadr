@@ -29,6 +29,7 @@ from app import db
 from app.graph.repository import index
 from app.ingest.feeds import FeedReader, Headline, mentions_graph_entity
 from app.ingest.oracle import NewsOracle
+from app.trader import TradePlan
 from app.traversal import (
     HOP_DECAY,
     implied_drawdown_pct,
@@ -69,6 +70,7 @@ MIGRATIONS = [
     "ALTER TABLE agent_decisions ADD COLUMN published TEXT",
     "ALTER TABLE agent_decisions ADD COLUMN uncertainty TEXT NOT NULL DEFAULT ''",
     "ALTER TABLE agent_decisions ADD COLUMN exposures TEXT",
+    "ALTER TABLE agent_decisions ADD COLUMN trade_plan TEXT",
 ]
 
 # Decision outcomes. Each names what actually happened - the old "BLOCKED"
@@ -82,6 +84,7 @@ NO_MARKET_PRICE = "NO_MARKET_PRICE"  # no Bitget mark to trade at
 ALREADY_HOLDING = "ALREADY_HOLDING"  # the same thesis is already open
 NOT_ON_VENUE = "NOT_ON_VENUE"  # the venue (Bitget demo) does not list the instrument
 NO_TRADABLE_EXPOSURE = "NO_TRADABLE_EXPOSURE"  # nothing crossed the trade threshold
+PASSED = "PASSED"  # the LLM weighed the candidate shorts and chose none
 EXECUTION_FAILED = "EXECUTION_FAILED"  # the executor raised; see detail
 ANALYSED = "ANALYSED"  # execution disabled for this cycle
 
@@ -91,13 +94,18 @@ SKIP_OUTCOMES = [
     ("error", EXECUTION_FAILED),
     ("risk", BLOCKED_BY_RISK),
     ("venue", REJECTED_BY_VENUE),
+    # The LLM's own pass outranks the venue and price reasons below: when it
+    # chose not to trade, that is the decision the record should name.
+    ("passed", PASSED),
     ("unlisted", NOT_ON_VENUE),
     ("no_mark", NO_MARKET_PRICE),
     ("duplicate", ALREADY_HOLDING),
 ]
 
-# (exposures, headline, source) -> {"opened": [...], "skipped": [{kind, reason}]}
-ExecuteFn = Callable[[list[dict], str, str], Awaitable[dict]]
+# (exposures, headline, source, plan) -> {"opened": [...], "skipped": [{kind, reason}]}
+ExecuteFn = Callable[..., Awaitable[dict]]
+# (headline, verdict, exposures) -> TradePlan: the LLM's trading decision.
+DecideFn = Callable[..., Awaitable[TradePlan]]
 
 
 class AutonomousAgent:
@@ -109,6 +117,7 @@ class AutonomousAgent:
         oracle: NewsOracle,
         repo,
         execute_fn: ExecuteFn,
+        decide_fn: DecideFn | None = None,
         shock_floor: float = 0.25,
         max_llm_calls_per_hour: int = 60,
     ):
@@ -125,6 +134,7 @@ class AutonomousAgent:
         self._oracle = oracle
         self._repo = repo
         self._execute = execute_fn
+        self._decide = decide_fn
         self.shock_floor = shock_floor
         self.max_llm_per_hour = max_llm_calls_per_hour
         self._llm_calls: list[datetime] = []
@@ -206,14 +216,15 @@ class AutonomousAgent:
             """INSERT INTO agent_decisions
                (at, headline, source, engine, model, entities, shock, severity,
                 confidence, reasoning, action, detail, provider, url, published,
-                uncertainty, exposures)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                uncertainty, exposures, trade_plan)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             row,
         )
         self._conn.commit()
 
     async def _record(
-        self, h: Headline, v, action: str, detail: str, exposures: list[dict]
+        self, h: Headline, v, action: str, detail: str, exposures: list[dict],
+        plan: TradePlan | None = None,
     ) -> None:
         async with self._lock:
             await db.run(
@@ -230,6 +241,7 @@ class AutonomousAgent:
                     h.published.astimezone(UTC).isoformat() if h.published else None,
                     getattr(v, "uncertainty", "")[:600],
                     json.dumps(exposures),
+                    plan.model_dump_json() if plan is not None else None,
                 ),
             )
 
@@ -238,6 +250,8 @@ class AutonomousAgent:
         d = dict(r)
         raw = d.get("exposures")
         d["exposures"] = json.loads(raw) if raw else []
+        plan = d.get("trade_plan")
+        d["trade_plan"] = json.loads(plan) if plan else None
         d["entities"] = [e for e in (d.get("entities") or "").split(",") if e]
         return d
 
@@ -316,6 +330,29 @@ class AutonomousAgent:
 
     # -- the loop ----------------------------------------------------------
 
+    async def _plan(self, h: Headline, verdict, exposures: list[dict]) -> TradePlan | None:
+        """The LLM's trading decision on the graph's candidates, or None when
+        no decider is wired (tests, what-if tools)."""
+        if self._decide is None:
+            return None
+        plan = await self._decide(h, verdict, exposures)
+        if plan.engine == "llm":
+            self._llm_calls.append(datetime.now(UTC))
+        return plan
+
+    async def news_about(self, entity_ids: set[str], since: datetime, limit: int = 6) -> list[dict]:
+        """Recent LLM readings that named any of these companies."""
+        rows = await self.decisions(limit=400)
+        out = []
+        for r in rows:
+            if r["at"] < since.isoformat() or r.get("engine") != "llm":
+                continue
+            if entity_ids & set(r["entities"]):
+                out.append(r)
+            if len(out) >= limit:
+                break
+        return out
+
     async def replay(self, decision_id: int) -> dict:
         """Re-run one recorded headline through the whole agent, as an
         operator action: LLM -> graph -> risk -> venue.
@@ -353,8 +390,11 @@ class AutonomousAgent:
             action, detail = DECLINED, (
                 f"{prefix}: shock {verdict.shock:.2f} below floor {self.shock_floor:.2f}")
         else:
+            plan = await self._plan(h, verdict, exposures)
+            if plan is not None and plan.engine == "unavailable":
+                return {"error": f"LLM unavailable for the trade decision: {plan.detail}"}
             try:
-                result = await self._execute(exposures, h.title, "manual")
+                result = await self._execute(exposures, h.title, "manual", plan)
             except Exception as exc:
                 result = {"opened": [], "skipped": [], "error": f"{type(exc).__name__}: {exc}"}
             if result.get("error"):
@@ -362,6 +402,10 @@ class AutonomousAgent:
             else:
                 action, detail = outcome(result.get("opened", []), result.get("skipped", []))
                 detail = f"{prefix}: {detail}"
+            await self._record(h, verdict, action, detail, exposures, plan)
+            return {"replayed": decision_id, "action": action, "detail": detail,
+                    "verdict": verdict, "exposures": exposures, "plan": plan,
+                    "execution": result}
         await self._record(h, verdict, action, detail, exposures)
         return {"replayed": decision_id, "action": action, "detail": detail,
                 "verdict": verdict, "exposures": exposures, "execution": result}
@@ -420,10 +464,18 @@ class AutonomousAgent:
                 await self._feeds.mark_seen(h, acted=False)
                 continue
 
+            # The LLM decides which of the graph's candidates to short, how
+            # big and for how long. If it cannot be reached, nothing trades:
+            # the headline stays unseen and the next cycle asks again.
+            plan = await self._plan(h, verdict, exposures)
+            if plan is not None and plan.engine == "unavailable":
+                self.stats["last_error"] = f"trade decision unavailable: {plan.detail}"[:200]
+                continue
+
             # Execution acts on exactly the exposures recorded above, so the
             # record of why the agent traded and what it traded cannot differ.
             try:
-                result = await self._execute(exposures, h.title, "agent")
+                result = await self._execute(exposures, h.title, "agent", plan)
             except Exception as exc:
                 # Still recorded and marked seen: the next cycle must not pay
                 # for the same headline again.
@@ -435,7 +487,7 @@ class AutonomousAgent:
                 action, detail = EXECUTION_FAILED, result["error"][:300]
             else:
                 action, detail = outcome(opened, skipped)
-            await self._record(h, verdict, action, detail, exposures)
+            await self._record(h, verdict, action, detail, exposures, plan)
             await self._feeds.mark_seen(h, acted=bool(opened))
             acted.append({"headline": h.title, "opened": len(opened), "action": action})
 

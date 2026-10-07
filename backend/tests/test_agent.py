@@ -124,7 +124,7 @@ async def test_keyword_fallback_is_never_traded(tmp_path, llm_configured):
 
     Oracle.llm_configured = llm_configured
 
-    async def execute(exposures, headline, source):
+    async def execute(exposures, headline, source, plan=None):
         executed.append(headline)
         return {"opened": [], "skipped": []}
 
@@ -162,7 +162,7 @@ class _Oracle:
 def replay_agent(tmp_path, verdict):
     executed = []
 
-    async def execute(exposures, headline, source):
+    async def execute(exposures, headline, source, plan=None):
         executed.append((headline, source))
         return {"opened": [{"position": None}], "skipped": []}
 

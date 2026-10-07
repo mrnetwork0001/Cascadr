@@ -160,6 +160,27 @@ class BitgetDemo:
                 out[s] = float(px)
         return out
 
+    async def tickers(self, symbols: list[str]) -> dict[str, dict]:
+        """Mark and 24h change per symbol, for the trading decision's context."""
+
+        async def fetch():
+            rows = await self._public("/api/v3/market/tickers", {"category": CATEGORY})
+            return {r["symbol"]: r for r in rows or []}
+
+        snap = await self._tickers.get(fetch)
+        out: dict[str, dict] = {}
+        for s in symbols:
+            row = snap.get(s) or {}
+            px = row.get("markPrice") or row.get("lastPrice")
+            if not px:
+                continue
+            pct = row.get("price24hPcnt")
+            out[s] = {
+                "mark": float(px),
+                "change_24h_pct": float(pct) * 100 if pct not in (None, "") else None,
+            }
+        return out
+
     # ------------------------------------------------------------- account
 
     async def hold_mode(self) -> str:

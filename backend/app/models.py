@@ -148,6 +148,7 @@ class CloseReason(StrEnum):
     TAKE_PROFIT = "TAKE_PROFIT"  # reached the modelled drawdown
     MANUAL = "MANUAL"
     RECONCILED = "RECONCILED"  # exchange says it is gone; our book was stale
+    AGENT_EXIT = "AGENT_EXIT"  # the LLM reviewed the thesis and chose to close
 
 
 class ExitPolicy(BaseModel):

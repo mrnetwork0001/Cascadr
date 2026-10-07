@@ -43,6 +43,14 @@ from app.portfolio.journal import Journal
 from app.portfolio.manager import PortfolioManager
 from app.portfolio.store import PositionStore
 from app.risk import RiskLimits, RiskManager
+from app.trader import (
+    REVIEW_EVERY_HOURS,
+    STOP_LOSS_PCT,
+    LLMTrader,
+    TradePlan,
+    leverage_for,
+    notional_for,
+)
 from app.traversal import (
     HOP_DECAY,
     MAX_HOPS,
@@ -68,6 +76,8 @@ async def lifespan(app: FastAPI):
     state["edgar"] = EdgarClient(s.sec_user_agent)
     state["llm"] = LLMClient(s)
     state["oracle"] = NewsOracle(state["llm"])
+    state["trader"] = LLMTrader(state["llm"])
+    state["reviews"] = {"runs": 0, "closed": 0, "last_error": None, "last_at": {}}
 
     repo = MemoryGraphRepository()
     if s.neo4j_enabled:
@@ -111,6 +121,7 @@ async def lifespan(app: FastAPI):
         oracle=state["oracle"],
         repo=repo,
         execute_fn=_execute,
+        decide_fn=_decide,
         shock_floor=s.cascadr_shock_floor,
         max_llm_calls_per_hour=s.cascadr_max_llm_per_hour,
     )
@@ -198,14 +209,32 @@ async def lifespan(app: FastAPI):
                 backoff = min(backoff * 2, 3600)
             await asyncio.sleep(backoff)
 
+    async def reviewer():
+        """The LLM reviews each open position's thesis every few hours and
+        decides whether to keep it. Runs only when the agent is armed."""
+        if not s.autonomous:
+            return
+        await asyncio.sleep(30)
+        while True:
+            try:
+                await _review_positions()
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                state["reviews"]["last_error"] = f"{type(exc).__name__}: {exc}"[:200]
+                print(f"[review] failed: {type(exc).__name__}: {exc}", flush=True)
+            await asyncio.sleep(600)
+
     task = asyncio.create_task(sweeper())
     sensor_task = asyncio.create_task(sensor())
+    review_task = asyncio.create_task(reviewer())
 
     yield
 
     task.cancel()
     sensor_task.cancel()
-    await asyncio.gather(task, sensor_task, return_exceptions=True)
+    review_task.cancel()
+    await asyncio.gather(task, sensor_task, review_task, return_exceptions=True)
     # A cancelled task's asyncio.to_thread work keeps running in its worker
     # thread. Closing the SQLite connection under it crashes the process, so
     # wait for every worker to finish first.
@@ -361,6 +390,12 @@ async def health():
         "paper_venue": state["portfolio"].venue,
         "trading_credentials": s.has_trading_credentials,
         "admin_endpoints": bool(s.cascadr_admin_token),
+        "position_reviews": {
+            "every_hours": REVIEW_EVERY_HOURS,
+            "runs": state["reviews"]["runs"],
+            "closed": state["reviews"]["closed"],
+            "last_error": state["reviews"]["last_error"],
+        },
         "trade_alerts": {
             "configured": state["alerts"].configured,
             "sent": state["alerts"].sent,
@@ -665,7 +700,80 @@ async def _score(origin: str, shock: float) -> dict:
     }
 
 
-async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
+def _tradable_exposure(e: dict) -> bool:
+    """Which graph exposures may become trade candidates at all."""
+    s = state["settings"]
+    if not e.get("ticker") or e["score"] < TRADE_THRESHOLD:
+        return False
+    if e.get("is_origin"):
+        # First-order: the company the headline itself hits, when its shock
+        # clears the floor.
+        return s.trade_origin and e["score"] >= s.cascadr_shock_floor
+    return True
+
+
+async def _book_context() -> dict:
+    pm: PortfolioManager = state["portfolio"]
+    rows = await state["store"].open_positions()
+    try:
+        marks = await pm.position_marks(rows)
+    except Exception:
+        marks = {}
+    realized, unrealized = await pm.book_pnl()
+    return {
+        "equity": pm.risk.limits.starting_equity_usdt + realized + (unrealized or 0.0),
+        "max_per_cluster": pm.risk.limits.max_positions_per_cluster,
+        "open": [
+            {"symbol": p.symbol, "origin": p.origin,
+             "pnl_pct": p.pnl_pct(marks[p.id]) if p.id in marks else None}
+            for p in rows
+        ],
+    }
+
+
+async def _decide(h, verdict, exposures: list[dict]) -> TradePlan:
+    """Put the graph's tradable candidates in front of the LLM, which decides
+    what to short. Candidates the venue cannot trade are excluded first, with
+    their reason, so the model only weighs trades that could actually happen."""
+    pm: PortfolioManager = state["portfolio"]
+    tradable = [e for e in exposures if _tradable_exposure(e)]
+    if not tradable:
+        return TradePlan(engine="none", summary="no exposure reached the trade threshold")
+    symbols = [perp_symbol(e["ticker"]) for e in tradable]
+    excluded: dict[str, list[str]] = {}
+    context: dict[str, dict] = {}
+    if pm.venue == "bitget-demo":
+        try:
+            listed = await state["demo"].instruments()
+            context = await state["demo"].tickers(symbols)
+        except Exception as exc:
+            return TradePlan(engine="unavailable", detail=f"Bitget demo unreachable ({type(exc).__name__})")
+    else:
+        listed = None
+        marks, market_error = await _marks([e["ticker"] for e in tradable])
+        context = {perp_symbol(t): {"mark": m, "change_24h_pct": None} for t, m in marks.items()}
+    candidates = []
+    for e, sym in zip(tradable, symbols):
+        if listed is not None and sym not in listed:
+            excluded[sym] = ["unlisted", f"UNLISTED: {sym} is not listed on Bitget's demo exchange"]
+        elif sym not in context:
+            excluded[sym] = ["no_mark", f"no Bitget mark for {sym}"]
+        elif sym not in {c["symbol"] for c in candidates}:
+            candidates.append({"symbol": sym, "exposure": e, **context[sym]})
+    if not candidates:
+        return TradePlan(engine="none", summary="no candidate is tradable on the venue", excluded=excluded)
+    published = h.published.isoformat() if getattr(h, "published", None) else None
+    plan = await state["trader"].decide(
+        headline=h.title, source=h.source, published=published, verdict=verdict,
+        candidates=candidates, book=await _book_context(),
+    )
+    plan.excluded = excluded
+    return plan
+
+
+async def _execute(
+    exposures: list[dict], headline: str, source: str, plan: TradePlan | None = None
+) -> dict:
     """Open paper positions for every tradable exposure in a recorded set.
 
     Takes the exposures exactly as the decision recorded them (strongest path
@@ -684,18 +792,7 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
     it names, it opens at most one cluster's allowance of positions and
     notional in total.
     """
-    s = state["settings"]
-
-    def tradable_exposure(e: dict) -> bool:
-        if not e.get("ticker") or e["score"] < TRADE_THRESHOLD:
-            return False
-        if e.get("is_origin"):
-            # First-order: the company the headline itself hits, when its
-            # shock clears the calibrated floor.
-            return s.trade_origin and e["score"] >= s.cascadr_shock_floor
-        return True
-
-    tradable = [e for e in exposures if tradable_exposure(e)]
+    tradable = [e for e in exposures if _tradable_exposure(e)]
     opened, skipped = [], []
     if not tradable:
         return {"opened": opened, "skipped": skipped}
@@ -703,16 +800,38 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
     pm: PortfolioManager = state["portfolio"]
     limits = pm.risk.limits
     headline_notional = 0.0
+    seen: set[str] = set()
     for e in tradable:
         symbol = perp_symbol(e["ticker"])
+        if symbol in seen:
+            continue
+        seen.add(symbol)
+        call = None
+        if plan is not None:
+            # The LLM's decision governs: candidates it never saw keep the
+            # reason they were excluded, and those it passed on are not traded.
+            if symbol in plan.excluded:
+                kind, reason = plan.excluded[symbol]
+                skipped.append({"symbol": symbol, "kind": kind, "reason": reason})
+                continue
+            call = plan.call_for(symbol)
+            if call is None or not call.short:
+                why = call.reason if call is not None else "not among the candidates the LLM weighed"
+                skipped.append({"symbol": symbol, "kind": "passed", "reason": f"PASSED: {why}"})
+                continue
         mark = marks.get(e["ticker"])
         if not mark:
             skipped.append({"symbol": symbol, "kind": "no_mark",
                             "reason": market_error or f"no Bitget mark for {symbol}"})
             continue
-        # 18% to 60% of the paper account, by exposure; caps scale the same way.
         equity = limits.starting_equity_usdt
-        notional = round(equity * (0.18 + 0.42 * e["score"]) / 50) * 50
+        if call is not None:
+            # Size from the LLM's conviction (10% to 50% of the account),
+            # then capped by the risk engine inside open_short.
+            notional = notional_for(call.conviction, equity)
+        else:
+            # No decider (what-if tools): 18% to 60% of the account by score.
+            notional = round(equity * (0.18 + 0.42 * e["score"]) / 50) * 50
         if (
             len(opened) >= limits.max_positions_per_cluster
             or headline_notional + notional > limits.max_cluster_notional_usdt
@@ -722,16 +841,30 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
                 f"({limits.max_positions_per_cluster} positions / "
                 f"{limits.max_cluster_notional_usdt:,.0f} USDT) is used")})
             continue
+        if call is not None:
+            leverage = leverage_for(call.conviction)
+            thesis = f"{call.reason} - on: {headline[:160]}"
+            policy = ExitPolicy(
+                max_hold_hours=call.hold_hours, stop_loss_pct=STOP_LOSS_PCT,
+                take_profit_pct=call.take_profit_pct,
+            )
+            target = None
+        else:
+            leverage = 3 if e["score"] >= 0.55 else 2
+            thesis = f"{e.get('rationale', '')} - on: {headline[:160]}"
+            policy = None
+            # The model's own implied drawdown becomes the profit target.
+            target = e["implied_drawdown_pct"]
         try:
             position, detail, kind = await pm.open_short(
                 ticker=e["ticker"],
                 notional_usdt=notional,
-                leverage=3 if e["score"] >= 0.55 else 2,
+                leverage=leverage,
                 mark=mark,
-                thesis=f"{e.get('rationale', '')} - on: {headline[:160]}",
+                thesis=thesis,
                 origin=e["origin"],
-                # The model's own implied drawdown becomes the profit target.
-                target_pct=e["implied_drawdown_pct"],
+                target_pct=target,
+                policy=policy,
                 source=source,
             )
         except Exception as exc:
@@ -746,6 +879,51 @@ async def _execute(exposures: list[dict], headline: str, source: str) -> dict:
             opened.append({"position": position, "detail": detail})
             headline_notional += position.notional_usdt
     return {"opened": opened, "skipped": skipped}
+
+
+async def _review_positions() -> list[dict]:
+    """Ask the LLM whether each open position's thesis still holds, at most
+    every REVIEW_EVERY_HOURS per position, and close those it says to close.
+    The hard stop-loss, take-profit and time stop keep running regardless."""
+    pm: PortfolioManager = state["portfolio"]
+    rows = await state["store"].open_positions()
+    if not rows:
+        return []
+    marks = await pm.position_marks(rows)
+    nodes = await state["repo"].nodes()
+    by_ticker = {n.ticker: n.id for n in nodes if n.ticker}
+    last_at: dict = state["reviews"]["last_at"]
+    now = datetime.now(UTC)
+    out = []
+    for p in rows:
+        mark = marks.get(p.id)
+        if mark is None or p.age_hours() < REVIEW_EVERY_HOURS:
+            continue
+        prev = last_at.get(p.id)
+        if prev is not None and (now - prev).total_seconds() < REVIEW_EVERY_HOURS * 3600:
+            continue
+        ids = {p.origin}
+        if node_id := by_ticker.get(p.symbol.removesuffix("USDT")):
+            ids.add(node_id)
+        news = await state["agent"].news_about(ids, p.opened_at)
+        review = await state["trader"].review(position=p, mark=mark, news=news)
+        if review.action == "UNAVAILABLE":
+            state["reviews"]["last_error"] = review.reason[:200]
+            continue
+        last_at[p.id] = now
+        state["reviews"]["runs"] += 1
+        await state["store"].note(
+            p.id, "AGENT_REVIEW",
+            f"{review.action} at {mark:,.2f} ({p.pnl_pct(mark):+.2f}%): {review.reason}",
+        )
+        item = {"id": p.id, "symbol": p.symbol, "action": review.action, "reason": review.reason}
+        if review.action == "CLOSE":
+            _, detail = await pm.close_by_id(p.id, CloseReason.AGENT_EXIT)
+            state["reviews"]["closed"] += 1
+            item["detail"] = detail
+        out.append(item)
+        print(f"[review] {p.symbol} {review.action}: {review.reason[:120]}", flush=True)
+    return out
 
 
 @app.post("/oracle", dependencies=ADMIN)
@@ -769,8 +947,15 @@ async def oracle_act(req: HeadlineRequest):
     if not req.execute:
         return {"verdict": verdict, "acted": False,
                 "reason": "execute=false - analysis only", "exposures": exposures}
-    result = await _execute(exposures, req.headline, "manual")
-    return {"verdict": verdict, "acted": True, "exposures": exposures, "execution": result}
+    from app.ingest.feeds import Headline
+
+    h = Headline(title=req.headline, source=req.source, url="", published=None)
+    plan = await _decide(h, verdict, exposures)
+    if plan.engine == "unavailable":
+        raise HTTPException(503, f"LLM unavailable for the trade decision: {plan.detail}")
+    result = await _execute(exposures, req.headline, "manual", plan)
+    return {"verdict": verdict, "acted": True, "exposures": exposures, "plan": plan,
+            "execution": result}
 
 
 @app.post("/contagion", dependencies=ADMIN)
@@ -865,6 +1050,12 @@ async def close_position(pid: str, price: float | None = Query(default=None, gt=
     if p is None:
         raise HTTPException(404, detail)
     return {"position": p, "detail": detail}
+
+
+@app.post("/positions/review", dependencies=ADMIN)
+async def positions_review():
+    """Run the LLM's thesis review of open positions now (spends LLM credits)."""
+    return {"reviews": await _review_positions()}
 
 
 @app.get("/positions/reconcile", dependencies=ADMIN)
