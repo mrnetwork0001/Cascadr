@@ -8,8 +8,11 @@ Built by NetLayer Labs for the **Bitget AI Hackathon** - Agentic Trading track, 
 | --- | --- |
 | **Live site** | https://trycascadr.vercel.app |
 | **Live terminal** | https://trycascadr.vercel.app/terminal |
+| **Demo film (2:50)** | https://www.youtube.com/watch?v=6W74-qPAj7c |
+| **For judges** | https://trycascadr.vercel.app/judges - a traced event → decision → execution, the stats and every log |
+| **Trading log** | https://trycascadr.vercel.app/api/paper/log?format=csv - one row per fill |
 | **Public API** | https://trycascadr.vercel.app/api/health |
-| **Trading** | Paper only - orders are placed on **Bitget's demo exchange** (Demo Trading, no real funds) |
+| **Trading** | Paper only - orders are placed on **Bitget's demo exchange** through **Bitget Agent Hub** (Demo Trading, no real funds) |
 
 ---
 
@@ -17,18 +20,21 @@ Built by NetLayer Labs for the **Bitget AI Hackathon** - Agentic Trading track, 
 
 1. [The idea](#the-idea)
 2. [How the agent works](#how-the-agent-works)
-3. [Verify it yourself](#verify-it-yourself)
-4. [Paper trading on Bitget](#paper-trading-on-bitget)
-5. [The knowledge graph](#the-knowledge-graph)
-6. [Does the premise hold?](#does-the-premise-hold)
-7. [Calibration](#calibration)
-8. [Risk management](#risk-management)
-9. [Explainability](#explainability)
-10. [Role of the LLM](#role-of-the-llm)
-11. [Architecture](#architecture)
-12. [Running it locally](#running-it-locally)
-13. [Security](#security)
-14. [Limitations](#limitations)
+3. [A live decision](#a-live-decision)
+4. [Verify it yourself](#verify-it-yourself)
+5. [Paper trading on Bitget](#paper-trading-on-bitget)
+6. [The knowledge graph](#the-knowledge-graph)
+7. [Does the premise hold?](#does-the-premise-hold)
+8. [Calibration](#calibration)
+9. [Operator replays](#operator-replays)
+10. [Risk management](#risk-management)
+11. [Explainability](#explainability)
+12. [Role of the LLM](#role-of-the-llm)
+13. [Architecture](#architecture)
+14. [Running it locally](#running-it-locally)
+15. [Demo film](#demo-film)
+16. [Security](#security)
+17. [Limitations](#limitations)
 
 ---
 
@@ -68,18 +74,32 @@ One loop runs on the server every 10 minutes, whether or not anyone is watching.
 | **Act** | The risk engine vets each order (caps per root cause, per headline and per symbol, plus a drawdown halt) and it is placed on Bitget's demo exchange. |
 | **Exit** | Every open position is marked at Bitget's mark price each minute and closed by its hard 6% stop-loss, the LLM's take-profit or its holding period. Every 4 hours the LLM also reviews each open thesis against the news since entry and closes positions whose thesis no longer holds. |
 
+## A live decision
+
+Decision #2107, made by the agent on its own on 2026-10-07 at 13:02 UTC, end to end:
+
+1. **Sense.** The news loop picked up "SK hynix Reportedly Faces Difficulties in HBM Hybrid Bonding, Trailing Samsung" (TechPowerUp).
+2. **Reason.** The LLM named SK hynix as the directly hit company and scored a shock of 0.35 (MEDIUM, confidence 0.82), above the 0.25 floor.
+3. **Propagate.** The graph offered SKHYUSDT, which Bitget's demo exchange lists, with a graph-implied move of −3.33%.
+4. **Decide.** The LLM passed, with conviction 0.15: *"Shock is only medium (0.35) and sourced as 'reportedly' about hybrid bonding yields for future HBM rather than confirmed current production loss, while the price is already -6.88% in 24h, exceeding the graph-implied -3.33% move, so the risk/reward of a fresh short is poor."*
+5. **Record.** Outcome `PASSED`; nothing traded. The decision, its reasoning, its trade call and the 0G provider that ran it are in [`/api/agent/decisions`](https://trycascadr.vercel.app/api/agent/decisions).
+
+When the LLM says short, the order goes to Bitget's demo exchange through Agent Hub, and every fill appears in the [trading log](https://trycascadr.vercel.app/api/paper/log?format=csv).
+
 ## Verify it yourself
 
 Everything the site shows is read from the running system; nothing is mocked. The public API serves the same data:
 
 | Endpoint | What it shows |
 | --- | --- |
+| [`/judges`](https://trycascadr.vercel.app/judges) | One page for reviewers: the demo links, a real trade traced from the log, the stats and every endpoint below |
+| [`/api/paper/log?format=csv`](https://trycascadr.vercel.app/api/paper/log?format=csv) | The trading log, one row per fill: timestamp, instrument, direction, price, quantity, fee, balance change and balance after (JSON without `format=csv`) |
 | [`/api/health`](https://trycascadr.vercel.app/api/health) | Agent state, last cycle, LLM, news feed, exit loop, paper venue |
 | [`/api/agent/decisions`](https://trycascadr.vercel.app/api/agent/decisions) | Every decision - including every refusal - with the headline, article link, LLM reasoning, uncertainty, 0G provider and implied exposures |
 | [`/api/positions`](https://trycascadr.vercel.app/api/positions) | The paper book, each position with its venue, fills, fees and P&L |
 | [`/api/venue`](https://trycascadr.vercel.app/api/venue) | **Bitget's own view** of the demo account: balances and open positions |
 | [`/api/paper/report`](https://trycascadr.vercel.app/api/paper/report) | Paper performance: return, Sharpe, max drawdown, win rate, closed trades |
-| [`/api/paper/equity`](https://trycascadr.vercel.app/api/paper/equity) | The equity time series, one point per minute |
+| [`/api/paper/equity`](https://trycascadr.vercel.app/api/paper/equity) | The equity time series, one point per minute (large: several MB) |
 | [`/api/graph`](https://trycascadr.vercel.app/api/graph) | The supply-chain graph with every link's sources and filing facts |
 | [`/api/risk`](https://trycascadr.vercel.app/api/risk) | Risk limits, cluster utilisation, drawdown |
 
@@ -161,7 +181,7 @@ Every proposed order is vetted before it reaches Bitget. Five shorts opened from
 
 ## Explainability
 
-Each decision is stored with: the headline and article link; the LLM's named entities, shock, severity, confidence, reasoning and stated uncertainty; the 0G provider that ran the inference; every implied exposure with the exact links and constants its score was multiplied from; and an outcome that names what happened - `TRADED`, `DECLINED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`, `NOT_ON_VENUE`, `NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NO_TRADABLE_EXPOSURE` or `EXECUTION_FAILED`.
+Each decision is stored with: the headline and article link; the LLM's named entities, shock, severity, confidence, reasoning and stated uncertainty; the 0G provider that ran the inference; every implied exposure with the exact links and constants its score was multiplied from; the LLM's trade call on each candidate (short or pass, conviction, target, hold and reason); and an outcome that names what happened - `TRADED`, `DECLINED`, `PASSED`, `BLOCKED_BY_RISK`, `REJECTED_BY_VENUE`, `NOT_ON_VENUE`, `NO_MARKET_PRICE`, `ALREADY_HOLDING`, `NO_TRADABLE_EXPOSURE` or `EXECUTION_FAILED`.
 
 The landing page's *A real decision* section rebuilds one decision's arithmetic from those stored factors. In the terminal, clicking a company shows every supply link's sources, quotes, caveats and counter-evidence.
 
@@ -179,8 +199,8 @@ The landing page's *A real decision* section rebuilds one decision's arithmetic 
 ## Architecture
 
 ```
-Browser ──► Caddy (TLS) ──► /api/* ──► FastAPI agent  (127.0.0.1:8010)
-                        └──► /*     ──► Next.js site   (127.0.0.1:4010)
+Browser ──► Vercel: Next.js site (trycascadr.vercel.app)
+                └── /api/* rewrite ──► VPS: Caddy (TLS) ──► FastAPI agent (127.0.0.1:8010)
 
 FastAPI agent
 ├── news loop (10 min) ── Google News RSS ── LLM oracle (0G) ── graph traversal ── LLM trade call ── risk ── Agent Hub ── Bitget demo
@@ -196,22 +216,24 @@ FastAPI agent
 | Market data | Bitget public API v2 (live quotes and mark prices) |
 | Execution | Bitget Agent Hub (`@bitget-ai/bitget-agent-mcp`, `--paper-trading`) over MCP stdio, Demo Trading environment; native v3 Unified Account API for fills and as a duplicate-safe fallback |
 | LLM | `claude-opus-5` via 0G Private Computer |
-| Hosting | Ubuntu VPS, systemd services, Caddy reverse proxy with automatic TLS |
+| Hosting | Site on Vercel; agent on an Ubuntu VPS (systemd, Caddy with automatic TLS); Agent Hub runs beside it as a Node subprocess |
 
 ```
 app/                       landing page (server-rendered from the API) and terminal
 components/                graph canvas, terminal panels, landing sections
 hooks/useCascadr.ts        live polling of the API
 lib/                       API client and response types
-backend/app/agent.py       the autonomous loop: sense → reason → propagate → act
+backend/app/agent.py       the autonomous loop: sense → reason → propagate → decide → act
+backend/app/trader.py      the LLM's trade call and its thesis review of open positions
 backend/app/traversal.py   contagion scoring and the calibrated thresholds
 backend/app/risk.py        portfolio risk limits
 backend/app/portfolio/     position store, lifecycle, exits, equity journal
-backend/app/market/        Bitget market data, Bitget demo execution, local simulator
+backend/app/market/        Bitget market data, Agent Hub client, Bitget demo execution, local simulator
 backend/app/graph/         the sourced graph (data/edges.json, data/filing_facts.json)
 backend/app/ingest/        news feeds, LLM oracle, SEC EDGAR extraction
 backend/research/          event study, calibration, verified events
-backend/tests/             114 tests
+backend/tests/             154 tests
+video/                     the demo film (Remotion, ElevenLabs), see video/README.md
 ```
 
 ## Running it locally
@@ -241,19 +263,27 @@ cd backend
 .venv/bin/python -m research.calibrate   # threshold calibration (spends LLM calls)
 ```
 
+To place demo orders through Bitget Agent Hub, install it (`npm i @bitget-ai/bitget-agent-mcp@3.3.1`) and set `CASCADR_AGENT_HUB_ENTRY` to its `lib/index.js`, with a Demo API key in `BITGET_DEMO_*`; without it, orders go through the native v3 client.
+
 Deployment is described in [DEPLOY.md](DEPLOY.md); the backend in detail in [backend/README.md](backend/README.md).
+
+## Demo film
+
+A 2:50 film: the problem, the evidence, and Cascadr working live, including the live decision above. Watch it on [YouTube](https://www.youtube.com/watch?v=6W74-qPAj7c). It is built with [Remotion](https://www.remotion.dev) in [`video/`](video/), with narration, score and sound effects from ElevenLabs. Its README lists where every number, quote, clip and voice came from.
 
 ## Security
 
 - Every endpoint that writes, trades or spends LLM credits requires an admin token, checked before the request body is read. Public endpoints are read-only; CORS allows `GET` only.
-- Exchange and LLM keys live only in the server's environment file (mode 600) and are never sent to the browser.
+- Exchange and LLM keys live only in the server's environment file (mode 600) and are never sent to the browser or committed; `.env` is gitignored and the repository history holds none.
 - The test suite runs with every exchange key blanked, so no test can reach a real or demo account.
 
 ## Limitations
 
 - **Paper trading only.** No real funds are at risk.
 - **Few tradable names on the demo venue.** Bitget's demo lists 8 of the graph's 15 stocks.
-- **Trades are rare by design.** The agent acts only on headlines the LLM rates as genuine disruptions; most news is not one, and it declines it.
+- **Trades are rare by design.** Most news is not a disruption, and the LLM declines it; when it is, the LLM may still pass, as in the live decision above.
+- **No closed trade yet.** The two open positions (AAPL, TSLA) are operator replays from 2026-10-07, so win rate is not yet measurable and the Sharpe ratio covers hours of positions.
+- **No Bitget market data in the trade call yet.** Bitget's market-data MCP returned 503 for every query on 2026-10-07; earnings dates and analyst targets are planned inputs.
 - **First-order trades are not backtested.** The event study supports the downstream (second-order) drift. Shorting the directly hit company rests on the LLM's severity judgement and the calibrated shock floor; it was added on 2026-10-07 so the agent acts on disruptions to the companies Bitget's demo lists.
 - **Small research sample.** Three verified events support the premise directionally; they do not prove it.
 - **Headlines, not articles.** The LLM judges each headline, not the full article.

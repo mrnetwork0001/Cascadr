@@ -117,12 +117,11 @@ export default async function JudgesPage() {
                 <p className="text-[14.5px] leading-[1.6] text-muted-2">Linked here once published.</p>
               </Card>
             )}
-            <Card label="Source code" accent="dim">
-              <p className="text-[14.5px] leading-[1.6] text-muted-2">
-                The repository is private. Read access for judges on request through the hackathon
-                organisers.
-              </p>
-            </Card>
+            <LinkCard
+              label="Source code"
+              href="https://github.com/mrnetwork0001/Cascadr"
+              note="The full repository: agent, graph and its sources, research, tests and the demo film."
+            />
           </div>
         </Section>
 

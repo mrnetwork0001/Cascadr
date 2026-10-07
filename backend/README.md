@@ -141,8 +141,16 @@ happen is how a book silently diverges from reality.
 ## Paper-trading venue: Bitget Demo Trading
 
 With `BITGET_DEMO_*` set, every paper trade is placed on Bitget's demo
-exchange through the v3 API - the environment Agent Hub's `--paper-trading`
-mode uses: the same host, a Demo API key and the `paptrading: 1` header.
+exchange, the Demo Trading environment: the same host, a Demo API key and the
+`paptrading: 1` header. With `CASCADR_AGENT_HUB_ENTRY` pointing at an installed
+`@bitget-ai/bitget-agent-mcp` (`lib/index.js`), orders are placed through
+Bitget Agent Hub, Bitget's agent MCP server, run as a stdio subprocess in
+`--paper-trading` mode (`app/market/agent_hub.py`). A refused order is never
+retried elsewhere; if the Agent Hub process fails mid-call, the order is looked
+up by its clientOid before anything is re-sent through the native v3 API, so it
+cannot fill twice. Each fill records which path it took, and `/health` reports
+Agent Hub's state. `GET /paper/log` (`?format=csv`) lists every fill with its
+timestamp, instrument, direction, price, quantity, fee and balance change.
 Bitget fills the orders and keeps the order, position and P&L record; Cascadr
 books exactly what Bitget reports (average price, filled quantity, fees) and
 marks demo positions at Bitget's demo mark price. Market orders are split at
