@@ -109,7 +109,7 @@ class AutonomousAgent:
         oracle: NewsOracle,
         repo,
         execute_fn: ExecuteFn,
-        shock_floor: float = 0.40,
+        shock_floor: float = 0.30,
         max_llm_calls_per_hour: int = 60,
     ):
         self._conn = conn

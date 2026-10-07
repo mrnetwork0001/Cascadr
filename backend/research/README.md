@@ -114,10 +114,16 @@ none implied a downstream exposure above 0.13. Not one reached a trade.
 - **Trade threshold 0.32 → 0.18.** 0.32 dated from the guessed weights the
   graph had before it was sourced. On the sourced graph it would have traded
   none of the events this study is built on. 0.18 trades the Hualien and
-  Foxconn names on every call, and adds no trade on live noise, which never
-  reaches the floor. Texas storm's Qualcomm link stays untraded: Samsung is
+  Foxconn names on every call. Texas storm's Qualcomm link stays untraded: Samsung is
   one of three primary foundries for Qualcomm, so its weight is the lowest
   bucket.
+- **Shock floor 0.40 → 0.30 (2026-10-07).** From 2026-09-24 to 10-07 one of
+  1,905 live headlines cleared 0.40 (Apple's iPhone 18 Pro Max recall, 0.42),
+  so the agent had nothing to trade in the hackathon window. 0.30 admits the
+  strongest live headlines: Apple's cellular defect (0.33) and Tesla's $30bn
+  credit line (0.30) would have traded. That is a deliberate step away from
+  the calibration: the floor no longer separates disruption from noise on its
+  own, and trades on such headlines test the agent, not the research.
 - **Keyword fallback is never traded.** If the LLM fails, the headline is
   left for the next cycle instead of being decided on keywords.
 

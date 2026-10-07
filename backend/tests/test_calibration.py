@@ -31,10 +31,18 @@ def tradable(origin: str, shock: float) -> set[str]:
     }
 
 
-def test_shock_floor_separates_disruption_from_live_noise():
+def test_shock_floor_admits_every_verified_disruption():
     floor = Settings.model_fields["cascadr_shock_floor"].default
-    assert LIVE_NOISE_CEILING < floor
     assert all(shock >= floor for _, shock, _ in VERIFIED_EVENTS.values())
+
+
+def test_shock_floor_admits_the_top_of_live_noise_on_purpose():
+    # Lowered from 0.40 to 0.30 on 2026-10-07 so the agent trades within the
+    # hackathon window. It no longer separates disruption from noise on its
+    # own: the strongest live headlines (0.30-0.33) now clear it. If this
+    # fails, the floor moved; update research/README.md with the reason.
+    floor = Settings.model_fields["cascadr_shock_floor"].default
+    assert floor == 0.30 and floor <= LIVE_NOISE_CEILING
 
 
 def test_verified_events_would_be_traded():

@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     cascadr_poll_seconds: int = 600
     # Shock below this never reaches the risk layer.
     # Calibrated: research/README.md "Calibrating the agent".
-    cascadr_shock_floor: float = 0.40
+    cascadr_shock_floor: float = 0.30
     # First-order trades: also short the company a headline names as directly
     # disrupted (shock at or above the floor), not only its downstream.
     cascadr_trade_origin: str = "true"

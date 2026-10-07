@@ -54,16 +54,16 @@ One loop runs on the server every 10 minutes, whether or not anyone is watching.
   freshness,       0-1, reasoning,                               exchange
   keyword filter   uncertainty
 
-  shock < 0.40 ............ declined (recorded)
+  shock < 0.30 ............ declined (recorded)
   exposure < 0.18 ......... not traded (recorded)
 ```
 
 | Stage | What happens |
 | --- | --- |
 | **Sense** | Pulls headlines for each of the 16 companies. Already-seen and stale (> 6 h) stories are skipped, and a free keyword filter drops stories that name no graph company before any model is called. |
-| **Reason** | The LLM names the directly disrupted company (checked against the graph, never trusted), scores the shock from 0 to 1, and states its reasoning and what would change its mind. Below a shock of **0.40** the headline is declined. |
+| **Reason** | The LLM names the directly disrupted company (checked against the graph, never trusted), scores the shock from 0 to 1, and states its reasoning and what would change its mind. Below a shock of **0.30** the headline is declined. |
 | **Propagate** | A breadth-first walk of the graph, up to 3 hops. Each hop multiplies by that link's sourced dependency and decays by 0.62, so direct customers are hit hardest. The strongest path per company wins. |
-| **Act** | Downstream exposures of at least **0.18**, and the directly hit company itself when its shock is at least **0.40** (first-order), become short orders on Bitget's demo exchange - if Bitget lists the company - sized to the account and vetted by the risk engine first. |
+| **Act** | Downstream exposures of at least **0.18**, and the directly hit company itself when its shock is at least **0.30** (first-order), become short orders on Bitget's demo exchange - if Bitget lists the company - sized to the account and vetted by the risk engine first. |
 | **Exit** | Every open position is marked at Bitget's mark price each minute and closed by stop-loss, take-profit (the model's own implied move) or a 7-day time stop. |
 
 ## Verify it yourself
@@ -124,7 +124,7 @@ Three of the six originally listed events failed verification and were dropped (
 
 [`backend/research/calibrate.py`](backend/research/calibrate.py) scores real headlines from each verified event with the live LLM and replays them through the graph. Over 8 calls per event, real disruptions scored **0.45–0.65**; the 1,466 live headlines the LLM scored from 2026-09-24 to 10-04 peaked at **0.33**.
 
-- **Shock floor 0.40** sits between the two, so the floor alone separates disruption from noise.
+- **Shock floor 0.30.** Calibration put it at 0.40, between the two. In 13 days of live news only one headline cleared 0.40, so on 2026-10-07 it was lowered to 0.30 for the hackathon window. This is a deliberate trade-off: the strongest live headlines (0.30–0.33, such as Apple's iPhone cellular defect) now trade too, so some trades are on news that is not a supply-chain disruption. Every one is in the decision log with the LLM's reasoning.
 - **Trade threshold 0.18** trades the Hualien-earthquake and Foxconn-lockdown names on every call. The previous 0.32 dated from guessed graph weights and would have traded none of them.
 
 [`tests/test_calibration.py`](backend/tests/test_calibration.py) pins this: if the graph or thresholds change, it says whether the agent would still trade the events its own research supports.

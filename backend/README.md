@@ -54,7 +54,7 @@ With `CASCADR_AUTONOMOUS=true` a background loop runs every
    and shown in `/health`, not swallowed.
 2. **Reason** - the LLM names the directly disrupted companies (checked against
    the graph), scores the shock 0–1, and states its reasoning and what would
-   change its mind. Below `CASCADR_SHOCK_FLOOR` (0.40) the headline is
+   change its mind. Below `CASCADR_SHOCK_FLOOR` (0.30) the headline is
    declined. If the LLM fails, the headline waits for the next cycle; a
    keyword match is never traded.
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.
