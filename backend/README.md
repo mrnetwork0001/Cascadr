@@ -39,6 +39,7 @@ configured those endpoints answer 503, with a wrong one 401. CORS allows
 | `POST` | `/oracle`, `/oracle/act` | Admin: score one headline; score and act on it |
 | `POST` | `/contagion`, `/execute` | Admin: what-if scoring; open positions for a hypothetical shock (`source="manual"`) |
 | `POST` | `/agent/cycle` | Admin: run one agent pass now |
+| `POST` | `/agent/replay` | Admin: re-run one real headline from the decision log through the agent; logged as an operator replay, positions `source="manual"` |
 | `POST` | `/positions/sweep`, `/positions/{id}/close` | Admin: force an exit pass; flatten one position |
 | `GET` | `/positions/reconcile` | Admin: our book vs the exchange's |
 | `POST` | `/ingest/edgar/refresh`, `GET /ingest/edgar/{ticker}` | Admin: EDGAR extraction |
@@ -54,7 +55,7 @@ With `CASCADR_AUTONOMOUS=true` a background loop runs every
    and shown in `/health`, not swallowed.
 2. **Reason** - the LLM names the directly disrupted companies (checked against
    the graph), scores the shock 0–1, and states its reasoning and what would
-   change its mind. Below `CASCADR_SHOCK_FLOOR` (0.30) the headline is
+   change its mind. Below `CASCADR_SHOCK_FLOOR` (0.25) the headline is
    declined. If the LLM fails, the headline waits for the next cycle; a
    keyword match is never traded.
    LLM calls are capped at `CASCADR_MAX_LLM_PER_HOUR`.

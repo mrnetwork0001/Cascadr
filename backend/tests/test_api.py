@@ -166,10 +166,10 @@ def test_a_shock_to_a_tradable_company_shorts_it_directly(tmp_path, monkeypatch)
 
 
 def test_first_order_needs_the_shock_floor(tmp_path, monkeypatch):
-    # The floor is 0.30: just below it nothing trades, at it Apple does.
-    assert _first_order_run(tmp_path, monkeypatch, 0.29)["opened"] == []
+    # The floor is 0.25: just below it nothing trades, at it Apple does.
+    assert _first_order_run(tmp_path, monkeypatch, 0.24)["opened"] == []
     (tmp_path / "at").mkdir()
-    opened = _first_order_run(tmp_path / "at", monkeypatch, 0.30)["opened"]
+    opened = _first_order_run(tmp_path / "at", monkeypatch, 0.25)["opened"]
     assert [o["position"].symbol for o in opened] == ["AAPLUSDT"]
 
 

@@ -68,7 +68,7 @@ In `backend/.env`:
 ```bash
 CASCADR_AUTONOMOUS=true      # exactly "true" - nothing else arms it
 CASCADR_POLL_SECONDS=600     # sense every 10 minutes
-CASCADR_SHOCK_FLOOR=0.30     # below this, no trade is even considered
+CASCADR_SHOCK_FLOOR=0.25     # below this, no trade is even considered
 CASCADR_MAX_LLM_PER_HOUR=60  # bounds spend if a feed floods
 CASCADR_PAPER_EQUITY=100000  # starting equity of the paper account
 

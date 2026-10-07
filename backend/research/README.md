@@ -117,13 +117,16 @@ none implied a downstream exposure above 0.13. Not one reached a trade.
   Foxconn names on every call. Texas storm's Qualcomm link stays untraded: Samsung is
   one of three primary foundries for Qualcomm, so its weight is the lowest
   bucket.
-- **Shock floor 0.40 → 0.30 (2026-10-07).** From 2026-09-24 to 10-07 one of
+- **Shock floor 0.40 → 0.25 (2026-10-07).** From 2026-09-24 to 10-07 one of
   1,905 live headlines cleared 0.40 (Apple's iPhone 18 Pro Max recall, 0.42),
-  so the agent had nothing to trade in the hackathon window. 0.30 admits the
-  strongest live headlines: Apple's cellular defect (0.33) and Tesla's $30bn
-  credit line (0.30) would have traded. That is a deliberate step away from
-  the calibration: the floor no longer separates disruption from noise on its
-  own, and trades on such headlines test the agent, not the research.
+  so the agent had nothing to trade in the hackathon window. 0.25 admits
+  company-specific bad news: over those 13 days, nine headlines naming Apple,
+  Tesla or Nvidia scored 0.25-0.42 (Apple's recall and cellular defect,
+  Tesla's falling sales and credit line, Nvidia's chip-smuggling cases). The
+  0.20 band below is mostly keyword-only matches, which never trade. That is a
+  deliberate step away from the calibration: the floor no longer separates
+  disruption from noise on its own, and trades on such headlines test the
+  agent, not the research.
 - **Keyword fallback is never traded.** If the LLM fails, the headline is
   left for the next cycle instead of being decided on keywords.
 

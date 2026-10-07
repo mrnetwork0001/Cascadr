@@ -14,16 +14,16 @@ MAX_HOPS = 3
 MIN_SCORE = 0.08
 
 # A headline is acted on only if the LLM scores its shock at or above the
-# agent's shock floor (CASCADR_SHOCK_FLOOR, 0.30). An exposure that clears
+# agent's shock floor (CASCADR_SHOCK_FLOOR, 0.25). An exposure that clears
 # that floor is traded at or above TRADE_THRESHOLD.
 #
 # Calibrated on 2026-10-04 against the verified historical disruptions in
 # research/events.py (research/README.md, "Calibrating the agent"). Over 8
 # LLM calls per event, their real headlines scored 0.45-0.65; the 1,466 live
 # headlines the LLM scored from 2026-09-24 to 10-04 peaked at 0.33. The floor
-# was set to 0.40, between the two; on 2026-10-07 it was lowered to 0.30 so the
-# agent trades within the hackathon window. That admits the top of the live
-# range (0.30-0.33) on purpose. At the lowest recorded shocks the events'
+# was set to 0.40, between the two; on 2026-10-07 it was lowered to 0.25 so the
+# agent trades within the hackathon window. That admits company-specific bad
+# news (0.25-0.33) on purpose. At the lowest recorded shocks the events'
 # documented downstream names score 0.196-0.28 on the sourced graph. The old
 # threshold, 0.32, dated from guessed and higher weights and would have traded
 # none of them; 0.18 trades them all.
