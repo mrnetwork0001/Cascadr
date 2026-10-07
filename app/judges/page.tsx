@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 const SITE = "https://trycascadr.vercel.app";
 /** Set once the walkthrough video is published. */
-const DEMO_VIDEO_URL = "";
+const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=6W74-qPAj7c";
 
 const API_LINKS: [string, string][] = [
   ["/api/agent/decisions", "Every decision, refusals included: headline, article link, the LLM's reading, its trade call and the 0G provider"],
@@ -111,7 +111,7 @@ export default async function JudgesPage() {
               note="Live news, the graph, the agent log (open any decision's “why”) and the positions on Bitget demo."
             />
             {DEMO_VIDEO_URL ? (
-              <LinkCard label="Walkthrough video" href={DEMO_VIDEO_URL} note="Event, decision and execution, recorded on the live system." />
+              <LinkCard label="Walkthrough video" href={DEMO_VIDEO_URL} note="2:50 · the problem, the evidence, and Cascadr working live: event, decision and execution." />
             ) : (
               <Card label="Walkthrough video" accent="dim">
                 <p className="text-[14.5px] leading-[1.6] text-muted-2">Linked here once published.</p>
